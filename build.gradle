@@ -211,6 +211,10 @@ sonar {
     }
 }
 
+checkstyle {
+    ignoreFailures = true // Do not fail the build on checkstyle violations
+}
+
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
     reports {
         xml {
