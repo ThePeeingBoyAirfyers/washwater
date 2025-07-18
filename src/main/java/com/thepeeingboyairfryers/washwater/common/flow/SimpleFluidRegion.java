@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.common.flow;
 
-import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
 import com.thepeeingboyairfryers.washwater.common.util.MultiFluidResult;

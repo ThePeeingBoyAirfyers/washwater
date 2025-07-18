@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.common.flow;
 
-import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.scheduling.FluidTicker;
 import net.minecraft.core.Direction;
 

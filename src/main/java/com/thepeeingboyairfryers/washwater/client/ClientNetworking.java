@@ -1,7 +1,5 @@
 package com.thepeeingboyairfryers.washwater.client;
 
-import net.minecraft.core.Direction;
-
 public class ClientNetworking {
 /*
     public static void register() {
