@@ -10,7 +10,10 @@ import net.minecraft.world.level.material.FluidState;
 
 public class WashFluidRendererFactory implements FluidRendererFactory {
     @Override
-    public FluidRenderer createPlatformFluidRenderer(ColorProviderRegistry colorProviderRegistry, LightPipelineProvider lightPipelineProvider) {
+    public FluidRenderer createPlatformFluidRenderer(
+            ColorProviderRegistry colorProviderRegistry,
+            LightPipelineProvider lightPipelineProvider
+    ) {
         return null;
     }
 
