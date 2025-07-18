@@ -85,6 +85,8 @@
         <property name="message" value="Line has trailing spaces."/>
     </module>
 
+
+
     <!-- Checks for Headers                                -->
     <!-- See https://checkstyle.org/checks/header/index.html   -->
     <!-- <module name="Header"> -->
@@ -99,7 +101,6 @@
         <module name="InvalidJavadocPosition"/>
         <module name="JavadocMethod"/>
         <module name="JavadocType"/>
-        <module name="JavadocVariable"/>
         <module name="JavadocStyle"/>
 
         <!-- Checks for Naming Conventions.                  -->
@@ -108,7 +109,15 @@
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
         <module name="MemberName"/>
-        <module name="MethodName"/>
+        <module name="MethodName">
+            <property name="id" value="MethodNameRegular"/>
+            <property name="format" value="^[a-z](_?[a-zA-Z0-9]+)*$"/>
+        </module>
+        <module name="MethodName">
+            <property name="id" value="MethodNameDuckInterface"/>
+            <property name="format" value="^ww€[a-z](_?[a-zA-Z0-9]+)*$"/>
+        </module>
+
         <module name="PackageName"/>
         <module name="ParameterName"/>
         <module name="StaticVariableName"/>
@@ -159,7 +168,6 @@
         <module name="HiddenField"/>
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
-        <module name="MagicNumber"/>
         <module name="MissingSwitchDefault"/>
         <module name="MultipleVariableDeclarations"/>
         <module name="SimplifyBooleanExpression"/>
@@ -183,6 +191,17 @@
             <property name="optional" value="true"/>
         </module>
 
+    </module>
+
+    <module name="SuppressionSingleFilter">
+        <metadata name="net.sf.eclipsecs.core.comment" value="Suppress MethodNameRegular check on ducks"/>
+        <property name="files" value="[/\\](duck|mixin)[/\\]"/>
+        <property name="id" value="MethodNameRegular"/>
+    </module>
+    <module name="SuppressionSingleFilter">
+        <metadata name="net.sf.eclipsecs.core.comment" value="Suppress MethodNameDuckInterface check except on ducks"/>
+        <property name="files" value="[/\\](?!duck[/\\])"/>
+        <property name="id" value="MethodNameDuckInterface"/>
     </module>
 
 </module>

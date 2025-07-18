@@ -16,14 +16,14 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinBucketItem {
 
     @Redirect(
-            method = "emptyContents",
+            method = "emptyContents(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/BlockHitResult;Lnet/minecraft/world/item/ItemStack;)Z",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"
 
             )
     )
-    private boolean bucketPlace(Level level, BlockPos pos, BlockState state, int flags) {
+    private boolean ww€setBlock(Level level, BlockPos pos, BlockState state, int flags) {
         if (!level.isClientSide && pos.getY() != WaterInfo.minY) {
             FluidManager.addVolume((ServerLevel) level, pos, WaterInfo.volumePerBlock);
             return true;

@@ -19,8 +19,14 @@ public class WashWaterClient {
         // The config screen is accessed by going to the Mods screen > clicking on your mod > clicking on config.
         // Do not forget to add translations for your config options to the en_us.json file.
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        init();
     }
 
+    public void init() {
+        WashWater.LOGGER.info("HELLO FROM CLIENT INITIALIZATION");
+    }
+
+    // This method is called during the client setup phase.
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
         // Some client setup code

@@ -10,6 +10,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 public class FluidManager {
+    private FluidManager() {
+        throw new IllegalStateException();
+    }
 
     public static int tickSpeed(ServerLevel level) {
         return 2;
