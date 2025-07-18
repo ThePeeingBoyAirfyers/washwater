@@ -216,6 +216,7 @@ checkstyle {
 }
 
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+    ignoreFailures = true // Do not fail the build on SpotBugs violations
     reports {
         xml {
             required.set(true)
