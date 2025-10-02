@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.mixin.common;
 
-import com.thepeeingboyairfryers.washwater.common.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.BucketItem;
@@ -25,7 +25,7 @@ public abstract class MixinBucketItem {
     )
     private boolean ww€setBlock(Level level, BlockPos pos, BlockState state, int flags) {
         if (!level.isClientSide && pos.getY() != WaterInfo.minY) {
-            FluidManager.addVolume((ServerLevel) level, pos, WaterInfo.volumePerBlock);
+            FluidUtil.addVolume((ServerLevel) level, pos, WaterInfo.WATER_TYPE, WaterInfo.volumePerBlock);
             return true;
         } else {
             return false;

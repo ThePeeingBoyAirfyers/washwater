@@ -1,8 +1,9 @@
 package com.thepeeingboyairfryers.washwater.common.flow;
 
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
+import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
-import com.thepeeingboyairfryers.washwater.common.util.MultiFluidResult;
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongConsumer;
@@ -28,7 +29,7 @@ public class SimpleFluidRegion implements FluidRegion {
     }
 
     @Override
-    public MultiFluidResult getFluids(int x, int y, int z) {
+    public MultiFluidValue getFluids(int x, int y, int z) {
         return null;
     }
 
@@ -43,8 +44,8 @@ public class SimpleFluidRegion implements FluidRegion {
     }
 
     @Override
-    public void setVolume(int x, int y, int z, FluidType type, int volume) {
-        getSection(x, y, z).setVolume(x & 15, y & 15, z & 15, type, (short) volume);
+    public void setVolume(int x, int y, int z, MultiFluidValue value) {
+        getSection(x, y, z).setVolume(x & 15, y & 15, z & 15, value);
 
         onUpdate.accept(BlockPos.asLong(x, y, z));
         for (Direction direction : Direction.values()) {
@@ -55,9 +56,6 @@ public class SimpleFluidRegion implements FluidRegion {
     }
 
     private FluidSection getSection(int x, int y, int z) {
-        return sections.computeIfAbsent(
-                SectionPos.asLong(x >> 4, y >> 4, z >> 4),
-                k -> level.getChunk(x >> 4, z >> 4).getData(WWAttachments.FLUID_CHUNK.get()).getSectionWithY(y)
-        );
+        return FluidSectionManager.getIfAbsent(level, sections, x >> 4, y >> 4, z >> 4);
     }
 }

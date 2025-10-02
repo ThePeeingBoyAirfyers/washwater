@@ -1,6 +1,8 @@
 package com.thepeeingboyairfryers.washwater.common.blockentity;
 
-import com.thepeeingboyairfryers.washwater.common.FluidManager;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -24,12 +26,9 @@ public class FathomlessFluidChasmBlockEntity extends BlockEntity {
     }
 
     public static void performChasmAction(Level level, BlockPos pos) {
-        if (FluidManager.getVolume(level, pos.below()) > 0) {
-            FluidManager.setVolume((ServerLevel) level, pos.below(), 0);
-        }
-        for (Direction dir : Direction.Plane.HORIZONTAL) {
-            if (FluidManager.getVolume(level, pos.relative(dir)) > 0) {
-                FluidManager.setVolume((ServerLevel) level, pos.relative(dir), 0);
+        for (Direction dir : Direction.values()) {
+            if (FluidUtil.getVolume(level, pos.relative(dir), FluidUtil.WATER_TYPE) > 0) {
+                FluidUtil.setVolume((ServerLevel) level, pos.relative(dir), MultiFluidValue.EMPTY);
             }
         }
 

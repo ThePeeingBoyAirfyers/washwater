@@ -67,10 +67,6 @@
     <!-- Checks for Size Violations.                    -->
     <!-- See https://checkstyle.org/checks/sizes/index.html -->
     <module name="FileLength"/>
-    <module name="LineLength">
-        <property name="fileExtensions" value="java"/>
-        <property name="max" value="120"/>
-    </module>
 
     <!-- Checks for whitespace                               -->
     <!-- See https://checkstyle.org/checks/whitespace/index.html -->
@@ -99,7 +95,6 @@
         <!-- Checks for Javadoc comments.                     -->
         <!-- See https://checkstyle.org/checks/javadoc/index.html -->
         <module name="InvalidJavadocPosition"/>
-        <module name="JavadocMethod"/>
         <module name="JavadocType"/>
         <module name="JavadocStyle"/>
 
@@ -108,10 +103,17 @@
         <module name="ConstantName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
-        <module name="MemberName"/>
+        <module name="MemberName">
+            <property name="id" value="MethodNameRegular"/>
+            <property name="format" value="^[a-z](_?[a-zA-Z0-9]+)*$"/>
+        </module>
         <module name="MethodName">
             <property name="id" value="MethodNameRegular"/>
             <property name="format" value="^[a-z](_?[a-zA-Z0-9]+)*$"/>
+        </module>
+        <module name="MemberName">
+            <property name="id" value="MethodNameDuckInterface"/>
+            <property name="format" value="^ww€[a-z](_?[a-zA-Z0-9]+)*$"/>
         </module>
         <module name="MethodName">
             <property name="id" value="MethodNameDuckInterface"/>

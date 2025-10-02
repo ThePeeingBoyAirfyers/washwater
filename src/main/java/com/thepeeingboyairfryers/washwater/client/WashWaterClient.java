@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.client;
 
+import com.thepeeingboyairfryers.washwater.client.debug.DebugFluidRenderer;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -19,10 +20,12 @@ public class WashWaterClient {
         // The config screen is accessed by going to the Mods screen > clicking on your mod > clicking on config.
         // Do not forget to add translations for your config options to the en_us.json file.
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        DebugFluidRenderer.register(container.getEventBus());
         init();
     }
 
     public void init() {
+
         WashWater.LOGGER.info("HELLO FROM CLIENT INITIALIZATION");
     }
 

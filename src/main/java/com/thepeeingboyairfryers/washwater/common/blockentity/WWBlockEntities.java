@@ -25,4 +25,8 @@ public class WWBlockEntities {
                     WWBlocks.FATHOMLESS_FLUID_CHASM.get()
             ).build(null)
     );
+
+    public static void register(net.neoforged.bus.api.IEventBus bus) {
+        BLOCK_ENTITY_TYPE.register(bus);
+    }
 }

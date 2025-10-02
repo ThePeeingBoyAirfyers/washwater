@@ -1,7 +1,9 @@
 package com.thepeeingboyairfryers.washwater.common.item;
 
-import com.thepeeingboyairfryers.washwater.common.FluidManager;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -43,7 +45,7 @@ public class FluidPipetteItem extends Item {
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
             BlockPos blockPos2 = blockPos.relative(direction);
-            FluidManager.addVolume((ServerLevel) level, blockPos2, 1);
+            FluidUtil.addVolume((ServerLevel) level, blockPos2, FluidUtil.WATER_TYPE, 1);
         }
         return true;
     }
@@ -54,9 +56,9 @@ public class FluidPipetteItem extends Item {
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
             BlockPos blockPos2 = blockPos.relative(direction);
-            int oldVolume = FluidManager.getVolume(level, blockPos2);
+            int oldVolume = FluidUtil.getVolume(level, blockPos2, WaterInfo.WATER_TYPE);
             int newVolume = (oldVolume < 1) ? oldVolume : oldVolume - 1;
-            FluidManager.setVolume((ServerLevel) level, blockPos2,  newVolume);
+            FluidUtil.setVolume((ServerLevel) level, blockPos2, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
         }
         return true;
     }

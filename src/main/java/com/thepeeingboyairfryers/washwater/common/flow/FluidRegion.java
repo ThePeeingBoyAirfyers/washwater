@@ -2,7 +2,7 @@ package com.thepeeingboyairfryers.washwater.common.flow;
 
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
-import com.thepeeingboyairfryers.washwater.common.util.MultiFluidResult;
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -15,11 +15,11 @@ public interface FluidRegion {
 
     int getFluidVolume(int x, int y, int z, FluidType type);
 
-    default MultiFluidResult getFluids(BlockPos pos) {
+    default MultiFluidValue getFluids(BlockPos pos) {
         return getFluids(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    MultiFluidResult getFluids(int x, int y, int z);
+    MultiFluidValue getFluids(int x, int y, int z);
 
     default boolean isAir(BlockPos pos) {
         return isAir(pos.getX(), pos.getY(), pos.getZ());
@@ -38,16 +38,10 @@ public interface FluidRegion {
     }
     boolean isSolid(int x, int y, int z);
 
-    default void setVolume(BlockPos pos, FluidType type, int volume) {
-        if (volume > WaterInfo.volumePerBlock) {
-            setVolume(pos, type, WaterInfo.volumePerBlock);
-            WashWater.LOGGER.warn("Tried to set water volume higher than max");
-            return;
-        }
-
-        setVolume(pos.getX(), pos.getY(), pos.getZ(), type, volume);
+    default void setVolume(BlockPos pos, MultiFluidValue fluids) {
+        setVolume(pos.getX(), pos.getY(), pos.getZ(), fluids);
     }
 
-    void setVolume(int x, int y, int z, FluidType type, int volume);
+    void setVolume(int x, int y, int z, MultiFluidValue fluids);
 
 }

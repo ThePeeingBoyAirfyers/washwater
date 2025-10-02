@@ -1,17 +1,30 @@
 package com.thepeeingboyairfryers.washwater.common.storage;
 
-import com.thepeeingboyairfryers.washwater.common.util.MultiFluidResult;
-import com.thepeeingboyairfryers.washwater.duck.FluidSectionContainer;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.thepeeingboyairfryers.washwater.common.WashWater;
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.registries.RegistryBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+
+
 public interface FluidSection {
+    ResourceKey<Registry<MapCodec<? extends FluidSection>>> DISPATCH_KEY = ResourceKey.createRegistryKey(WashWater.resource("fluid_section"));
+    Registry<MapCodec<? extends FluidSection>> DISPATCH_REGISTRY = new RegistryBuilder<>(DISPATCH_KEY).create();
+    Codec<FluidSection> CODEC = DISPATCH_REGISTRY.byNameCodec().dispatch(FluidSection::codec, Function.identity());
 
 
-    void setVolume(int x, int y, int z, FluidType type, short volume);
+    void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids);
     short getVolumeOf(int x, int y, int z, FluidType type);
 
-    @NotNull MultiFluidResult getVolume(int x, int y, int z);
+    @NotNull MultiFluidValue getVolume(int x, int y, int z);
+    short getAllVolume(int x, int y, int z);
 
     boolean isEmpty();
 
@@ -23,13 +36,17 @@ public interface FluidSection {
      */
     void setContainer(FluidSectionContainer container);
 
+    MapCodec<? extends FluidSection> codec();
+
     /**
      * An empty FluidSection that does nothing.
      * This is used to avoid null checks in the code.
      */
     FluidSection EMPTY = new FluidSection() {
+
+
         @Override
-        public void setVolume(int x, int y, int z, FluidType type, short volume) {
+        public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
             // No operation, as this is an empty section.
         }
 
@@ -39,8 +56,13 @@ public interface FluidSection {
         }
 
         @Override
-        public @NotNull MultiFluidResult getVolume(int x, int y, int z) {
-            return MultiFluidResult.EMPTY;
+        public @NotNull MultiFluidValue getVolume(int x, int y, int z) {
+            return MultiFluidValue.EMPTY;
+        }
+
+        @Override
+        public short getAllVolume(int x, int y, int z) {
+            return 0;
         }
 
         @Override
@@ -50,7 +72,44 @@ public interface FluidSection {
 
         @Override
         public void setContainer(FluidSectionContainer container) {
-            // No operation, as this is an empty section.
+            container.update(new SelfReplacingEmptySection());
+        }
+
+        @Override
+        public MapCodec<FluidSection> codec() {
+            return EMPTY_CODEC;
+        }
+
+        @Override
+        public String toString() {
+            return "FluidSection.EMPTY";
         }
     };
+
+    // Has to be after EMPTY has been defined, dear god help this soul
+    MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
+
+    static short localPos2Short(BlockPos pos) {
+        return localPos2Short(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    static short localPos2Short(int x, int y, int z) {
+        return (short) ((x & 15) | ((y & 15) << 4) | ((z & 15) << 8));
+    }
+
+    static BlockPos short2localPos(short v) {
+        return new BlockPos(short2localX(v), short2localY(v), short2localZ(v));
+    }
+
+    static int short2localX(short v) {
+        return v & 15;
+    }
+
+    static int short2localY(short v) {
+        return  (v >> 4) & 15;
+    }
+
+    static int short2localZ(short v) {
+        return (v >> 8) & 15;
+    }
 }

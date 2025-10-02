@@ -1,12 +1,15 @@
 package com.thepeeingboyairfryers.washwater.common.blockentity;
 
-import com.thepeeingboyairfryers.washwater.common.FluidManager;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
 public class CosmicMonoxideSpoutBlockEntity extends BlockEntity {
 
@@ -25,14 +28,13 @@ public class CosmicMonoxideSpoutBlockEntity extends BlockEntity {
     }
 
     public static void performSpoutAction(Level level, BlockPos pos) {
-        int vol0 = FluidManager.getVolume(level, pos.below());
+        int vol0 = FluidUtil.getVolume(level, pos.below(), FluidUtil.WATER_TYPE);
         if (vol0 >= 0 && vol0 < 1000) {
-            FluidManager.setVolume((ServerLevel) level, pos.below(), 1000);
+            FluidUtil.setVolume((ServerLevel) level, pos.below(), MultiFluidValue.single(FluidUtil.WATER_TYPE, (short) 1000));
         }
         for (Direction dir : Direction.Plane.HORIZONTAL) {
-            int vol1 = FluidManager.getVolume(level, pos.relative(dir));
-            if (vol1 >= 0 && vol1 < 1000) {
-                FluidManager.setVolume((ServerLevel) level, pos.relative(dir), 1000);
+            if (FluidUtil.isFilledUp(level, pos.relative(dir))) {
+                FluidUtil.setVolume((ServerLevel) level, pos.relative(dir), MultiFluidValue.single(FluidUtil.WATER_TYPE, (short) 1000));
             }
         }
 

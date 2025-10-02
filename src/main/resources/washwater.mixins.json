@@ -6,7 +6,12 @@
     "common.ChunkMapAccessor",
     "common.MixinBucketItem",
     "common.MixinLevel",
+    "common.MixinLevelChunkSection",
     "common.MixinServerLevel"
+  ],
+  "client": [
+    "client.MixinFluidRendererFactory",
+    "client.MixinLevelSlice"
   ],
   "injectors": {
     "defaultRequire": 1
