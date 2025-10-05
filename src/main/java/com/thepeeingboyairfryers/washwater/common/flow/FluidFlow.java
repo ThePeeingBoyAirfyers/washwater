@@ -24,13 +24,13 @@ public class FluidFlow {
 
             //Flow down
             var underVolume = region.getFluidVolume(pos.getX(), pos.getY() - 1, pos.getZ(), WaterInfo.WATER_TYPE);
-            if (pos.getY() - 1 == WaterInfo.minY && underVolume == 0) {
+            if (pos.getY() - 1 == WaterInfo.MIN_Y && underVolume == 0) {
                 //Delete water
                 region.setVolume(pos, water(0));
             }
             else {
-                if (underVolume >= 0 && underVolume < WaterInfo.volumePerBlock) {
-                    var transaction = Math.min(volume, WaterInfo.volumePerBlock - underVolume);
+                if (underVolume >= 0 && underVolume < WaterInfo.VOLUME_PER_BLOCK) {
+                    var transaction = Math.min(volume, WaterInfo.VOLUME_PER_BLOCK - underVolume);
                     region.setVolume(pos, water(volume - transaction));
                     region.setVolume(pos.getX(), pos.getY() - 1, pos.getZ(), water(underVolume + transaction));
 
@@ -54,7 +54,7 @@ public class FluidFlow {
     }
 
     public static void equalizeWater(FluidRegion region, BlockPos owner, int volume) {
-        if (volume < WaterInfo.surfaceTensionLimit) return;
+        if (volume < WaterInfo.SURFACE_TENSION_LIMIT) return;
         int newVolume = volume;
 
         for (Direction direction : PseudoRandom.getRandomDirectionArray()) {
@@ -65,7 +65,7 @@ public class FluidFlow {
 
             if (otherVolume < 0) continue;
 
-            int transfer = (newVolume - otherVolume) / WaterInfo.flowDivider;
+            int transfer = (newVolume - otherVolume) / WaterInfo.FLOW_DIVIDER;
             if (transfer > 2 || transfer < -2) {
                 newVolume -= transfer;
                 region.setVolume(x, y, z, water(otherVolume + transfer));
@@ -76,7 +76,7 @@ public class FluidFlow {
     }
 
     public static void equalizeWaterDownwards(FluidRegion region, BlockPos owner, int volume) {
-        if (volume < WaterInfo.surfaceTensionLimit) return;
+        if (volume < WaterInfo.SURFACE_TENSION_LIMIT) return;
         int newVolume = volume;
 
         for (Direction direction : PseudoRandom.getRandomDirectionArray()) {
@@ -87,7 +87,7 @@ public class FluidFlow {
 
             if (otherVolume < 0) continue;
 
-            int transfer = Math.min(newVolume, WaterInfo.volumePerBlock - otherVolume);
+            int transfer = Math.min(newVolume, WaterInfo.VOLUME_PER_BLOCK - otherVolume);
             if (transfer > 2 || transfer < -2) {
                 newVolume -= transfer;
                 region.setVolume(x, y, z, water(otherVolume + transfer));

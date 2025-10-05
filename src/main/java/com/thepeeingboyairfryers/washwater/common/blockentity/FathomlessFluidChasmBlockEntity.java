@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.common.blockentity;
 
-import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;

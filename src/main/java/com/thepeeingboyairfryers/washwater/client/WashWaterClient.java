@@ -25,7 +25,6 @@ public class WashWaterClient {
     }
 
     public void init() {
-
         WashWater.LOGGER.info("HELLO FROM CLIENT INITIALIZATION");
     }
 

@@ -4,7 +4,6 @@ import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.scheduling.FluidTicker;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
-import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
 import com.thepeeingboyairfryers.washwater.common.util.DirectionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

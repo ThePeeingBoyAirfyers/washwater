@@ -24,8 +24,8 @@ public abstract class MixinBucketItem {
             )
     )
     private boolean ww€setBlock(Level level, BlockPos pos, BlockState state, int flags) {
-        if (!level.isClientSide && pos.getY() != WaterInfo.minY) {
-            FluidUtil.addVolume((ServerLevel) level, pos, WaterInfo.WATER_TYPE, WaterInfo.volumePerBlock);
+        if (!level.isClientSide && pos.getY() != WaterInfo.MIN_Y) {
+            FluidUtil.addVolume((ServerLevel) level, pos, WaterInfo.WATER_TYPE, WaterInfo.VOLUME_PER_BLOCK);
             return true;
         } else {
             return false;

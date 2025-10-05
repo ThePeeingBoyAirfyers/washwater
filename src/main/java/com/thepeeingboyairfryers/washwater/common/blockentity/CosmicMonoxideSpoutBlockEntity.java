@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.common.blockentity;
 
-import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
@@ -9,7 +8,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 public class CosmicMonoxideSpoutBlockEntity extends BlockEntity {
 

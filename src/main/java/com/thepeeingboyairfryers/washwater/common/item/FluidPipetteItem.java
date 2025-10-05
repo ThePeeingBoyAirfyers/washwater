@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.common.item;
 
-import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
@@ -40,7 +39,7 @@ public class FluidPipetteItem extends Item {
     }
 
     public static boolean creativePipettePlace(Level level, BlockPos pos, ItemStack itemStack, Player player) {
-        if (!level.isClientSide && pos.getY() != WaterInfo.minY) {
+        if (!level.isClientSide && pos.getY() != WaterInfo.MIN_Y) {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();

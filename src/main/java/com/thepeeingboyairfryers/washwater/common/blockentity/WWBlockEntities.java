@@ -8,9 +8,13 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class WWBlockEntities {
+    private WWBlockEntities() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPE = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, WashWater.MOD_ID);
 
-    public static DeferredHolder<BlockEntityType<?>, BlockEntityType<CosmicMonoxideSpoutBlockEntity>> COSMIC_MONOXIDE_SPOUT = BLOCK_ENTITY_TYPE.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CosmicMonoxideSpoutBlockEntity>> COSMIC_MONOXIDE_SPOUT = BLOCK_ENTITY_TYPE.register(
             "cosmic_monoxide_spout",
             () -> BlockEntityType.Builder.of(
                 CosmicMonoxideSpoutBlockEntity::new,
@@ -18,7 +22,7 @@ public class WWBlockEntities {
             ).build(null)
     );
 
-    public static DeferredHolder<BlockEntityType<?>, BlockEntityType<FathomlessFluidChasmBlockEntity>> FATHOMLESS_FLUID_CHASM = BLOCK_ENTITY_TYPE.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FathomlessFluidChasmBlockEntity>> FATHOMLESS_FLUID_CHASM = BLOCK_ENTITY_TYPE.register(
             "fathomless_fluid_chasm",
             () -> BlockEntityType.Builder.of(
                     FathomlessFluidChasmBlockEntity::new,

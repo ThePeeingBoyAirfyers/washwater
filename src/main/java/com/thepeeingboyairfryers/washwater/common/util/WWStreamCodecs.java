@@ -3,7 +3,6 @@ package com.thepeeingboyairfryers.washwater.common.util;
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.SectionPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 

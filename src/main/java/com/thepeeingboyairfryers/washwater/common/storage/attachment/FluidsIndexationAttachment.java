@@ -5,11 +5,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.ints.Int2ShortAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ShortMap;
-import it.unimi.dsi.fastutil.objects.Object2ShortAVLTreeMap;
-import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.shorts.*;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 

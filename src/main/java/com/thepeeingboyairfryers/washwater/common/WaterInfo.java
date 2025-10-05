@@ -7,13 +7,17 @@ import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
 
 public class WaterInfo {
+    private WaterInfo() {
+        throw new IllegalStateException();
+    }
+
     public static final FluidType WATER_TYPE = NeoForgeMod.WATER_TYPE.value();
-    public static short volumePerBlock = 1000;
-    public static short volumePerLevel = (short) ((volumePerBlock / 8) + 1);
-    public static short cutOffValue = (short) (volumePerLevel * 7);
-    public static short surfaceTensionLimit = 20;
-    public static int flowDivider = 8;
-    public static int minY = -64;
+    public static final short VOLUME_PER_BLOCK = 1000;
+    public static final short VOLUME_PER_LEVEL = (short) ((VOLUME_PER_BLOCK / 8) + 1);
+    public static final short CUT_OFF_VALUE = (short) (VOLUME_PER_LEVEL * 7);
+    public static final short SURFACE_TENSION_LIMIT = 20;
+    public static final int FLOW_DIVIDER = 8;
+    public static final int MIN_Y = -64;
     public static short getWaterVolumeOfState(BlockState state) {
         FluidState fluidstate = state.getFluidState();
         if (fluidstate.isEmpty()) {
@@ -21,7 +25,7 @@ public class WaterInfo {
                 return 0;
             else
                 return -1;
-        } else return (short) (fluidstate.getAmount() * volumePerLevel);
+        } else return (short) (fluidstate.getAmount() * VOLUME_PER_LEVEL);
     }
 
     public static FluidState getWaterState(int value) {
@@ -31,6 +35,6 @@ public class WaterInfo {
 
     public static float getHeight(int volume) {
         if (volume < 0) return 0;
-        return ((float) volume) / volumePerBlock;
+        return ((float) volume) / VOLUME_PER_BLOCK;
     }
 }

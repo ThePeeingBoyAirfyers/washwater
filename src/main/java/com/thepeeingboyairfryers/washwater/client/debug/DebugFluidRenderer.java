@@ -7,7 +7,6 @@ import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.debug.DebugRenderer;
-import net.minecraft.core.BlockPos;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;

@@ -1,7 +1,5 @@
 package com.thepeeingboyairfryers.washwater.common.flow;
 
-import com.thepeeingboyairfryers.washwater.common.WashWater;
-import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
 import net.neoforged.neoforge.common.NeoForgeMod;

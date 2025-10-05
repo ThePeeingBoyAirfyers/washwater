@@ -4,9 +4,9 @@ public class SwapPair<T> {
     private T one;
     private T two;
 
-    public SwapPair(T one, T two) {
-        this.one = one;
-        this.two = two;
+    public SwapPair(T iOne, T iTwo) {
+        this.one = iOne;
+        this.two = iTwo;
     }
 
     public T getCurrent() {

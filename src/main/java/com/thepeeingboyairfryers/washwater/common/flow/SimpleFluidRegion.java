@@ -1,15 +1,13 @@
 package com.thepeeingboyairfryers.washwater.common.flow;
 
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
-import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
-import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.fluids.FluidType;
 
