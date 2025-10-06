@@ -21,7 +21,7 @@ public class DebugFluidRenderer {
     }
 
     private static void render(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SOLID_BLOCKS) return;
 
         PoseStack poseStack = event.getPoseStack();
         MultiBufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();

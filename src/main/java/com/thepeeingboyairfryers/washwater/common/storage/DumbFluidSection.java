@@ -6,11 +6,17 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.packets.DumbFluidSectionUpdatePacket;
-import it.unimi.dsi.fastutil.shorts.*;
+import it.unimi.dsi.fastutil.shorts.AbstractShort2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectAVLTreeMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.ShortArrayList;
+import it.unimi.dsi.fastutil.shorts.ShortList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,19 +77,21 @@ public class DumbFluidSection implements FluidSection {
     }
 
     @Override
-    public void setContainer(FluidSectionContainer container) {
+    public void setContainer(@NotNull FluidSectionContainer container) {
         // No operation, as this is a dumb section.
+    }
+
+    @Override
+    public @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
+        if (dirty.isEmpty() && !all) return null;
+        var updates = (all ? map.keySet() : dirty).stream().map(s -> Pair.of(s, map.get(s))).toList();
+        if (!all) dirty.clear();
+        return new DumbFluidSectionUpdatePacket(pos, updates);
     }
 
     @Override
     public MapCodec<DumbFluidSection> codec() {
         return CODEC;
-    }
-
-    public DumbFluidSectionUpdatePacket buildUpdate(SectionPos pos, boolean all) {
-        var updates = (all ? map.keySet() : dirty).stream().map(s -> Pair.of(s, map.get(s))).toList();
-        if (!all) dirty.clear();
-        return new DumbFluidSectionUpdatePacket(pos, updates);
     }
 
     public Stream<BlockPos> allKeys() {

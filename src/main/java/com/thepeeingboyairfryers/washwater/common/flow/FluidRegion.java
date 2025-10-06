@@ -4,6 +4,7 @@ import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
+import org.jetbrains.annotations.NotNull;
 
 public interface FluidRegion {
 
@@ -13,11 +14,11 @@ public interface FluidRegion {
 
     int getFluidVolume(int x, int y, int z, FluidType type);
 
-    default MultiFluidValue getFluids(BlockPos pos) {
+    default @NotNull MultiFluidValue getFluids(BlockPos pos) {
         return getFluids(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    MultiFluidValue getFluids(int x, int y, int z);
+    @NotNull MultiFluidValue getFluids(int x, int y, int z);
 
     default boolean isAir(BlockPos pos) {
         return isAir(pos.getX(), pos.getY(), pos.getZ());

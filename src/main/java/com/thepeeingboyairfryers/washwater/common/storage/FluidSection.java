@@ -6,10 +6,13 @@ import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -34,7 +37,16 @@ public interface FluidSection {
      *
      * @param container The container that this FluidSection belongs to.
      */
-    void setContainer(FluidSectionContainer container);
+    void setContainer(@NotNull FluidSectionContainer container);
+
+    /**
+     * Returns a packet that contains the dirty data of this FluidSection.
+     * @param pos The position of the section in the world.
+     * @param fullUpdate If true, the packet should contain all data, not just the dirty data.
+     *                   This is used when the chunk is sent to the client for the first time.
+     * @return A packet that contains the dirty data of this FluidSection, or null if there is no dirty data.
+     */
+    @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean fullUpdate);
 
     MapCodec<? extends FluidSection> codec();
 
@@ -71,8 +83,13 @@ public interface FluidSection {
         }
 
         @Override
-        public void setContainer(FluidSectionContainer container) {
+        public void setContainer(@NotNull FluidSectionContainer container) {
             container.update(new SelfReplacingEmptySection());
+        }
+
+        @Override
+        public @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
+            return null;
         }
 
         @Override

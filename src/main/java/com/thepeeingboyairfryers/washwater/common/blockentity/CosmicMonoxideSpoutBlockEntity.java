@@ -16,12 +16,8 @@ public class CosmicMonoxideSpoutBlockEntity extends BlockEntity {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, CosmicMonoxideSpoutBlockEntity entity) {
-        //DO TICK STUFF
         if (!level.isClientSide) {
             performSpoutAction(level, pos);
-/*            if (FluidTicker.shouldTick((ServerLevel) level)) {
-                performSpoutAction(level, pos);
-            }*/
         }
     }
 
@@ -31,7 +27,7 @@ public class CosmicMonoxideSpoutBlockEntity extends BlockEntity {
             FluidUtil.setVolume((ServerLevel) level, pos.below(), MultiFluidValue.single(FluidUtil.WATER_TYPE, (short) 1000));
         }
         for (Direction dir : Direction.Plane.HORIZONTAL) {
-            if (FluidUtil.isFilledUp(level, pos.relative(dir))) {
+            if (!FluidUtil.isFilledUp(level, pos.relative(dir))) {
                 FluidUtil.setVolume((ServerLevel) level, pos.relative(dir), MultiFluidValue.single(FluidUtil.WATER_TYPE, (short) 1000));
             }
         }

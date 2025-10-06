@@ -6,6 +6,10 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class WWBlocks {
+    private WWBlocks() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(WashWater.MOD_ID);
 
     public static final DeferredBlock<CosmicMonoxideSpoutBlock> COSMIC_MONOXIDE_SPOUT = BLOCKS.registerBlock("cosmic_monoxide_spout", CosmicMonoxideSpoutBlock::new);

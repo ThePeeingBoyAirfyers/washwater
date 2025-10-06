@@ -5,10 +5,15 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.ints.Int2ShortAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ShortMap;
-import it.unimi.dsi.fastutil.shorts.*;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectAVLTreeMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ShortAVLTreeMap;
+import it.unimi.dsi.fastutil.shorts.Short2ShortFunction;
+import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import net.minecraft.core.Holder;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,15 +49,15 @@ public class FluidsIndexationAttachment {
         return fixedIds;
     }
 
-    public short getId(FluidType fluidType) {
+    public short getId(@NotNull FluidType fluidType) {
         int id = NeoForgeRegistries.FLUID_TYPES.getId(fluidType);
+        if (!fluid2id.containsKey(id)) throw new IllegalArgumentException("No id for fluid " + fluidType);
 
-        assert fluid2id.containsKey(id);
         return fluid2id.get(id);
     }
 
-    public FluidType getFluid(short id) {
-        assert id2fluid.containsKey(id);
+    public @NotNull FluidType getFluid(short id) {
+        if (!id2fluid.containsKey(id)) throw new IllegalArgumentException("No fluid with id " + id);
 
         return id2fluid.get(id);
     }

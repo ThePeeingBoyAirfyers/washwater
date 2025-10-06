@@ -2,9 +2,13 @@ package com.thepeeingboyairfryers.washwater.common.storage;
 
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import net.minecraft.core.SectionPos;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("SynchronizeOnNonFinalField")
 public class SelfReplacingEmptySection implements FluidSection {
     private FluidSectionContainer container;
     private FluidSection otherSection = null;
@@ -54,11 +58,19 @@ public class SelfReplacingEmptySection implements FluidSection {
     }
 
     @Override
-    public void setContainer(FluidSectionContainer iContainer) {
+    public void setContainer(@NotNull FluidSectionContainer iContainer) {
         if (otherSection == null)
             container = iContainer;
         else synchronized (otherSection) {
             otherSection.setContainer(iContainer);
+        }
+    }
+
+    @Override
+    public @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
+        if (otherSection == null) return null;
+        synchronized (otherSection) {
+            return otherSection.updatePacket(pos, all);
         }
     }
 

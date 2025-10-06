@@ -2,6 +2,7 @@ package com.thepeeingboyairfryers.washwater.common.storage.attachment;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.duck.IChunkFluidSection;
@@ -69,7 +70,21 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
     }
 
     public void addFluidVolume(int x, int y, int z, FluidType type, short volume) {
-        //todo
+        FluidSection section = sections.get(chunk.getSectionIndex(y));
+        synchronized (section) {
+            var values = section.getVolume(x & 15, y & 15, z & 15);
+            short total = 0;
+            for (MultiFluidValue.Entry e : values) {
+                total += e.volume();
+            }
+            if (total >= FluidUtil.VOLUME_OF_BLOCK) return;
+            volume = (short) Math.min(volume, FluidUtil.VOLUME_OF_BLOCK - total);
+
+            section.setVolume(
+                    x & 15, y & 15, z & 15,
+                    values.setFluid(type, (short) (volume + values.forFluid(type)))
+            );
+        }
     }
 
     public FluidSection getSectionWithY(int y) {

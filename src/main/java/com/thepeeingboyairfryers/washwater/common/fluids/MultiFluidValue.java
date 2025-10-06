@@ -24,13 +24,19 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
         }
 
         @Override
-        public short forFluid(FluidType type) {
+        public short forFluid(@NotNull FluidType type) {
             return 0;
         }
 
         @Override
         public short getTotalVolume() {
             return 0;
+        }
+
+        @Override
+        public @NotNull MultiFluidValue setFluid(FluidType type, short value) {
+            if (value == 0) return this;
+            return single(type, value);
         }
 
         @Override
@@ -64,7 +70,7 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
     boolean isEmpty();
     int size();
 
-    short forFluid(FluidType type);
+    short forFluid(@NotNull FluidType type);
 
     default short getTotalVolume() {
         short result = 0;
@@ -74,9 +80,11 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
         return result;
     }
 
+    @NotNull MultiFluidValue setFluid(FluidType type, short value);
+
     record Entry(short volume, FluidType fluidType) { }
 
-    static MultiFluidValue single(FluidType fluidType, short volume) {
+    static @NotNull MultiFluidValue single(@NotNull FluidType fluidType, short volume) {
         return new SingleFluidValue(fluidType, volume);
     }
 }

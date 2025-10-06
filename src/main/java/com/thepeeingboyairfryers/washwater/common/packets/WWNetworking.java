@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.common.packets;
 
-import com.thepeeingboyairfryers.washwater.common.storage.DumbFluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import net.minecraft.client.Minecraft;
@@ -29,7 +28,6 @@ public class WWNetworking {
                     var x = FluidSection.short2localX(u.getFirst());
                     var y = FluidSection.short2localY(u.getFirst());
                     var z = FluidSection.short2localZ(u.getFirst());
-                    System.out.println("Recieved update at " + x + ", " + y + ", " + z);
                     synchronized (section) {
                         section.setVolume(x, y, z, u.getSecond());
                     }
@@ -43,11 +41,9 @@ public class WWNetworking {
                 int idx = 0;
                 for (var s : FluidSectionManager.getAttachmentFor(l.getChunk(0, 0))) {
                     synchronized (s) {
-                        if (s instanceof DumbFluidSection ds) {
-                            var p = ds.buildUpdate(SectionPos.of(0, l.getMinSection() + idx++, 0), false);
-                            if (p.updates().isEmpty()) continue;
-                            PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, new ChunkPos(0, 0), p);
-                        }
+                        var update = s.updatePacket(SectionPos.of(0, l.getMinSection() + idx++, 0), false);
+                        if (update == null) continue;
+                        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, new ChunkPos(0, 0), update);
                     }
                 }
             }
@@ -60,11 +56,9 @@ public class WWNetworking {
             int idx = 0;
             for (var s : attachment) {
                 synchronized (s) {
-                    if (s instanceof DumbFluidSection ds) {
-                        var p = ds.buildUpdate(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
-                        if (p.updates().isEmpty()) continue;
-                        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, new ChunkPos(0, 0), p);
-                    }
+                    var update = s.updatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
+                    if (update == null) continue;
+                    PacketDistributor.sendToPlayer(e.getPlayer(), update);
                 }
             }
         });

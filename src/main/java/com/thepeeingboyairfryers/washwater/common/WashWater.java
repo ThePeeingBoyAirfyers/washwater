@@ -6,6 +6,7 @@ import com.thepeeingboyairfryers.washwater.common.blockentity.WWBlockEntities;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.item.WWItems;
 import com.thepeeingboyairfryers.washwater.common.packets.WWNetworking;
+import com.thepeeingboyairfryers.washwater.common.scheduling.FluidTicker;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
 import com.thepeeingboyairfryers.washwater.tests.BucketTest;
@@ -35,9 +36,12 @@ public class WashWater {
         WWItems.register(modEventBus);
         WWBlockEntities.register(modEventBus);
         WWAttachments.register(modEventBus);
+        WWNetworking.register(modEventBus);
+
         FluidManager.register(modEventBus);
         FluidSectionManager.register(modEventBus);
-        WWNetworking.register(modEventBus);
+        FluidTicker.register(modEventBus);
+
         modEventBus.addListener(this::registerTests);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

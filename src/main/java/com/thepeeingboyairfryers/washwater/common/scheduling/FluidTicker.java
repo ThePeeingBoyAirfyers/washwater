@@ -10,7 +10,9 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +25,10 @@ public class FluidTicker {
 
     private FluidTicker() {
         throw new IllegalStateException();
+    }
+
+    public static void register(IEventBus bus) {
+        NeoForge.EVENT_BUS.addListener(FluidTicker::tick);
     }
 
     public static void tickWater(ServerLevel level, BlockPos pos) {
@@ -47,7 +53,9 @@ public class FluidTicker {
         return counter % (FluidManager.lowestTick(level) * 100) == 0;
     }
 
-    public static void tick(ServerLevel level) {
+    public static void tick(LevelTickEvent.Post e) {
+        if (e.getLevel().isClientSide) return;
+        var level = (ServerLevel) e.getLevel();
         currentTick++;
 
         if (shouldTick(level)) {
@@ -68,11 +76,7 @@ public class FluidTicker {
             pair.swap();
             for (long pos : pair.getOther()) {
                 var bPos = BlockPos.of(pos);
-                var chunkPos = ChunkPos.asLong(bPos.getX() >> 4, bPos.getZ() >> 4);
-
-                //if (activeChunks.contains(chunkPos)) {
-                    FluidFlow.tick(region, bPos);
-                //}
+                FluidFlow.tick(region, bPos);
             }
 
             pair.getOther().clear();

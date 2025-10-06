@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class SingleFluidValue implements MultiFluidValue {
     private final Entry entry;
-    SingleFluidValue(FluidType fluidTyp, short vol) {
+    SingleFluidValue(@NotNull FluidType fluidTyp, short vol) {
         this.entry = new Entry(vol, fluidTyp);
     }
 
@@ -23,7 +23,7 @@ public class SingleFluidValue implements MultiFluidValue {
     }
 
     @Override
-    public short forFluid(FluidType type) {
+    public short forFluid(@NotNull FluidType type) {
         if (entry.fluidType().equals(type)) {
             return entry.volume();
         } else return 0;
@@ -41,6 +41,11 @@ public class SingleFluidValue implements MultiFluidValue {
     @Override
     public short getTotalVolume() {
         return entry.volume();
+    }
+
+    @Override
+    public @NotNull MultiFluidValue setFluid(FluidType type, short value) {
+        throw new UnsupportedOperationException(); //TODO
     }
 
     public short getVolume() {

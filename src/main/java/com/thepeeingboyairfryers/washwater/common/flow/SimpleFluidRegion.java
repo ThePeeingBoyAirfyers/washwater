@@ -10,30 +10,31 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.fluids.FluidType;
+import org.jetbrains.annotations.NotNull;
 
 public class SimpleFluidRegion implements FluidRegion {
     private final Long2ObjectMap<FluidSection> sections = new Long2ObjectOpenHashMap<>();
     private final ServerLevel level;
     private final LongConsumer onUpdate;
 
-    public SimpleFluidRegion(ServerLevel level, LongConsumer onUpdate) {
-        this.level = level;
-        this.onUpdate =  onUpdate;
+    public SimpleFluidRegion(ServerLevel iLevel, LongConsumer iOnUpdate) {
+        this.level = iLevel;
+        this.onUpdate =  iOnUpdate;
     }
 
     @Override
     public int getFluidVolume(int x, int y, int z, FluidType type) {
-        return 0;
+        return getSection(x, y, z).getVolumeOf(x & 15, y & 15, z & 15, type);
     }
 
     @Override
-    public MultiFluidValue getFluids(int x, int y, int z) {
-        return null;
+    public @NotNull MultiFluidValue getFluids(int x, int y, int z) {
+        return getSection(x, y, z).getVolume(x & 15, y & 15, z & 15);
     }
 
     @Override
     public boolean isAir(int x, int y, int z) {
-        return false;
+        return getSection(x, y, z).getAllVolume(x & 15, y & 15, z & 15) == 0;
     }
 
     @Override

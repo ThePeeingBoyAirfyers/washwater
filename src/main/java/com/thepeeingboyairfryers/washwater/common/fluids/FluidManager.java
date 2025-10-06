@@ -7,6 +7,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.fluids.FluidType;
+import org.jetbrains.annotations.NotNull;
 
 public class FluidManager {
     private FluidManager() {
@@ -23,11 +24,11 @@ public class FluidManager {
         return (fluidType.getViscosity() / 1000) + 1;
     }
 
-    public static short getFluidId(FluidType fluidType) {
+    public static short getFluidId(@NotNull FluidType fluidType) {
         return fluidsIndexation.getId(fluidType);
     }
 
-    public static FluidType getFluidType(short id) {
+    public static @NotNull FluidType getFluidType(short id) {
         return fluidsIndexation.getFluid(id);
     }
 
