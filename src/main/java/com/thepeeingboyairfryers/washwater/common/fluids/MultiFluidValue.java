@@ -84,6 +84,7 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
     record Entry(short volume, FluidType fluidType) { }
 
     static @NotNull MultiFluidValue single(@NotNull FluidType fluidType, short volume) {
+        if (volume == 0) return EMPTY;
         return new SingleFluidValue(fluidType, volume);
     }
 

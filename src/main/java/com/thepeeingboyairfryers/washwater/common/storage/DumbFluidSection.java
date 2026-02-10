@@ -45,6 +45,13 @@ public class DumbFluidSection implements FluidSection {
     @Override
     public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
         short p = FluidSection.localPos2Short(x, y, z);
+        if (fluids.isEmpty()) {
+            if (map.remove(p) != null) {
+                dirty.add(p);
+            }
+            return;
+        }
+
         map.put(p, fluids);
         dirty.add(p);
     }
