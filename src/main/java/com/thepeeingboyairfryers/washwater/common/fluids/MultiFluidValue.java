@@ -2,13 +2,13 @@ package com.thepeeingboyairfryers.washwater.common.fluids;
 
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.function.IntSupplier;
 import java.util.stream.IntStream;
 
 public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
@@ -45,27 +45,26 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
         }
     };
 
-    Codec<MultiFluidValue> CODEC = Codec.INT_STREAM.xmap(i -> {
-        var a = i.toArray();
-        if (a.length == 0) return EMPTY;
+    Codec<MultiFluidValue> CODEC = Codec.INT_STREAM.xmap(
+            i -> deserialize(i.iterator()::next, (int) i.count()),
+            f -> IntStream.of(serialize(f)));
 
-        if (a.length == 1)
-            return single(FluidManager.getFluidType((short) (a[0] & 0xFFFF)), (short) (a[0] >>> 16));
-
-        throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
-    }, f -> {
-        if (f.isEmpty()) return IntStream.empty();
-        if (f instanceof SingleFluidValue s) {
-            int i = FluidManager.getFluidId(s.getFluidType());
-            i |= (s.getVolume() << 16);
-
-            return IntStream.of(i);
+    StreamCodec<ByteBuf, MultiFluidValue> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public void encode(ByteBuf buffer, MultiFluidValue value) {
+            int[] i = serialize(value);
+            buffer.writeInt(i.length);
+            for (int j = 0; j < i.length; j++) {
+                buffer.writeInt(i[j]);
+            }
         }
 
-        throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
-    });
-
-    StreamCodec<ByteBuf, MultiFluidValue> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);
+        @Override
+        public MultiFluidValue decode(ByteBuf buffer) {
+            int size = buffer.readInt();
+            return deserialize(buffer::readInt, size);
+        }
+    };
 
     boolean isEmpty();
     int size();
@@ -86,5 +85,29 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
 
     static @NotNull MultiFluidValue single(@NotNull FluidType fluidType, short volume) {
         return new SingleFluidValue(fluidType, volume);
+    }
+
+    private static int[] serialize(MultiFluidValue f) {
+        if (f.isEmpty()) return new int[] {};
+        if (f instanceof SingleFluidValue s) {
+            int i = FluidManager.getFluidId(s.getFluidType()) & 0xFFFF;
+            i |= (s.getVolume() << 16);
+
+            return new int[] {i};
+        }
+
+        throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
+    }
+
+    private static MultiFluidValue deserialize(IntSupplier supplier, int size) {
+        if (size == 0) return EMPTY;
+
+
+        if (size == 1) {
+            int i = supplier.getAsInt();
+            return single(FluidManager.getFluidType((short) (i & 0xFFFF)), (short) ((i >>> 16)));
+        }
+
+        throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
     }
 }
