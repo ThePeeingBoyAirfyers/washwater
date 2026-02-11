@@ -46,21 +46,31 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
     };
 
     Codec<MultiFluidValue> CODEC = Codec.INT_STREAM.xmap(
-            i -> deserialize(i.iterator()::next, (int) i.count()),
+            stream -> {
+                var array = stream.toArray();
+                return deserialize(new IntSupplier() {
+                    private int i = 0;
+
+                    @Override
+                    public int getAsInt() {
+                        return array[i++];
+                    }
+                }, (int) array.length);
+            },
             f -> IntStream.of(serialize(f)));
 
     StreamCodec<ByteBuf, MultiFluidValue> STREAM_CODEC = new StreamCodec<>() {
         @Override
-        public void encode(ByteBuf buffer, MultiFluidValue value) {
-            int[] i = serialize(value);
-            buffer.writeInt(i.length);
-            for (int j = 0; j < i.length; j++) {
-                buffer.writeInt(i[j]);
+        public void encode(ByteBuf buffer, @NotNull MultiFluidValue value) {
+            int[] array = serialize(value);
+            buffer.writeInt(array.length);
+            for (int i : array) {
+                buffer.writeInt(i);
             }
         }
 
         @Override
-        public MultiFluidValue decode(ByteBuf buffer) {
+        public @NotNull MultiFluidValue decode(ByteBuf buffer) {
             int size = buffer.readInt();
             return deserialize(buffer::readInt, size);
         }

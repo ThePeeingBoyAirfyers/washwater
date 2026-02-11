@@ -91,7 +91,7 @@ public class DumbFluidSection implements FluidSection {
     @Override
     public @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
         if (dirty.isEmpty() && !all) return null;
-        var updates = (all ? map.keySet() : dirty).stream().map(s -> Pair.of(s, map.get(s))).toList();
+        var updates = (all ? map.keySet() : dirty).stream().map(s -> Pair.of(s, map.getOrDefault(s, MultiFluidValue.EMPTY))).toList();
         if (!all) dirty.clear();
         return new DumbFluidSectionUpdatePacket(pos, updates);
     }
