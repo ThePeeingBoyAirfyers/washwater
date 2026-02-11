@@ -20,6 +20,11 @@ public interface FluidRegion {
 
     @NotNull MultiFluidValue getFluids(int x, int y, int z);
 
+    default int getAllVolume(BlockPos pos) {
+        return getAllVolume(pos.getX(), pos.getY(), pos.getZ());
+    }
+    int getAllVolume(int x, int y, int z);
+
     default boolean isAir(BlockPos pos) {
         return isAir(pos.getX(), pos.getY(), pos.getZ());
     }

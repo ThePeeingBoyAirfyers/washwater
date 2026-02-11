@@ -59,9 +59,6 @@ public class FluidTicker {
         currentTick++;
 
         if (shouldTick(level)) {
-            LongSet activeChunks = new LongOpenHashSet();
-            ActiveChunks.getActiveChunks(level, activeChunks);
-
             var region = REGIONS.computeIfAbsent(level, level1 -> new SimpleFluidRegion(level1, l -> {
                 int x = BlockPos.getX(l);
                 int y = BlockPos.getY(l);
