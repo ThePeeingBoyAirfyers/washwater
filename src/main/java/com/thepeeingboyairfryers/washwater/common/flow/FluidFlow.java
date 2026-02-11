@@ -21,34 +21,30 @@ public class FluidFlow {
         int volume = region.getFluidVolume(pos, WaterInfo.WATER_TYPE);
 
         if (volume > 0) {
+            BlockPos underPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
+            var underVolume = region.getFluidVolume(underPos, WaterInfo.WATER_TYPE);
 
-
-            //Flow down
-            var underVolume = region.getFluidVolume(pos.getX(), pos.getY() - 1, pos.getZ(), WaterInfo.WATER_TYPE);
-            if (pos.getY() - 1 == WaterInfo.MIN_Y && underVolume == 0) {
-                //Delete water
-                region.setVolume(pos, water(0));
-            }
-            else {
-                if (underVolume >= 0 && underVolume < WaterInfo.VOLUME_PER_BLOCK) {
-                    var transaction = Math.min(volume, WaterInfo.VOLUME_PER_BLOCK - underVolume);
-                    region.setVolume(pos, water(volume - transaction));
-                    region.setVolume(pos.getX(), pos.getY() - 1, pos.getZ(), water(underVolume + transaction));
-
-                    volume -= transaction;
-
-                    if (volume > 0) {
-                        //Flow downwards sideways
-                        equalizeWaterDownwards(region, pos, volume);
-                    }
-                } else {
-                    //If under is solid or filled up then flow to sides
-                    equalizeWater(region, pos, volume);
+            //Downwards flow
+            if (!region.isSolid(underPos) && underVolume < WaterInfo.VOLUME_PER_BLOCK) {
+                //Delete water at world bottom (void)
+                if (underPos.getY() == WaterInfo.MIN_Y) {
+                    region.setVolume(pos, water(0));
+                    return;
+                }
+                //Flow down
+                var transaction = Math.min(volume, WaterInfo.VOLUME_PER_BLOCK - underVolume);
+                region.setVolume(pos, water(volume - transaction));
+                region.setVolume(underPos, water(underVolume + transaction));
+                volume -= transaction;
+                if (volume > 0) {
+                    //Flow downwards sideways
+                    //equalizeWaterDownwards(region, pos, volume);
                 }
             }
-
-
-
+            else {
+                //Flow sideways
+                equalizeWater(region, pos, volume);
+            }
         } else {
             LOGGER.warn("Ticking water with no volume");
         }
@@ -64,7 +60,7 @@ public class FluidFlow {
             int z = owner.getZ() + direction.getStepZ();
             int otherVolume = region.getFluidVolume(x, y, z, WaterInfo.WATER_TYPE);
 
-            if (otherVolume < 0) continue;
+            if (region.isSolid(x, y, z)) continue;
 
             int transfer = (newVolume - otherVolume) / WaterInfo.FLOW_DIVIDER;
             if (transfer > 2 || transfer < -2) {

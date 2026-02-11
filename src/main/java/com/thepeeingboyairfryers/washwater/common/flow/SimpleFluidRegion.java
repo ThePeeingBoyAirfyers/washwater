@@ -10,6 +10,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +50,8 @@ public class SimpleFluidRegion implements FluidRegion {
 
     @Override
     public boolean isSolid(int x, int y, int z) {
-        return !getSection(x, y, z).getBlockState(x & 15, y & 15, z & 15).isAir();
+        BlockState localBS = getSection(x, y, z).getBlockState(x & 15, y & 15, z & 15);
+        return (!localBS.isAir() && localBS.getFluidState().isEmpty());
     }
 
     @Override
