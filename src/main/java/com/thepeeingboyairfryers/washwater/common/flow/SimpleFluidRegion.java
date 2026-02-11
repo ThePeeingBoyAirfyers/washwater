@@ -10,7 +10,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -71,6 +70,6 @@ public class SimpleFluidRegion implements FluidRegion {
     }
 
     private LevelChunkSection getSection(int x, int y, int z) {
-        return sections.computeIfAbsent(SectionPos.asLong(x, y, z), l -> level.getChunk(x, z).getSection(level.getSectionIndex(y)));
+        return sections.computeIfAbsent(SectionPos.asLong(x >> 4, y >> 4, z >> 4), l -> level.getChunk(x >> 4, z >> 4).getSection(level.getSectionIndex(y)));
     }
 }
