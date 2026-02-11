@@ -1,0 +1,17 @@
+package com.thepeeingboyairfryers.washwater.mixin.common;
+
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.thepeeingboyairfryers.washwater.duck.IFakeRegistryObject;
+import net.minecraft.core.IdMapper;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(IdMapper.class)
+public class MixinIdMapper {
+
+    @WrapMethod(method = "getId")
+    int wrap(Object value, Operation<Integer> original) {
+        if (value instanceof IFakeRegistryObject<?> f) value = f.ww€getOG();
+        return original.call(value);
+    }
+}

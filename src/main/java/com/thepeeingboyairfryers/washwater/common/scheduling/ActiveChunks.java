@@ -1,6 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.scheduling;
 
-import com.thepeeingboyairfryers.washwater.mixin.common.ChunkMapAccessor;
+import com.thepeeingboyairfryers.washwater.mixin.accessors.ChunkMapAccessor;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerChunkCache;

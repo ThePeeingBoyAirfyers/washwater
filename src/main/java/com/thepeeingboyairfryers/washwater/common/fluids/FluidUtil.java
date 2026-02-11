@@ -38,6 +38,8 @@ public class FluidUtil {
                     pos.getX(), pos.getY(), pos.getZ(),
                     type, (short) Math.min(spaceLeft, volume)
             );
+
+            FluidTicker.tickWater(level, pos);
         }
 
         if (spaceLeft < volume) {
@@ -120,6 +122,6 @@ public class FluidUtil {
     }
 
     public static boolean hasFluid(Level level, int x, int y, int z) {
-        return getAllVolume(level, x, y, z) <= 0;
+        return getAllVolume(level, x, y, z) >= 0;
     }
 }

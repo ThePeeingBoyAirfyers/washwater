@@ -51,15 +51,15 @@ public class MixinLevelChunkSection implements IChunkFluidSection {
 
     @Inject(at = @At("RETURN"), method = "getBlockState", cancellable = true)
     public void getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
-        if (ww€fluidSection != null && cir.getReturnValue().isAir()) {
-            cir.setReturnValue(FluidSectionManager.getBlockStateFromFluidSection(ww€fluidSection, x, y, z));
+        if (ww€fluidSection != null) {
+            cir.setReturnValue(FluidSectionManager.getBlockStateFromFluidSection(ww€fluidSection, x, y, z, cir.getReturnValue()));
         }
     }
 
     @Inject(at = @At("RETURN"), method = "getFluidState", cancellable = true)
     public void getFluidState(int x, int y, int z, CallbackInfoReturnable<FluidState> cir) {
-        if (ww€fluidSection != null && cir.getReturnValue().isEmpty()) {
-            cir.setReturnValue(FluidSectionManager.getFluidStateFromFluidSection(ww€fluidSection, x, y, z));
+        if (ww€fluidSection != null) {
+            cir.setReturnValue(FluidSectionManager.getFluidStateFromFluidSection(ww€fluidSection, x, y, z, cir.getReturnValue()));
         }
     }
 

@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.mixin.common;
+package com.thepeeingboyairfryers.washwater.mixin.accessors;
 
 
 import net.minecraft.server.level.ChunkHolder;
