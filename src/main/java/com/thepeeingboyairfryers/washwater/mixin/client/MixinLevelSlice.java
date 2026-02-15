@@ -24,6 +24,6 @@ public class MixinLevelSlice implements ILevelSliceFluidSections {
 
     @Override
     public FluidSection ww€getSectionFor(int x, int y, int z) {
-        return FluidSectionManager.getIfAbsent(level, sections, x, y, z);
+        return FluidSectionManager.getIfAbsent(level, sections, x >> 4, y >> 4, z >> 4);
     }
 }

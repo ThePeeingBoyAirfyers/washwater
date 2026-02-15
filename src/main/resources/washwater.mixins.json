@@ -5,11 +5,12 @@
   "mixins": [
     "accessors.ChunkMapAccessor",
     "accessors.StateHolderAccessor",
+    "client.MixinChunkBuilderMeshingTask",
     "common.MixinBucketItem",
     "common.MixinFluidState",
     "common.MixinIdMapper",
-    "common.MixinNeighborUpdater",
     "common.MixinLevelChunkSection",
+    "common.MixinNeighborUpdater",
     "common.MixinServerLevel"
   ],
   "client": [

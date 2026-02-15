@@ -118,10 +118,10 @@ public class FluidUtil {
     }
 
     public static boolean hasFluid(Level level, BlockPos pos) {
-        return getAllVolume(level,  pos.getX(), pos.getY(), pos.getZ()) <= 0;
+        return getAllVolume(level,  pos.getX(), pos.getY(), pos.getZ()) > 0;
     }
 
     public static boolean hasFluid(Level level, int x, int y, int z) {
-        return getAllVolume(level, x, y, z) >= 0;
+        return getAllVolume(level, x, y, z) > 0;
     }
 }

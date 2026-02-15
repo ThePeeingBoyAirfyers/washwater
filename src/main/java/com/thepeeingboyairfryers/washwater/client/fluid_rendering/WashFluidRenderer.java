@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WashFluidRenderer extends FluidRenderer {
-    private static final ThreadLocal<FluidRendererCache> CACHE = ThreadLocal.withInitial(FluidRendererCache::new);
 
     private final Logger logger = LoggerFactory.getLogger(WashFluidRenderer.class);
     private final ColorProviderRegistry colorRegistry;
@@ -33,6 +32,7 @@ public class WashFluidRenderer extends FluidRenderer {
     private final DefaultFluidRenderer defaultFluidRenderer;
     private final ModelQuad quad = new ModelQuad();
     private final ChunkVertexEncoder.Vertex[] vertices = ChunkVertexEncoder.Vertex.uninitializedQuad();
+    private final FluidRendererCache cache = new FluidRendererCache();
 
     public WashFluidRenderer(ColorProviderRegistry iColorRegistry, LightPipelineProvider iLightPipelineProvider) {
         this.colorRegistry = iColorRegistry;
@@ -53,8 +53,7 @@ public class WashFluidRenderer extends FluidRenderer {
         Material material = DefaultMaterials.forFluidState(fluidState);
         ChunkModelBuilder meshBuilder = buffers.get(material);
         IClientFluidTypeExtensions handler = IClientFluidTypeExtensions.of(fluidState);
-        FluidRendererCache cache = CACHE.get();
-        cache.prepare(level, blockPos);
+        //cache.prepare(level, blockPos);
 
         quad.setColor(0, 0xFFFFFFFF);
         quad.setColor(1, 0xFFFFFFFF);
@@ -62,12 +61,15 @@ public class WashFluidRenderer extends FluidRenderer {
         quad.setColor(3, 0xFFFFFFFF);
 
         try {
+            logger.info("Rendering block at {} of {}", blockPos, offset);
+            /*
             cache.run((dir, get) -> {
                 var r = get.get();
 
-                //if (!r.isEmpty())
-                //    debugRender(meshBuilder, r, collector, material, offset);
+                if (!r.isEmpty())
+                    debugRender(meshBuilder, r, collector, material, offset);
             });
+             */
         } catch (Exception e) {
             logger.error("Exception while rendering,", e);
         }
