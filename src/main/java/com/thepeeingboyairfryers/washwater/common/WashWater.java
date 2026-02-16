@@ -9,6 +9,7 @@ import com.thepeeingboyairfryers.washwater.common.packets.WWNetworking;
 import com.thepeeingboyairfryers.washwater.common.scheduling.FluidTicker;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
+import com.thepeeingboyairfryers.washwater.common.util.performance.WorldPerfTest;
 import com.thepeeingboyairfryers.washwater.tests.BucketTest;
 import me.lucko.spark.api.Spark;
 import me.lucko.spark.api.SparkProvider;
@@ -41,6 +42,7 @@ public class WashWater {
         WWBlockEntities.register(modEventBus);
         WWAttachments.register(modEventBus);
         WWNetworking.register(modEventBus);
+        WorldPerfTest.register(modEventBus);
 
         FluidManager.register(modEventBus);
         FluidSectionManager.register(modEventBus);
