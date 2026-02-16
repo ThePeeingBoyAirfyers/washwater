@@ -1,6 +1,7 @@
 package com.thepeeingboyairfryers.washwater.client.fluid_rendering;
 
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.duck.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.api.util.NormI8;
 import net.caffeinemc.mods.sodium.client.model.color.ColorProviderRegistry;
 import net.caffeinemc.mods.sodium.client.model.light.LightPipelineProvider;
@@ -32,7 +33,6 @@ public class WashFluidRenderer extends FluidRenderer {
     private final DefaultFluidRenderer defaultFluidRenderer;
     private final ModelQuad quad = new ModelQuad();
     private final ChunkVertexEncoder.Vertex[] vertices = ChunkVertexEncoder.Vertex.uninitializedQuad();
-    private final FluidRendererCache cache = new FluidRendererCache();
 
     public WashFluidRenderer(ColorProviderRegistry iColorRegistry, LightPipelineProvider iLightPipelineProvider) {
         this.colorRegistry = iColorRegistry;
@@ -53,7 +53,7 @@ public class WashFluidRenderer extends FluidRenderer {
         Material material = DefaultMaterials.forFluidState(fluidState);
         ChunkModelBuilder meshBuilder = buffers.get(material);
         IClientFluidTypeExtensions handler = IClientFluidTypeExtensions.of(fluidState);
-        //cache.prepare(level, blockPos);
+        ILevelSliceFluids fluids = (ILevelSliceFluids) (Object) level;
 
         quad.setColor(0, 0xFFFFFFFF);
         quad.setColor(1, 0xFFFFFFFF);
@@ -61,15 +61,7 @@ public class WashFluidRenderer extends FluidRenderer {
         quad.setColor(3, 0xFFFFFFFF);
 
         try {
-            logger.info("Rendering block at {} of {}", blockPos, offset);
-            /*
-            cache.run((dir, get) -> {
-                var r = get.get();
-
-                if (!r.isEmpty())
-                    debugRender(meshBuilder, r, collector, material, offset);
-            });
-             */
+            logger.info("Rendering block at {} with {}", blockPos, fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), blockPos.getZ()).getTotalVolume());
         } catch (Exception e) {
             logger.error("Exception while rendering,", e);
         }

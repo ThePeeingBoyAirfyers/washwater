@@ -129,4 +129,15 @@ public interface FluidSection {
     static int short2localZ(short v) {
         return (v >> 8) & 15;
     }
+
+    default void fill(MultiFluidValue[] fluids) {
+        if (fluids.length != 4096) throw new IllegalArgumentException();
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    fluids[y << 4 << 4 | z << 4 | x] = getVolume(x, y, z);
+                }
+            }
+        }
+    }
 }

@@ -88,6 +88,7 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
     }
 
     public FluidSection getSectionWithY(int y) {
+        if (y < chunk.getMinSection()) return null;
         return sections.get(chunk.getSectionIndexFromSectionY(y));
     }
 

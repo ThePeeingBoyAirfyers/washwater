@@ -1,29 +1,94 @@
 package com.thepeeingboyairfryers.washwater.mixin.client;
 
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
-import com.thepeeingboyairfryers.washwater.duck.ILevelSliceFluidSections;
-import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import com.thepeeingboyairfryers.washwater.duck.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import net.caffeinemc.mods.sodium.client.world.cloned.ChunkRenderContext;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Arrays;
+
 
 @Mixin(LevelSlice.class)
-public class MixinLevelSlice implements ILevelSliceFluidSections {
-
-    @Unique
-    private final Long2ObjectMap<FluidSection> sections = new Long2ObjectAVLTreeMap<>();
+public abstract class MixinLevelSlice implements ILevelSliceFluids {
 
     @Shadow
     @Final
+    private static int SECTION_ARRAY_SIZE;
+    @Shadow
+    @Final
+    private static int SECTION_ARRAY_LENGTH;
+    @Shadow
+    @Final
     private ClientLevel level;
+    @Shadow
+    private BoundingBox volume;
+    @Shadow
+    private int originBlockX;
+    @Shadow
+    private int originBlockY;
+    @Shadow
+    private int originBlockZ;
+
+    @Shadow
+    public static int getLocalSectionIndex(int sectionX, int sectionY, int sectionZ) {
+        throw new AssertionError();
+    }
+
+    @Shadow
+    public static int getLocalBlockIndex(int blockX, int blockY, int blockZ) {
+        throw new AssertionError();
+    }
+
+    @Unique
+    private final MultiFluidValue[][] ww€fluids = new MultiFluidValue[SECTION_ARRAY_SIZE][4096];
+
+    @Inject(method = "copySectionData", at = @At("HEAD"))
+    void ww€copyFluidSection(ChunkRenderContext context, int sectionIndex, CallbackInfo ci) {
+        int x = sectionIndex % SECTION_ARRAY_LENGTH;
+        int sd = (sectionIndex - x) / SECTION_ARRAY_LENGTH;
+        int z = sd % SECTION_ARRAY_LENGTH;
+        int y = (sd - z) / SECTION_ARRAY_LENGTH;
+        LevelChunk chunk = level.getChunk(context.getOrigin().x() + x - 1, context.getOrigin().z() + z - 1);
+        ww€writeFluids(ww€fluids[sectionIndex], FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(context.getOrigin().y() + y - 1));
+    }
+
+    @Unique
+    private void ww€writeFluids(MultiFluidValue[] fluids, FluidSection section) {
+        if (section == null) return;
+
+        if (section.isEmpty()) {
+            Arrays.fill(fluids, MultiFluidValue.EMPTY);
+            return;
+        }
+
+        synchronized (section) {
+            section.fill(fluids);
+        }
+    }
 
     @Override
-    public FluidSection ww€getSectionFor(int x, int y, int z) {
-        return FluidSectionManager.getIfAbsent(level, sections, x >> 4, y >> 4, z >> 4);
+    public MultiFluidValue ww€getFluidFor(int x, int y, int z) {
+        if (!this.volume.isInside(x, y, z)) {
+            return MultiFluidValue.EMPTY;
+        } else {
+            int relBlockX = x - this.originBlockX;
+            int relBlockY = y - this.originBlockY;
+            int relBlockZ = z - this.originBlockZ;
+            return this.ww€fluids
+                    [getLocalSectionIndex(relBlockX >> 4, relBlockY >> 4, relBlockZ >> 4)]
+                    [getLocalBlockIndex(relBlockX & 15, relBlockY & 15, relBlockZ & 15)];
+        }
     }
 }
