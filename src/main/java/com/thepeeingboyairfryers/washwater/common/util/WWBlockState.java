@@ -19,6 +19,8 @@ public class WWBlockState extends BlockState implements IFakeRegistryObject<Bloc
 
         this.og = iOg;
         this.fluid = iFluid;
+
+        initCache();
     }
 
     public MultiFluidValue getFluid() {
