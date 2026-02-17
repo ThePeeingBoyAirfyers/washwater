@@ -1,10 +1,13 @@
 package com.thepeeingboyairfryers.washwater.mixin.common;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidChunkAttachment;
 import com.thepeeingboyairfryers.washwater.duck.IChunkFluidSection;
+import com.thepeeingboyairfryers.washwater.duck.IFakeRegistryObject;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
@@ -48,21 +51,27 @@ public class MixinLevelChunkSection implements IChunkFluidSection {
         ww€updateSection = updater;
     }
 
-    @Inject(at = @At("HEAD"), method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;")
-    public void setBlockState(int x, int y, int z, BlockState state, boolean lock, CallbackInfoReturnable<BlockState> cir) {
+
+    @WrapMethod(method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;")
+    public BlockState ww€setBlockState(int x, int y, int z, BlockState state, boolean useLocks, Operation<BlockState> original) {
         if (ww€fluidSection != null)
-            FluidSectionManager.writeStateToFluidSection(ww€fluidSection, x, y, z, state);
+            return original.call(x, y, z, FluidSectionManager.writeStateToFluidSection(ww€fluidSection, x, y, z, state), useLocks);
+
+        if (state instanceof IFakeRegistryObject<?> f)
+            state = (BlockState) f.ww€getOG();
+
+        return original.call(x, y, z, state, useLocks);
     }
 
     @Inject(at = @At("RETURN"), method = "getBlockState", cancellable = true)
-    public void getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
+    public void ww€getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
         if (ww€fluidSection != null) {
             cir.setReturnValue(FluidSectionManager.getBlockStateFromFluidSection(ww€fluidSection, x, y, z, cir.getReturnValue()));
         }
     }
 
     @Inject(at = @At("RETURN"), method = "getFluidState", cancellable = true)
-    public void getFluidState(int x, int y, int z, CallbackInfoReturnable<FluidState> cir) {
+    public void ww€getFluidState(int x, int y, int z, CallbackInfoReturnable<FluidState> cir) {
         if (ww€fluidSection != null) {
             cir.setReturnValue(FluidSectionManager.getFluidStateFromFluidSection(ww€fluidSection, x, y, z, cir.getReturnValue()));
         }

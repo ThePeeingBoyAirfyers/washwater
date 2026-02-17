@@ -9,6 +9,7 @@ import com.thepeeingboyairfryers.washwater.duck.IFluidState;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.material.FluidState;
@@ -35,9 +36,13 @@ public class FluidSectionManager {
         return result;
     }
 
-    public static void writeStateToFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState state) {
+    public static BlockState writeStateToFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState state) {
         var iState = (IFluidState) state.getFluidState();
         fluidSection.setVolume(x, y, z, iState.ww€getFluid());
+
+        if (state.is(Blocks.WATER)) return Blocks.AIR.defaultBlockState();
+        if (state instanceof WWBlockState ww) return ww.ww€getOG();
+        return state;
     }
 
     public static BlockState getBlockStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState og) {

@@ -3,8 +3,10 @@ package com.thepeeingboyairfryers.washwater.common.util;
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.duck.IFakeRegistryObject;
+import com.thepeeingboyairfryers.washwater.mixin.accessors.BlockStateBase;
 import com.thepeeingboyairfryers.washwater.mixin.accessors.StateHolderAccessor;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +21,8 @@ public class WWBlockState extends BlockState implements IFakeRegistryObject<Bloc
         this.og = iOg;
         this.fluid = iFluid;
 
-        initCache();
+        this.cache = ((BlockStateBase) iOg).getCache();
+        ((BlockStateBase) this).setRandomlyTicking(iOg.isRandomlyTicking());
     }
 
     public MultiFluidValue getFluid() {
@@ -28,7 +31,12 @@ public class WWBlockState extends BlockState implements IFakeRegistryObject<Bloc
 
     @Override
     public @NotNull FluidState getFluidState() {
-        return new WWFluidState(fluid, super.getFluidState());
+        return new WWFluidState(fluid, og.getFluidState());
+    }
+
+    @Override
+    public <T extends Comparable<T>, V extends T> BlockState setValue(Property<T> property, V value) {
+        return new WWBlockState(fluid, og.setValue(property, value));
     }
 
     @Override
