@@ -26,7 +26,6 @@ public class WaterSourceAirBlock extends Block {
     }
 
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        System.out.println("randomly ticked");
         FluidUtil.addVolume(level, pos, NeoForgeMod.WATER_TYPE.value(), 1);
     }
 
