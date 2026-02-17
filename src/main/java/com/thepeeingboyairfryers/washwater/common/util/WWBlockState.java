@@ -6,7 +6,6 @@ import com.thepeeingboyairfryers.washwater.duck.IFakeRegistryObject;
 import com.thepeeingboyairfryers.washwater.mixin.accessors.StateHolderAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 
 public class WWBlockState extends BlockState implements IFakeRegistryObject<BlockState> {
@@ -29,7 +28,7 @@ public class WWBlockState extends BlockState implements IFakeRegistryObject<Bloc
 
     @Override
     public @NotNull FluidState getFluidState() {
-        return new WWFluidState(fluid, Fluids.WATER.defaultFluidState());
+        return new WWFluidState(fluid, super.getFluidState());
     }
 
     @Override
