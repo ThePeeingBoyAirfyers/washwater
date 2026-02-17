@@ -2,10 +2,9 @@ package com.thepeeingboyairfryers.washwater.duck;
 
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionContainer;
+import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidChunkAttachment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 public interface IChunkFluidSection extends FluidSectionContainer {
 
@@ -18,5 +17,5 @@ public interface IChunkFluidSection extends FluidSectionContainer {
 
     void ww€setFluidSection(@Nullable FluidSection fSection);
 
-    void ww€configureFluidSectionUpdater(@NotNull Consumer<FluidSection> updater);
+    void ww€configureFluidSectionUpdater(@NotNull FluidChunkAttachment.SectionUpdater updater);
 }

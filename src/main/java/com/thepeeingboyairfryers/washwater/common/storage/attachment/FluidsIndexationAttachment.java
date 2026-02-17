@@ -33,7 +33,7 @@ public class FluidsIndexationAttachment {
     private final Short2ShortMap fixedIds;
 
     public static FluidsIndexationAttachment create() {
-        return new FluidsIndexationAttachment(new Int2ShortAVLTreeMap(), new Short2ObjectAVLTreeMap<>(), new Short2ShortAVLTreeMap());
+        return createIndexation(new HashMap<>());
     }
 
     private FluidsIndexationAttachment(Int2ShortMap fld2id, Short2ObjectMap<FluidType> id2fld, Short2ShortMap fxedIds) {
@@ -75,7 +75,6 @@ public class FluidsIndexationAttachment {
         var fluid2id = new Int2ShortAVLTreeMap();
         var id2fluid = new Short2ObjectAVLTreeMap<FluidType>();
         var fixedIds = new Short2ShortAVLTreeMap();
-        //registries.lookupOrThrow(NeoForgeRegistries.Keys.FLUID_TYPES);
         var registry = NeoForgeRegistries.FLUID_TYPES;
         var orderedIterator = Stream.concat(fluidIndexation.keySet().stream(), registry.holders())
                 .distinct()

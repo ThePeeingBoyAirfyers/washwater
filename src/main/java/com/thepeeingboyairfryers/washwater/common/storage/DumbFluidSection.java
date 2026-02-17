@@ -30,8 +30,10 @@ public class DumbFluidSection implements FluidSection {
     public static final MapCodec<DumbFluidSection> CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
             Codec.list(ENTRY_CODEC.codec()).fieldOf("fluids").forGetter(s -> new ArrayList<>(s.map.short2ObjectEntrySet()))
     ).apply(b, DumbFluidSection::new));
+
     private final Short2ObjectMap<MultiFluidValue> map = new Short2ObjectAVLTreeMap<>();
     private final ShortList dirty = new ShortArrayList();
+    private FluidSectionContainer container;
 
     public DumbFluidSection() { }
     public DumbFluidSection(List<Short2ObjectMap.Entry<MultiFluidValue>> iMap) {
@@ -54,6 +56,7 @@ public class DumbFluidSection implements FluidSection {
 
         map.put(p, fluids);
         dirty.add(p);
+        container.markDirty();
     }
 
     @Override
@@ -84,8 +87,8 @@ public class DumbFluidSection implements FluidSection {
     }
 
     @Override
-    public void setContainer(@NotNull FluidSectionContainer container) {
-        // No operation, as this is a dumb section.
+    public void setContainer(@NotNull FluidSectionContainer iContainer) {
+        container = iContainer;
     }
 
     @Override

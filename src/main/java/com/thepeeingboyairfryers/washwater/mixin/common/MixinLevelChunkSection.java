@@ -3,6 +3,7 @@ package com.thepeeingboyairfryers.washwater.mixin.common;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
+import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidChunkAttachment;
 import com.thepeeingboyairfryers.washwater.duck.IChunkFluidSection;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -14,14 +15,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.function.Consumer;
-
 @Mixin(value = LevelChunkSection.class, priority = 1200)
 public class MixinLevelChunkSection implements IChunkFluidSection {
     @Unique
     private FluidSection ww€fluidSection;
     @Unique
-    private Consumer<FluidSection> ww€updateSection;
+    private FluidChunkAttachment.SectionUpdater ww€updateSection;
 
     @Unique
     public FluidSection ww€getFluidSection() {
@@ -37,9 +36,15 @@ public class MixinLevelChunkSection implements IChunkFluidSection {
         ww€fluidSection.setContainer(this);
     }
 
+    @Override
+    @Unique
+    public void markDirty() {
+        ww€updateSection.markDirty();
+    }
+
     @Unique
     @Override
-    public void ww€configureFluidSectionUpdater(@NotNull Consumer<FluidSection> updater) {
+    public void ww€configureFluidSectionUpdater(@NotNull FluidChunkAttachment.SectionUpdater updater) {
         ww€updateSection = updater;
     }
 

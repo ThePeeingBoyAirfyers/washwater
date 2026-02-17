@@ -4,8 +4,10 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.common.packets.WWNetworking;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.duck.IChunkFluidSection;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
@@ -96,12 +98,18 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         return sections;
     }
 
+    private void markDirty(int idx) {
+        if (chunk.getLevel().isClientSide) return;
+        chunk.setUnsaved(true);
+        WWNetworking.queueUpdate((ServerLevel) chunk.getLevel(), chunk.getPos().x, chunk.getMinSection() + idx, chunk.getPos().z);
+    }
+
     @Override
     public @NotNull Iterator<FluidSection> iterator() {
         return sections.iterator();
     }
 
-    private class SectionUpdater implements Consumer<FluidSection> {
+    public class SectionUpdater implements Consumer<FluidSection> {
         private final int i;
 
         private SectionUpdater(int ii) {
@@ -111,6 +119,10 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         @Override
         public void accept(FluidSection fluidSection) {
             sections.set(i, fluidSection);
+        }
+
+        public void markDirty() {
+            FluidChunkAttachment.this.markDirty(i);
         }
     }
 }
