@@ -7,6 +7,7 @@ import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.packets.WWNetworking;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.duck.IChunkFluidSection;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -99,9 +100,17 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
     }
 
     private void markDirty(int idx) {
-        if (chunk.getLevel().isClientSide) return;
+        int x = chunk.getPos().x;
+        int y = chunk.getMinSection() + idx;
+        int z = chunk.getPos().z;
+
+        if (chunk.getLevel().isClientSide) {
+            Minecraft.getInstance().levelRenderer.setSectionDirty(x, y, z);
+            return;
+        }
+
         chunk.setUnsaved(true);
-        WWNetworking.queueUpdate((ServerLevel) chunk.getLevel(), chunk.getPos().x, chunk.getMinSection() + idx, chunk.getPos().z);
+        WWNetworking.queueUpdate((ServerLevel) chunk.getLevel(), x, y, z);
     }
 
     @Override
