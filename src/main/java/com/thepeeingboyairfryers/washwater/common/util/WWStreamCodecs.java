@@ -7,6 +7,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 public class WWStreamCodecs {
+    public static final StreamCodec<ByteBuf, SectionPos> SECTION_POS = ByteBufCodecs.VAR_LONG.map(SectionPos::of, SectionPos::asLong);
+
     private WWStreamCodecs() {
         throw new IllegalStateException("Utility class");
     }
@@ -20,6 +22,4 @@ public class WWStreamCodecs {
                 Pair::new
         );
     }
-
-    public static final StreamCodec<ByteBuf, SectionPos> SECTION_POS = ByteBufCodecs.VAR_LONG.map(SectionPos::of, SectionPos::asLong);
 }

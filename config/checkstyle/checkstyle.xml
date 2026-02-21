@@ -122,7 +122,9 @@
 
         <module name="PackageName"/>
         <module name="ParameterName"/>
-        <module name="StaticVariableName"/>
+        <module name="StaticVariableName">
+            <property name="id" value="StaticVariableName"/>
+        </module>
         <module name="TypeName"/>
 
         <!-- Checks for imports                              -->
@@ -205,5 +207,13 @@
         <property name="files" value="[/\\](?!duck[/\\])"/>
         <property name="id" value="MethodNameDuckInterface"/>
     </module>
+
+    <module name="SuppressionSingleFilter">
+        <metadata name="net.sf.eclipsecs.core.comment" value="Suppress StaticVariableName check except on mixins (@Final)"/>
+        <property name="files" value="[/\\](duck|mixin)[/\\]"/>
+        <property name="id" value="StaticVariableName"/>
+    </module>
+
+
 
 </module>

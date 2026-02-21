@@ -18,9 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FluidTicker {
-    private static int counter = 0;
     private static final Map<ServerLevel, FluidRegion> REGIONS = new HashMap<>();
     private static final Map<ServerLevel, SwapPair<LongSet>> WATERS = new HashMap<>();
+    private static int counter = 0;
     private static int currentTick = 0;
 
     private FluidTicker() {

@@ -22,35 +22,35 @@ public interface FluidSection {
     Registry<MapCodec<? extends FluidSection>> DISPATCH_REGISTRY = new RegistryBuilder<>(DISPATCH_KEY).create();
     Codec<FluidSection> CODEC = DISPATCH_REGISTRY.byNameCodec().dispatch(FluidSection::codec, Function.identity());
 
+    static short localPos2Short(BlockPos pos) {
+        return localPos2Short(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    static short localPos2Short(int x, int y, int z) {
+        return (short) ((x & 15) | ((y & 15) << 4) | ((z & 15) << 8));
+    }
+
+    static BlockPos short2localPos(short v) {
+        return new BlockPos(short2localX(v), short2localY(v), short2localZ(v));
+    }
+
+    static int short2localX(short v) {
+        return v & 15;
+    }
+
+    static int short2localY(short v) {
+        return (v >> 4) & 15;
+    }
+
+    static int short2localZ(short v) {
+        return (v >> 8) & 15;
+    }
 
     void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids);
+
     short getVolumeOf(int x, int y, int z, FluidType type);
 
-    @NotNull MultiFluidValue getVolume(int x, int y, int z);
-    short getAllVolume(int x, int y, int z);
-
-    boolean isEmpty();
-
-    /**
-     * Sets the container that this FluidSection belongs to.
-     * This is used to allow the FluidSection to 'update' itself or change things in the container.
-     *
-     * @param container The container that this FluidSection belongs to.
-     */
-    void setContainer(@NotNull FluidSectionContainer container);
-
-    /**
-     * Returns a packet that contains the dirty data of this FluidSection.
-     * @param pos The position of the section in the world.
-     * @param fullUpdate If true, the packet should contain all data, not just the dirty data.
-     *                   This is used when the chunk is sent to the client for the first time.
-     * @return A packet that contains the dirty data of this FluidSection, or null if there is no dirty data.
-     */
-    @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean fullUpdate);
-
-    MapCodec<? extends FluidSection> codec();
-
-    /**
+    @NotNull MultiFluidValue getVolume(int x, int y, int z);    /**
      * An empty FluidSection that does nothing.
      * This is used to avoid null checks in the code.
      */
@@ -103,32 +103,30 @@ public interface FluidSection {
         }
     };
 
-    // Has to be after EMPTY has been defined, dear god help this soul
+    short getAllVolume(int x, int y, int z);    // Has to be after EMPTY has been defined, dear god help this soul
     MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
 
-    static short localPos2Short(BlockPos pos) {
-        return localPos2Short(pos.getX(), pos.getY(), pos.getZ());
-    }
+    boolean isEmpty();
 
-    static short localPos2Short(int x, int y, int z) {
-        return (short) ((x & 15) | ((y & 15) << 4) | ((z & 15) << 8));
-    }
+    /**
+     * Sets the container that this FluidSection belongs to.
+     * This is used to allow the FluidSection to 'update' itself or change things in the container.
+     *
+     * @param container The container that this FluidSection belongs to.
+     */
+    void setContainer(@NotNull FluidSectionContainer container);
 
-    static BlockPos short2localPos(short v) {
-        return new BlockPos(short2localX(v), short2localY(v), short2localZ(v));
-    }
+    /**
+     * Returns a packet that contains the dirty data of this FluidSection.
+     *
+     * @param pos        The position of the section in the world.
+     * @param fullUpdate If true, the packet should contain all data, not just the dirty data.
+     *                   This is used when the chunk is sent to the client for the first time.
+     * @return A packet that contains the dirty data of this FluidSection, or null if there is no dirty data.
+     */
+    @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean fullUpdate);
 
-    static int short2localX(short v) {
-        return v & 15;
-    }
-
-    static int short2localY(short v) {
-        return  (v >> 4) & 15;
-    }
-
-    static int short2localZ(short v) {
-        return (v >> 8) & 15;
-    }
+    MapCodec<? extends FluidSection> codec();
 
     default void fill(MultiFluidValue[] fluids) {
         if (fluids.length != 4096) throw new IllegalArgumentException();
@@ -140,4 +138,8 @@ public interface FluidSection {
             }
         }
     }
+
+
+
+
 }

@@ -12,7 +12,10 @@ import java.util.function.IntSupplier;
 import java.util.stream.IntStream;
 
 public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
-    MultiFluidValue EMPTY = new MultiFluidValue() {
+    static @NotNull MultiFluidValue single(@NotNull FluidType fluidType, short volume) {
+        if (volume == 0) return EMPTY;
+        return new SingleFluidValue(fluidType, volume);
+    }    MultiFluidValue EMPTY = new MultiFluidValue() {
         @Override
         public @NotNull Iterator<Entry> iterator() {
             return Collections.emptyIterator();
@@ -45,7 +48,17 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
         }
     };
 
-    Codec<MultiFluidValue> CODEC = Codec.INT_STREAM.xmap(
+    private static int[] serialize(MultiFluidValue f) {
+        if (f.isEmpty()) return new int[]{};
+        if (f instanceof SingleFluidValue s) {
+            int i = FluidManager.getFluidId(s.getFluidType()) & 0xFFFF;
+            i |= (s.getVolume() << 16);
+
+            return new int[]{i};
+        }
+
+        throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
+    }    Codec<MultiFluidValue> CODEC = Codec.INT_STREAM.xmap(
             stream -> {
                 var array = stream.toArray();
                 return deserialize(new IntSupplier() {
@@ -59,7 +72,16 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
             },
             f -> IntStream.of(serialize(f)));
 
-    StreamCodec<ByteBuf, MultiFluidValue> STREAM_CODEC = new StreamCodec<>() {
+    private static MultiFluidValue deserialize(IntSupplier supplier, int size) {
+        if (size == 0) return EMPTY;
+
+        if (size == 1) {
+            int i = supplier.getAsInt();
+            return single(FluidManager.getFluidType((short) (i & 0xFFFF)), (short) ((i >>> 16)));
+        }
+
+        throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
+    }    StreamCodec<ByteBuf, MultiFluidValue> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public void encode(ByteBuf buffer, @NotNull MultiFluidValue value) {
             int[] array = serialize(value);
@@ -77,6 +99,7 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
     };
 
     boolean isEmpty();
+
     int size();
 
     short forFluid(@NotNull FluidType type);
@@ -91,34 +114,12 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
 
     @NotNull MultiFluidValue setFluid(FluidType type, short value);
 
-    record Entry(short volume, FluidType fluidType) { }
-
-    static @NotNull MultiFluidValue single(@NotNull FluidType fluidType, short volume) {
-        if (volume == 0) return EMPTY;
-        return new SingleFluidValue(fluidType, volume);
+    record Entry(short volume, FluidType fluidType) {
     }
 
-    private static int[] serialize(MultiFluidValue f) {
-        if (f.isEmpty()) return new int[] {};
-        if (f instanceof SingleFluidValue s) {
-            int i = FluidManager.getFluidId(s.getFluidType()) & 0xFFFF;
-            i |= (s.getVolume() << 16);
-
-            return new int[] {i};
-        }
-
-        throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
-    }
-
-    private static MultiFluidValue deserialize(IntSupplier supplier, int size) {
-        if (size == 0) return EMPTY;
 
 
-        if (size == 1) {
-            int i = supplier.getAsInt();
-            return single(FluidManager.getFluidType((short) (i & 0xFFFF)), (short) ((i >>> 16)));
-        }
 
-        throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
-    }
+
+
 }

@@ -21,23 +21,6 @@ public class FluidPipetteItem extends Item {
         super(properties);
     }
 
-    public InteractionResult useOn(UseOnContext useOnContext) {
-        Level level = useOnContext.getLevel();
-        Player player = useOnContext.getPlayer();
-        if (player == null) return InteractionResult.FAIL;
-
-        ItemStack itemStack = useOnContext.getItemInHand();
-        BlockPos targetPos = useOnContext.getClickedPos();
-
-        if (!player.isCrouching()) {
-            creativePipettePlace(level, targetPos, itemStack, player);
-        } else {
-            creativePipettePickup(level, targetPos, itemStack, player);
-        }
-
-        return InteractionResult.PASS;
-    }
-
     public static boolean creativePipettePlace(Level level, BlockPos pos, ItemStack itemStack, Player player) {
         if (!level.isClientSide && pos.getY() != WaterInfo.MIN_Y) {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
@@ -60,6 +43,23 @@ public class FluidPipetteItem extends Item {
             FluidUtil.setVolume((ServerLevel) level, blockPos2, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
         }
         return true;
+    }
+
+    public InteractionResult useOn(UseOnContext useOnContext) {
+        Level level = useOnContext.getLevel();
+        Player player = useOnContext.getPlayer();
+        if (player == null) return InteractionResult.FAIL;
+
+        ItemStack itemStack = useOnContext.getItemInHand();
+        BlockPos targetPos = useOnContext.getClickedPos();
+
+        if (!player.isCrouching()) {
+            creativePipettePlace(level, targetPos, itemStack, player);
+        } else {
+            creativePipettePickup(level, targetPos, itemStack, player);
+        }
+
+        return InteractionResult.PASS;
     }
 
 }

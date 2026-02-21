@@ -21,13 +21,14 @@ import java.util.function.Consumer;
 public class FluidChunkAttachment implements Iterable<FluidSection> {
     public static final MapCodec<FluidChunkAttachment> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             FluidSection.CODEC.listOf().fieldOf("sections")
-                .forGetter(FluidChunkAttachment::getSections)
+                    .forGetter(FluidChunkAttachment::getSections)
     ).apply(i, FluidChunkAttachment::new));
 
     private List<FluidSection> sections = null;
     private LevelChunk chunk;
 
-    public FluidChunkAttachment() { }
+    public FluidChunkAttachment() {
+    }
 
     private FluidChunkAttachment(List<FluidSection> iSections) {
         this.sections = new ArrayList<>(iSections);
@@ -61,7 +62,7 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
     public short getVolume(int x, int y, int z, FluidType type) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
         synchronized (section) {
-           return section.getVolumeOf(x & 15, y & 15, z & 15, type);
+            return section.getVolumeOf(x & 15, y & 15, z & 15, type);
         }
     }
 

@@ -47,11 +47,11 @@ public class WashWater {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
-    private void registerTests(RegisterGameTestsEvent event) {
-        event.register(BucketTest.class);
-    }
-
     public static ResourceLocation resource(String name) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+    }
+
+    private void registerTests(RegisterGameTestsEvent event) {
+        event.register(BucketTest.class);
     }
 }

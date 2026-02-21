@@ -29,6 +29,8 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
     @Shadow
     @Final
     private static int SECTION_ARRAY_LENGTH;
+    @Unique
+    private final MultiFluidValue[][] ww€fluids = new MultiFluidValue[SECTION_ARRAY_SIZE][4096];
     @Shadow
     @Final
     private ClientLevel level;
@@ -50,9 +52,6 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
     public static int getLocalBlockIndex(int blockX, int blockY, int blockZ) {
         throw new AssertionError();
     }
-
-    @Unique
-    private final MultiFluidValue[][] ww€fluids = new MultiFluidValue[SECTION_ARRAY_SIZE][4096];
 
     @Inject(method = "copySectionData", at = @At("HEAD"))
     void ww€copyFluidSection(ChunkRenderContext context, int sectionIndex, CallbackInfo ci) {

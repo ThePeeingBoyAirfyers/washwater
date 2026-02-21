@@ -23,7 +23,7 @@ public class SimpleFluidRegion implements FluidRegion {
 
     public SimpleFluidRegion(ServerLevel iLevel, LongConsumer iOnUpdate) {
         this.level = iLevel;
-        this.onUpdate =  iOnUpdate;
+        this.onUpdate = iOnUpdate;
     }
 
     @Override

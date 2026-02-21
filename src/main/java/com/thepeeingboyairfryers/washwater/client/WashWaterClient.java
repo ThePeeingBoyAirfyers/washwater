@@ -24,15 +24,15 @@ public class WashWaterClient {
         init();
     }
 
-    public void init() {
-        WashWater.LOGGER.info("HELLO FROM CLIENT INITIALIZATION");
-    }
-
     // This method is called during the client setup phase.
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
         // Some client setup code
         WashWater.LOGGER.info("HELLO FROM CLIENT SETUP");
         WashWater.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+    }
+
+    public void init() {
+        WashWater.LOGGER.info("HELLO FROM CLIENT INITIALIZATION");
     }
 }

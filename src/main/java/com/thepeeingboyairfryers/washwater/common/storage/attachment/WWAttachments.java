@@ -8,12 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public class WWAttachments {
-    private WWAttachments() {
-        throw new IllegalStateException();
-    }
-
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, WashWater.MOD_ID);
-
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<FluidChunkAttachment>> FLUID_CHUNK =
             ATTACHMENTS.register(
                     "fluid",
@@ -22,7 +17,6 @@ public class WWAttachments {
                             .serialize(FluidChunkAttachment.CODEC.codec())
                             .build()
             );
-
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<FluidsIndexationAttachment>> FLUIDS_INDEXATION =
             ATTACHMENTS.register(
                     "fluids_indexation",
@@ -31,6 +25,10 @@ public class WWAttachments {
                             .serialize(FluidsIndexationAttachment.CODEC.codec())
                             .build()
             );
+
+    private WWAttachments() {
+        throw new IllegalStateException();
+    }
 
     public static void register(IEventBus bus) {
         ATTACHMENTS.register(bus);

@@ -44,7 +44,7 @@ public class WashFluidRenderer extends FluidRenderer {
         this.colorRegistry = iColorRegistry;
         this.lightPipelineProvider = iLightPipelineProvider;
     }
-    
+
     @Override
     public void render(
             LevelSlice level,

@@ -35,5 +35,6 @@ public class FluidScheduler {
         };
     }
 
-    private record QueuedSection(LevelChunkSection section, ShortList tick, int x, int y, int z) {}
+    private record QueuedSection(LevelChunkSection section, ShortList tick, int x, int y, int z) {
+    }
 }

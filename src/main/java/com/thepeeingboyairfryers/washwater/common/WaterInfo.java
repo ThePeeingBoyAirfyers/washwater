@@ -7,10 +7,6 @@ import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
 
 public class WaterInfo {
-    private WaterInfo() {
-        throw new IllegalStateException();
-    }
-
     public static final FluidType WATER_TYPE = NeoForgeMod.WATER_TYPE.value();
     public static final short VOLUME_PER_BLOCK = 1000;
     public static final short VOLUME_PER_LEVEL = (short) ((VOLUME_PER_BLOCK / 8) + 1);
@@ -18,6 +14,10 @@ public class WaterInfo {
     public static final short SURFACE_TENSION_LIMIT = 20;
     public static final int FLOW_DIVIDER = 8;
     public static final int MIN_Y = -64;
+    private WaterInfo() {
+        throw new IllegalStateException();
+    }
+
     public static short getWaterVolumeOfState(BlockState state) {
         FluidState fluidstate = state.getFluidState();
         if (fluidstate.isEmpty()) {

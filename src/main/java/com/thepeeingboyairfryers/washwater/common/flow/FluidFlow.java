@@ -9,13 +9,12 @@ import net.minecraft.core.Direction;
 import org.slf4j.Logger;
 
 public class FluidFlow {
-    private FluidFlow() {
-        throw new IllegalStateException();
-    }
-
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Direction[] HORIZONTAL_DIRECTIONS =
             new Direction[]{Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+    private FluidFlow() {
+        throw new IllegalStateException();
+    }
 
     public static void tick(FluidRegion region, BlockPos pos) {
         int volume = region.getFluidVolume(pos, WaterInfo.WATER_TYPE);
@@ -36,12 +35,11 @@ public class FluidFlow {
                 region.setVolume(pos, water(volume - transaction));
                 region.setVolume(underPos, water(underVolume + transaction));
                 volume -= transaction;
-                if (volume > 0) {
+                //if (volume > 0) {
                     //Flow downwards sideways
                     //equalizeWaterDownwards(region, pos, volume);
-                }
-            }
-            else {
+                //}
+            } else {
                 //Flow sideways
                 equalizeWater(region, pos, volume);
             }

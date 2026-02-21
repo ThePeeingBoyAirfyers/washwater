@@ -28,10 +28,10 @@ public class MixinChunkBuilderMeshingTask {
             at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/world/LevelSlice;getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", shift = At.Shift.AFTER)
     )
     void ww€getFluid(ChunkBuildContext buildContext, CancellationToken cancellationToken, CallbackInfoReturnable<ChunkBuildOutput> cir,
-              @Local(name = "slice") LevelSlice slice,
-              @Local(name = "x") int x,
-              @Local(name = "y") int y,
-              @Local(name = "z") int z
+                     @Local(name = "slice") LevelSlice slice,
+                     @Local(name = "x") int x,
+                     @Local(name = "y") int y,
+                     @Local(name = "z") int z
     ) {
         ww€current = ((ILevelSliceFluids) (Object) slice).ww€getFluidFor(x, y, z);
     }
@@ -45,7 +45,7 @@ public class MixinChunkBuilderMeshingTask {
 
     @Redirect(
             method = "execute(Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/ChunkBuildContext;Lnet/caffeinemc/mods/sodium/client/util/task/CancellationToken;)Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/ChunkBuildOutput;",
-    at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;isEmpty()Z"))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;isEmpty()Z"))
     boolean ww€isEmpty(FluidState instance) {
         return ww€current.isEmpty();
     }

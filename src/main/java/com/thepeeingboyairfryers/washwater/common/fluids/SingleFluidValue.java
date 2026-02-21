@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 public class SingleFluidValue implements MultiFluidValue {
     private final Entry entry;
+
     SingleFluidValue(@NotNull FluidType fluidTyp, short vol) {
         this.entry = new Entry(vol, fluidTyp);
     }

@@ -35,7 +35,9 @@ public class DumbFluidSection implements FluidSection {
     private final ShortList dirty = new ShortArrayList();
     private FluidSectionContainer container;
 
-    public DumbFluidSection() { }
+    public DumbFluidSection() {
+    }
+
     public DumbFluidSection(List<Short2ObjectMap.Entry<MultiFluidValue>> iMap) {
         for (var e : iMap) {
             this.map.put(e.getShortKey(), e.getValue());
@@ -71,7 +73,7 @@ public class DumbFluidSection implements FluidSection {
 
     @Override
     public short getAllVolume(int x, int y, int z) {
-        MultiFluidValue v =  getVolume(x, y, z);
+        MultiFluidValue v = getVolume(x, y, z);
         short total = 0;
 
         for (MultiFluidValue.Entry e : v) {

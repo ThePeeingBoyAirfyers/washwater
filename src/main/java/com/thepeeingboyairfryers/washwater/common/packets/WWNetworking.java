@@ -18,10 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WWNetworking {
+    private static final Map<ServerLevel, LongSet> DIRTY_SECTIONS = new HashMap<>();
+
     private WWNetworking() {
         throw new IllegalStateException("Utility class");
     }
-    private static final Map<ServerLevel, LongSet> DIRTY_SECTIONS = new HashMap<>();
 
     public static void register(IEventBus bus) {
         bus.addListener((RegisterPayloadHandlersEvent e) -> {

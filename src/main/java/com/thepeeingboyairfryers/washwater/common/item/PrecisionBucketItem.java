@@ -1,6 +1,7 @@
 package com.thepeeingboyairfryers.washwater.common.item;
 
 import net.minecraft.world.item.Item;
+
 public class PrecisionBucketItem extends Item {
 
     public PrecisionBucketItem(Properties properties) {

@@ -4,10 +4,6 @@ import com.thepeeingboyairfryers.washwater.common.scheduling.FluidTicker;
 import net.minecraft.core.Direction;
 
 public class PseudoRandom {
-    private PseudoRandom() {
-        throw new IllegalStateException("Utility class");
-    }
-
     private static final Direction[][] RANDOMISED_DIRECTION_ARRAY_ARRAY = new Direction[4][4];
 
     static {
@@ -18,6 +14,10 @@ public class PseudoRandom {
                 x++;
             }
         }
+    }
+
+    private PseudoRandom() {
+        throw new IllegalStateException("Utility class");
     }
 
     public static Direction[] getRandomDirectionArray() {

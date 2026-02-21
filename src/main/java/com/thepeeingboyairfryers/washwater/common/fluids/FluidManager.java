@@ -11,11 +11,11 @@ import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
 public class FluidManager {
+    private static FluidsIndexationAttachment fluidsIndexation;
+
     private FluidManager() {
         throw new IllegalStateException();
     }
-
-    private static FluidsIndexationAttachment fluidsIndexation;
 
     public static void register(IEventBus eventBus) {
         NeoForge.EVENT_BUS.addListener(FluidManager::levelLoaded);

@@ -13,11 +13,14 @@ public class SelfReplacingEmptySection implements FluidSection {
     private FluidSectionContainer container;
     private FluidSection otherSection = null;
 
+    private static FluidSection defaultSection(FluidSectionContainer container) {
+        return new DumbFluidSection();
+    }
 
     @Override
     public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
         if (otherSection == null) {
-            otherSection = defaultSection();
+            otherSection = defaultSection(container);
             container.update(otherSection);
         }
         synchronized (otherSection) {
@@ -78,9 +81,5 @@ public class SelfReplacingEmptySection implements FluidSection {
     public MapCodec<? extends FluidSection> codec() {
         if (otherSection == null) return FluidSection.EMPTY.codec();
         return otherSection.codec();
-    }
-
-    private static FluidSection defaultSection() {
-        return new DumbFluidSection();
     }
 }

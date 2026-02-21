@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public interface MixinFluidRendererFactory {
 
     /**
-     * Very sad and unhappy
+     * Very sad and unhappy.
      */
     @Redirect(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/services/Services;load(Ljava/lang/Class;)Ljava/lang/Object;"))
     private static Object instantiate(Class<?> clazz) {

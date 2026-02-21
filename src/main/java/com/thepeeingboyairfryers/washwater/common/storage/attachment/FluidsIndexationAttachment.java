@@ -29,9 +29,9 @@ import java.util.stream.Stream;
 
 public class FluidsIndexationAttachment {
     public static final MapCodec<FluidsIndexationAttachment> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Codec.simpleMap(NeoForgeRegistries.FLUID_TYPES.holderByNameCodec(), Codec.SHORT, NeoForgeRegistries.FLUID_TYPES)
-                        .fieldOf("fluid_indexation")
-                        .forGetter(FluidsIndexationAttachment::asIndexation)
+                    Codec.simpleMap(NeoForgeRegistries.FLUID_TYPES.holderByNameCodec(), Codec.SHORT, NeoForgeRegistries.FLUID_TYPES)
+                            .fieldOf("fluid_indexation")
+                            .forGetter(FluidsIndexationAttachment::asIndexation)
             ).apply(i, FluidsIndexationAttachment::createIndexation)
     );
 
@@ -39,10 +39,6 @@ public class FluidsIndexationAttachment {
     private final Short2ObjectMap<FluidType> id2fluid;
     private final Short2ShortMap fixedIds;
     private final Int2ObjectMap<List<Fluid>> relatedFluids;
-
-    public static FluidsIndexationAttachment create() {
-        return createIndexation(new HashMap<>());
-    }
 
     private FluidsIndexationAttachment(Int2ShortMap fld2id, Short2ObjectMap<FluidType> id2fld, Short2ShortMap fxedIds, Int2ObjectMap<List<Fluid>> irelatedFluids) {
         this.fluid2id = fld2id;
@@ -54,34 +50,8 @@ public class FluidsIndexationAttachment {
         fixedIds.defaultReturnValue(Short.MAX_VALUE);
     }
 
-    public Short2ShortFunction getIdFixer() {
-        return fixedIds;
-    }
-
-    public short getId(@NotNull FluidType fluidType) {
-        int id = NeoForgeRegistries.FLUID_TYPES.getId(fluidType);
-        if (!fluid2id.containsKey(id)) throw new IllegalArgumentException("No id for fluid " + fluidType);
-
-        return fluid2id.get(id);
-    }
-
-    public @NotNull FluidType getFluid(short id) {
-        if (!id2fluid.containsKey(id)) throw new IllegalArgumentException("No fluid with id " + id);
-
-        return id2fluid.get(id);
-    }
-
-    public @NotNull Collection<Fluid> getRelatedFluids(FluidType fluidType) {
-        return relatedFluids.get(NeoForgeRegistries.FLUID_TYPES.getId(fluidType));
-    }
-
-    private Map<Holder<FluidType>, Short> asIndexation() {
-        var result = new HashMap<Holder<FluidType>, Short>();
-        for (var entry : fluid2id.int2ShortEntrySet()) {
-            result.put(NeoForgeRegistries.FLUID_TYPES.getHolder(entry.getIntKey()).orElseThrow(), entry.getShortValue());
-        }
-
-        return result;
+    public static FluidsIndexationAttachment create() {
+        return createIndexation(new HashMap<>());
     }
 
     private static FluidsIndexationAttachment createIndexation(Map<Holder<FluidType>, Short> fluidIndexation) {
@@ -116,5 +86,35 @@ public class FluidsIndexationAttachment {
         });
 
         return new FluidsIndexationAttachment(fluid2id, id2fluid, fixedIds, relatedFluids);
+    }
+
+    public Short2ShortFunction getIdFixer() {
+        return fixedIds;
+    }
+
+    public short getId(@NotNull FluidType fluidType) {
+        int id = NeoForgeRegistries.FLUID_TYPES.getId(fluidType);
+        if (!fluid2id.containsKey(id)) throw new IllegalArgumentException("No id for fluid " + fluidType);
+
+        return fluid2id.get(id);
+    }
+
+    public @NotNull FluidType getFluid(short id) {
+        if (!id2fluid.containsKey(id)) throw new IllegalArgumentException("No fluid with id " + id);
+
+        return id2fluid.get(id);
+    }
+
+    public @NotNull Collection<Fluid> getRelatedFluids(FluidType fluidType) {
+        return relatedFluids.get(NeoForgeRegistries.FLUID_TYPES.getId(fluidType));
+    }
+
+    private Map<Holder<FluidType>, Short> asIndexation() {
+        var result = new HashMap<Holder<FluidType>, Short>();
+        for (var entry : fluid2id.int2ShortEntrySet()) {
+            result.put(NeoForgeRegistries.FLUID_TYPES.getHolder(entry.getIntKey()).orElseThrow(), entry.getShortValue());
+        }
+
+        return result;
     }
 }

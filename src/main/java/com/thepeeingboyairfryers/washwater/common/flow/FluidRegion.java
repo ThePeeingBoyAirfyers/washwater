@@ -23,16 +23,19 @@ public interface FluidRegion {
     default int getAllVolume(BlockPos pos) {
         return getAllVolume(pos.getX(), pos.getY(), pos.getZ());
     }
+
     int getAllVolume(int x, int y, int z);
 
     default boolean isAir(BlockPos pos) {
         return isAir(pos.getX(), pos.getY(), pos.getZ());
     }
+
     boolean isAir(int x, int y, int z);
 
     default boolean isWater(BlockPos pos) {
         return isWater(pos.getX(), pos.getY(), pos.getZ());
     }
+
     default boolean isWater(int x, int y, int z) {
         return getFluidVolume(x, y, z, NeoForgeMod.WATER_TYPE.value()) > 0;
     }
@@ -40,6 +43,7 @@ public interface FluidRegion {
     default boolean isSolid(BlockPos pos) {
         return isSolid(pos.getX(), pos.getY(), pos.getZ());
     }
+
     boolean isSolid(int x, int y, int z);
 
     default void setVolume(BlockPos pos, MultiFluidValue fluids) {

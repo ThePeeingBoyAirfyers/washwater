@@ -12,9 +12,9 @@ import org.spongepowered.asm.mixin.Overwrite;
 public abstract class MixinServerLevel {
 
     /**
-     * @author SirWashington
-     * @param pos The position of the fluid to tick
+     * @param pos   The position of the fluid to tick
      * @param fluid The fluid to tick
+     * @author SirWashington
      * @reason Vanilla fluid ticking is relieved of its duty
      */
     @Overwrite
