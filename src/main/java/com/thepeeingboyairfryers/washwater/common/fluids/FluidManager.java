@@ -3,6 +3,7 @@ package com.thepeeingboyairfryers.washwater.common.fluids;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidsIndexationAttachment;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.material.FluidState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -40,5 +41,9 @@ public class FluidManager {
 
     public static int lowestTick(ServerLevel level) {
         return 2;
+    }
+
+    public static FluidState dropinFluidState(FluidType fluidType) { // Think about what you have done
+        return fluidsIndexation.getRelatedFluids(fluidType).stream().findAny().orElseThrow().defaultFluidState();
     }
 }
