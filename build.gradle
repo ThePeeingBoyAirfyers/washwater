@@ -33,6 +33,14 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+
+    maven {
+        name 'luck-repo'
+        url 'https://repo.lucko.me/'
+        content {
+            includeModule 'me.lucko', 'spark-api'
+        }
+    }
 }
 
 base {
@@ -134,6 +142,7 @@ dependencies {
     // localRuntime "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
 
     implementation "maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge"
+    compileOnly 'me.lucko:spark-api:0.1-SNAPSHOT'
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar

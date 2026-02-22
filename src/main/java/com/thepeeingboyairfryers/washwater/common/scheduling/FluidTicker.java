@@ -1,7 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.scheduling;
 
 import com.thepeeingboyairfryers.washwater.common.flow.FluidFlow;
-import com.thepeeingboyairfryers.washwater.common.flow.FluidRegion;
 import com.thepeeingboyairfryers.washwater.common.flow.SimpleFluidRegion;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
@@ -18,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FluidTicker {
-    private static final Map<ServerLevel, FluidRegion> REGIONS = new HashMap<>();
+    private static final Map<ServerLevel, SimpleFluidRegion> REGIONS = new HashMap<>();
     private static final Map<ServerLevel, SwapPair<LongSet>> WATERS = new HashMap<>();
     private static int counter = 0;
     private static int currentTick = 0;
@@ -59,18 +58,13 @@ public class FluidTicker {
         currentTick++;
 
         if (shouldTick(level)) {
-            var region = REGIONS.computeIfAbsent(level, level1 -> new SimpleFluidRegion(level1, l -> {
-                int x = BlockPos.getX(l);
-                int y = BlockPos.getY(l);
-                int z = BlockPos.getZ(l);
-                if (FluidUtil.hasFluid(level, x, y, z)) {
-                    getCurrentWaterList(level).add(BlockPos.asLong(x, y, z));
-                }
-            }));
+
             var pair = WATERS.get(level);
             if (pair == null) return;
-
             pair.swap();
+
+            var region = REGIONS.computeIfAbsent(level, level1 -> new SimpleFluidRegion(level1));
+            region.setTickSet(pair.getCurrent());
             for (long pos : pair.getOther()) {
                 var bPos = BlockPos.of(pos);
                 FluidFlow.tick(region, bPos);

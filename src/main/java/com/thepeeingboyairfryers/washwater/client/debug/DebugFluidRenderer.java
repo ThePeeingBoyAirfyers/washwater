@@ -17,6 +17,7 @@ public class DebugFluidRenderer {
     }
 
     public static void register(IEventBus bus) {
+        if (System.getProperty("ww.debug") == null) return;
         NeoForge.EVENT_BUS.addListener(DebugFluidRenderer::render);
     }
 

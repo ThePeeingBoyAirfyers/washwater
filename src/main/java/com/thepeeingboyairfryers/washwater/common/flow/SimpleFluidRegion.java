@@ -5,7 +5,7 @@ import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongConsumer;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -19,11 +19,10 @@ public class SimpleFluidRegion implements FluidRegion {
     private final Long2ObjectMap<FluidSection> fluidSections = new Long2ObjectOpenHashMap<>();
     private final Long2ObjectMap<LevelChunkSection> sections = new Long2ObjectOpenHashMap<>();
     private final ServerLevel level;
-    private final LongConsumer onUpdate;
+    private LongSet onUpdate;
 
-    public SimpleFluidRegion(ServerLevel iLevel, LongConsumer iOnUpdate) {
+    public SimpleFluidRegion(ServerLevel iLevel) {
         this.level = iLevel;
-        this.onUpdate = iOnUpdate;
     }
 
     @Override
@@ -57,11 +56,18 @@ public class SimpleFluidRegion implements FluidRegion {
     public void setVolume(int x, int y, int z, MultiFluidValue value) {
         getFluidSection(x, y, z).setVolume(x & 15, y & 15, z & 15, value);
 
-        onUpdate.accept(BlockPos.asLong(x, y, z));
+        if (!value.isEmpty()) {
+            onUpdate.add(BlockPos.asLong(x, y, z));
+        } else {
+            onUpdate.remove(BlockPos.asLong(x, y, z));
+        }
+
         for (Direction direction : Direction.values()) {
-            onUpdate.accept(
-                    BlockPos.asLong(x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ())
-            );
+            int xD = x + direction.getStepX();
+            int yD = y + direction.getStepY();
+            int zD = z + direction.getStepZ();
+            if (isAir(xD, yD, zD)) continue;
+            onUpdate.add(BlockPos.asLong(xD, yD, zD));
         }
     }
 
@@ -71,5 +77,9 @@ public class SimpleFluidRegion implements FluidRegion {
 
     private LevelChunkSection getSection(int x, int y, int z) {
         return sections.computeIfAbsent(SectionPos.asLong(x >> 4, y >> 4, z >> 4), l -> level.getChunk(x >> 4, z >> 4).getSection(level.getSectionIndex(y)));
+    }
+
+    public void setTickSet(LongSet current) {
+        onUpdate = current;
     }
 }

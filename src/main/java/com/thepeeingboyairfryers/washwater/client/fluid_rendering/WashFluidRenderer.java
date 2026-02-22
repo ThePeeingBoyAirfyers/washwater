@@ -151,13 +151,6 @@ public class WashFluidRenderer extends FluidRenderer {
             setVertex(3, x1, c1, z1, u1, v1);
             writeQuad(builder, collector, material, blockPos, offset, dir, false);
         }
-
-
-        try {
-            logger.info("Rendering block at {} with {}", blockPos, fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), blockPos.getZ()).getTotalVolume());
-        } catch (Exception e) {
-            logger.error("Exception while rendering,", e);
-        }
     }
 
     private void writeQuad(ChunkModelBuilder builder, TranslucentGeometryCollector collector, Material material, BlockPos realPos, BlockPos offset, Direction facing, boolean flip) {

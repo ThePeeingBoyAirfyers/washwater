@@ -22,6 +22,7 @@ public class FluidUtil {
     }
 
     public static void addVolume(ServerLevel level, BlockPos pos, FluidType type, int volume) {
+        if (volume == 0) return;
         short oldVolume = getAllVolume(level, pos);
         if (oldVolume < 0) {
             WashWater.LOGGER.warn("Tried to add water volume to a non-air block");

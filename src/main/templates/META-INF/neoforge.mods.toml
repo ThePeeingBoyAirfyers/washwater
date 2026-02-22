@@ -86,7 +86,7 @@ file="META-INF/accesstransformer.cfg"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]] #optional
+[[dependencies.${mod_id}]]
 modId="sodium"
 type="required"
 # The version range of the dependency
@@ -102,3 +102,9 @@ side="CLIENT"
 # stop your mod loading on the server for example.
 #[features.${mod_id}]
 #openGLVersion="[3.2,)"
+
+[[dependencies.${mod_id}]] #optional
+modId="spark"
+type="optional"
+ordering="AFTER"
+side="BOTH"

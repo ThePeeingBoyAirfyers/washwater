@@ -19,7 +19,7 @@ public abstract class MixinServerLevel {
      */
     @Overwrite
     private void tickFluid(BlockPos pos, Fluid fluid) {
-        FluidTicker.tickWater((ServerLevel) (Object) this, pos);
+        FluidTicker.tickIfWater((ServerLevel) (Object) this, pos.getX(), pos.getY(), pos.getZ());
     }
 }
 

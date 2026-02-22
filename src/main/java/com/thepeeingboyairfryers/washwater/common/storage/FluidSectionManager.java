@@ -31,9 +31,11 @@ public class FluidSectionManager {
     }
 
     public static FluidChunkAttachment getAttachmentFor(LevelChunk chunk) {
-        var result = chunk.getData(WWAttachments.FLUID_CHUNK);
-        result.configure(chunk);
-        return result;
+        synchronized (chunk) {
+            var result = chunk.getData(WWAttachments.FLUID_CHUNK);
+            result.configure(chunk);
+            return result;
+        }
     }
 
     public static BlockState writeStateToFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState state) {
