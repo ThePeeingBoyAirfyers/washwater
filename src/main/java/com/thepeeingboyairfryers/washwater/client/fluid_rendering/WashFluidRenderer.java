@@ -166,16 +166,13 @@ public class WashFluidRenderer extends FluidRenderer {
         ColorProvider colorProvider = colorRegistry.getColorProvider(fluidState.getType());
         colorProvider.getColors(level, realPos, new BlockPos.MutableBlockPos(realPos.getX(), realPos.getY(), realPos.getZ()), fluidState, quad, quadColors);
 
-        for(int i = 0; i < 4; ++i) {
-            quad.setColor(i, ColorARGB.toABGR(quadColors[i]));
-        }
 
         for (int i = 0; i < 4; ++i) {
             ChunkVertexEncoder.Vertex out = iVertices[flip ? 3 - i + 1 & 3 : i];
             out.x = (float) offset.getX() + quad.getX(i);
             out.y = (float) offset.getY() + quad.getY(i);
             out.z = (float) offset.getZ() + quad.getZ(i);
-            out.color = quad.getColor(i);
+            out.color = ColorARGB.toABGR(quadColors[i]);
             out.ao = Integer.MAX_VALUE; //this.brightness[i];
             if (sprite == null) {
                 out.u = quad.getTexU(i);
