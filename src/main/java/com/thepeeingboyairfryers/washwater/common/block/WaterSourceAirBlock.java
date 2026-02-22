@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.block;
 
+import com.thepeeingboyairfryers.washwater.common.Config;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -8,8 +9,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -27,15 +26,10 @@ public class WaterSourceAirBlock extends Block {
     }
 
     protected void randomTick(@NotNull BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos, @NotNull RandomSource random) {
-        FluidUtil.addVolume(level, pos, NeoForgeMod.WATER_TYPE.value(), 1);
+        FluidUtil.addVolume(level, pos, NeoForgeMod.WATER_TYPE.value(), Config.WATER_SOURCE_GAIN.getAsInt());
     }
 
     protected @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return Shapes.empty();
-    }
-
-    @Override
-    protected @NotNull FluidState getFluidState(@NotNull BlockState state) {
-        return Fluids.WATER.defaultFluidState();
     }
 }
