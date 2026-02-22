@@ -54,41 +54,45 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
 
     public void setVolume(int x, int y, int z, MultiFluidValue value) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        synchronized (section) {
-            section.setVolume(x & 15, y & 15, z & 15, value);
-        }
+        section.writeLock().lock();
+        section.setVolume(x & 15, y & 15, z & 15, value);
+        section.writeLock().unlock();
     }
 
     public short getVolume(int x, int y, int z, FluidType type) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        synchronized (section) {
-            return section.getVolumeOf(x & 15, y & 15, z & 15, type);
-        }
+        section.readLock().lock();
+        short r = section.getVolumeOf(x & 15, y & 15, z & 15, type);
+        section.readLock().unlock();
+        return r;
     }
 
     public short getAllVolume(int x, int y, int z) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        synchronized (section) {
-            return section.getAllVolume(x & 15, y & 15, z & 15);
-        }
+        section.readLock().lock();
+        short r = section.getAllVolume(x & 15, y & 15, z & 15);
+        section.readLock().unlock();
+        return r;
     }
 
     public void addFluidVolume(int x, int y, int z, FluidType type, short volume) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        synchronized (section) {
-            var values = section.getVolume(x & 15, y & 15, z & 15);
-            short total = 0;
-            for (MultiFluidValue.Entry e : values) {
-                total += e.volume();
-            }
-            if (total >= FluidUtil.VOLUME_OF_BLOCK) return;
-            volume = (short) Math.min(volume, FluidUtil.VOLUME_OF_BLOCK - total);
+        section.writeLock().lock();
 
-            section.setVolume(
-                    x & 15, y & 15, z & 15,
-                    values.setFluid(type, (short) (volume + values.forFluid(type)))
-            );
+        var values = section.getVolume(x & 15, y & 15, z & 15);
+        short total = 0;
+        for (MultiFluidValue.Entry e : values) {
+            total += e.volume();
         }
+        if (total >= FluidUtil.VOLUME_OF_BLOCK) return;
+        volume = (short) Math.min(volume, FluidUtil.VOLUME_OF_BLOCK - total);
+
+        section.setVolume(
+                x & 15, y & 15, z & 15,
+                values.setFluid(type, (short) (volume + values.forFluid(type)))
+        );
+
+        section.writeLock().unlock();
     }
 
     public FluidSection getSectionWithY(int y) {

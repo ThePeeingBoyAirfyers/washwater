@@ -72,9 +72,9 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
             return;
         }
 
-        synchronized (section) {
-            section.fill(fluids);
-        }
+        section.readLock().lock();
+        section.fill(fluids);
+        section.readLock().unlock();
     }
 
     @Override

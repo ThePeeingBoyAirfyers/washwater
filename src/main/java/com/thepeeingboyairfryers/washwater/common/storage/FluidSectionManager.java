@@ -40,7 +40,9 @@ public class FluidSectionManager {
 
     public static BlockState writeStateToFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState state) {
         var iState = (IFluidState) state.getFluidState();
+        fluidSection.writeLock().lock();
         fluidSection.setVolume(x, y, z, iState.ww€getFluid());
+        fluidSection.writeLock().unlock();
 
         if (state.is(Blocks.WATER)) return Blocks.AIR.defaultBlockState();
         if (state instanceof WWBlockState ww) return ww.ww€getOG();
@@ -48,16 +50,20 @@ public class FluidSectionManager {
     }
 
     public static BlockState getBlockStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState og) {
+        fluidSection.readLock().lock();
         var result = fluidSection.getVolume(x, y, z);
-        if (result.isEmpty()) return og;
+        fluidSection.readLock().unlock();
 
+        if (result.isEmpty()) return og;
         return new WWBlockState(result, og);
     }
 
     public static FluidState getFluidStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, FluidState og) {
+        fluidSection.readLock().lock();
         var result = fluidSection.getVolume(x, y, z);
-        if (result.isEmpty()) return og;
+        fluidSection.readLock().unlock();
 
+        if (result.isEmpty()) return og;
         return new WWFluidState(result, og);
     }
 

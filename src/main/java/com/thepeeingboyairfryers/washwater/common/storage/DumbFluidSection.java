@@ -20,6 +20,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
 public class DumbFluidSection implements FluidSection {
@@ -33,6 +36,7 @@ public class DumbFluidSection implements FluidSection {
 
     private final Short2ObjectMap<MultiFluidValue> map = new Short2ObjectAVLTreeMap<>();
     private final ShortList dirty = new ShortArrayList();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private FluidSectionContainer container;
 
     public DumbFluidSection() {
@@ -104,6 +108,16 @@ public class DumbFluidSection implements FluidSection {
     @Override
     public MapCodec<DumbFluidSection> codec() {
         return CODEC;
+    }
+
+    @Override
+    public Lock readLock() {
+        return lock.readLock();
+    }
+
+    @Override
+    public Lock writeLock() {
+        return lock.writeLock();
     }
 
     public Stream<BlockPos> allKeys() {

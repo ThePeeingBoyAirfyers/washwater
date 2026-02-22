@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.common.util.DummyLock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
@@ -14,6 +15,7 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 
@@ -98,6 +100,16 @@ public interface FluidSection {
         }
 
         @Override
+        public Lock readLock() {
+            return DummyLock.INSTANCE;
+        }
+
+        @Override
+        public Lock writeLock() {
+            return DummyLock.INSTANCE;
+        }
+
+        @Override
         public String toString() {
             return "FluidSection.EMPTY";
         }
@@ -118,6 +130,8 @@ public interface FluidSection {
 
     /**
      * Returns a packet that contains the dirty data of this FluidSection.
+     * With fullUpdate == true it's allowed to call this method with the ReadLock
+     * If false you need a WriteLock
      *
      * @param pos        The position of the section in the world.
      * @param fullUpdate If true, the packet should contain all data, not just the dirty data.
@@ -127,6 +141,16 @@ public interface FluidSection {
     @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean fullUpdate);
 
     MapCodec<? extends FluidSection> codec();
+
+    /**
+     * Because of selfupcating properties you should not store the lock locally but get it lock and then later get it again and unlock
+     */
+    Lock readLock();
+
+    /**
+     * Because of selfupcating properties you should not store the lock locally but get it lock and then later get it again and unlock
+     */
+    Lock writeLock();
 
     default void fill(MultiFluidValue[] fluids) {
         if (fluids.length != 4096) throw new IllegalArgumentException();

@@ -30,14 +30,15 @@ public class WWNetworking {
             r.playToClient(DumbFluidSectionUpdatePacket.TYPE, DumbFluidSectionUpdatePacket.STREAM_CODEC, (p, ctx) -> {
                 var chunk = Minecraft.getInstance().level.getChunk(p.pos().x(), p.pos().z());
                 var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
-                synchronized (section) {
-                    for (var u : p.updates()) {
-                        var x = FluidSection.short2localX(u.getFirst());
-                        var y = FluidSection.short2localY(u.getFirst());
-                        var z = FluidSection.short2localZ(u.getFirst());
-                        section.setVolume(x, y, z, u.getSecond());
-                    }
+
+                section.writeLock().lock();
+                for (var u : p.updates()) {
+                    var x = FluidSection.short2localX(u.getFirst());
+                    var y = FluidSection.short2localY(u.getFirst());
+                    var z = FluidSection.short2localZ(u.getFirst());
+                    section.setVolume(x, y, z, u.getSecond());
                 }
+                section.writeLock().unlock();
             });
         });
 
@@ -51,11 +52,15 @@ public class WWNetworking {
                 var chunkPos = sectionPos.chunk();
                 var chunk = l.getChunk(chunkPos.x, chunkPos.z);
                 var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
-                synchronized (s) {
-                    var update = s.updatePacket(sectionPos, false);
-                    if (update == null) continue;
-                    PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, chunkPos, update);
-                }
+
+                //Write cus we cleanup dirties
+                s.writeLock().lock();
+
+                var update = s.updatePacket(sectionPos, false);
+                if (update == null) continue;
+                PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, chunkPos, update);
+
+                s.writeLock().unlock();
             }
         });
 
@@ -65,11 +70,13 @@ public class WWNetworking {
             var attachment = FluidSectionManager.getAttachmentFor(l.getChunk(cPos.x, cPos.z));
             int idx = 0;
             for (var s : attachment) {
-                synchronized (s) {
-                    var update = s.updatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
-                    if (update == null) continue;
-                    PacketDistributor.sendToPlayer(e.getPlayer(), update);
-                }
+                s.readLock().lock(); //Read cus we just send state of water to new player
+
+                var update = s.updatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
+                if (update == null) continue;
+                PacketDistributor.sendToPlayer(e.getPlayer(), update);
+
+                s.readLock().unlock();
             }
         });
     }
