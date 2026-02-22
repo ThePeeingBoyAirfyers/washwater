@@ -4,7 +4,9 @@ import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.duck.ILevelSliceFluids;
+import net.caffeinemc.mods.sodium.api.util.ColorARGB;
 import net.caffeinemc.mods.sodium.api.util.NormI8;
+import net.caffeinemc.mods.sodium.client.model.color.ColorProvider;
 import net.caffeinemc.mods.sodium.client.model.color.ColorProviderRegistry;
 import net.caffeinemc.mods.sodium.client.model.light.LightMode;
 import net.caffeinemc.mods.sodium.client.model.light.LightPipelineProvider;
@@ -24,8 +26,10 @@ import net.caffeinemc.mods.sodium.client.world.LevelSlice;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.textures.FluidSpriteCache;
 import org.slf4j.Logger;
@@ -66,10 +70,6 @@ public class WashFluidRenderer extends FluidRenderer {
         IClientFluidTypeExtensions handler = IClientFluidTypeExtensions.of(fluidState);
         TextureAtlasSprite[] sprites = FluidSpriteCache.getFluidSprites(level, blockPos, fluidState);
 
-        quad.setColor(0, 0xFFFFFFFF);
-        quad.setColor(1, 0xFFFFFFFF);
-        quad.setColor(2, 0xFFFFFFFF);
-        quad.setColor(3, 0xFFFFFFFF);
         quad.setSprite(sprites[0]);
 
         float generalHeight = (((float) entry.volume()) / WaterInfo.VOLUME_PER_BLOCK);
@@ -84,14 +84,14 @@ public class WashFluidRenderer extends FluidRenderer {
         setVertex(1, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f);
         setVertex(2, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
         setVertex(3, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-        writeQuad(builder, collector, material, blockPos, offset, Direction.DOWN, false);
+        writeQuad(builder, collector, material, blockPos, offset, Direction.DOWN, false, level, fluidState);
 
         //Top Face
         setVertex(0, 0.0f, southWestHeight, 1.0f, 0.0f, 0.0f);
         setVertex(1, 1.0f, southEastHeight, 1.0f, 1.0f, 0.0f);
         setVertex(2, 1.0f, northEastHeight, 0.0f, 1.0f, 1.0f);
         setVertex(3, 0.0f, northWestHeight, 0.0f, 0.0f, 1.0f);
-        writeQuad(builder, collector, material, blockPos, offset, Direction.UP, false);
+        writeQuad(builder, collector, material, blockPos, offset, Direction.UP, false, level, fluidState);
 
         for (Direction dir : DirectionUtil.HORIZONTAL_DIRECTIONS) {
             float c1;
@@ -149,11 +149,11 @@ public class WashFluidRenderer extends FluidRenderer {
             setVertex(1, x2, yOffset, z2, u2, v3);
             setVertex(2, x1, yOffset, z1, u1, v3);
             setVertex(3, x1, c1, z1, u1, v1);
-            writeQuad(builder, collector, material, blockPos, offset, dir, false);
+            writeQuad(builder, collector, material, blockPos, offset, dir, false, level, fluidState);
         }
     }
 
-    private void writeQuad(ChunkModelBuilder builder, TranslucentGeometryCollector collector, Material material, BlockPos realPos, BlockPos offset, Direction facing, boolean flip) {
+    private void writeQuad(ChunkModelBuilder builder, TranslucentGeometryCollector collector, Material material, BlockPos realPos, BlockPos offset, Direction facing, boolean flip, LevelSlice level, FluidState fluidState) {
         ChunkVertexEncoder.Vertex[] iVertices = this.vertices;
         var lighter = lightPipelineProvider.getLighter(LightMode.SMOOTH);
         var quadFacing = ModelQuadFacing.fromDirection(facing);
@@ -161,6 +161,14 @@ public class WashFluidRenderer extends FluidRenderer {
         TextureAtlasSprite sprite = quad.getSprite();
         quad.setFaceNormal(normal);
         lighter.calculate(quad, realPos, quadLightData, null, facing, false, false);
+
+        int[] quadColors = new int[4];
+        ColorProvider colorProvider = colorRegistry.getColorProvider(fluidState.getType());
+        colorProvider.getColors(level, realPos, new BlockPos.MutableBlockPos(realPos.getX(), realPos.getY(), realPos.getZ()), fluidState, quad, quadColors);
+
+        for(int i = 0; i < 4; ++i) {
+            quad.setColor(i, ColorARGB.toABGR(quadColors[i]));
+        }
 
         for (int i = 0; i < 4; ++i) {
             ChunkVertexEncoder.Vertex out = iVertices[flip ? 3 - i + 1 & 3 : i];
