@@ -40,7 +40,7 @@ public class FluidUtil {
                     type, (short) Math.min(spaceLeft, volume)
             );
 
-            FluidTicker.tickWater(level, pos);
+            FluidTicker.tickFluid(level, pos);
         }
 
         if (spaceLeft < volume) {
@@ -72,11 +72,11 @@ public class FluidUtil {
         fluidChunk.setVolume(x & 15, y, z & 15, fluids);
 
         if (!fluids.isEmpty()) {
-            FluidTicker.tickWater(level, x, y, z);
+            FluidTicker.tickFluid(level, x, y, z);
         }
 
         for (var direction : DirectionUtils.HORIZONTAL_TOP) {
-            FluidTicker.tickIfWater(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
+            FluidTicker.tickIfFluid(level, x + direction.getStepX(), y + direction.getStepY(), z + direction.getStepZ());
         }
     }
 
