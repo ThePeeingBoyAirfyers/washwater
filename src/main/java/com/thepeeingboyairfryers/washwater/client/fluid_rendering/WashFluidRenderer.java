@@ -127,10 +127,14 @@ public class WashFluidRenderer extends FluidRenderer {
 
         //Bottom Face
         //if (!cullDown) {
-            setVertex(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+/*            setVertex(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             setVertex(1, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
             setVertex(2, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-            setVertex(3, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+            setVertex(3, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);*/
+            setVertex(0, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+            setVertex(1, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+            setVertex(2, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+            setVertex(3, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
             writeQuad(builder, collector, material, blockPos, offset, Direction.DOWN, false, level, fluidState);
         //}
 
