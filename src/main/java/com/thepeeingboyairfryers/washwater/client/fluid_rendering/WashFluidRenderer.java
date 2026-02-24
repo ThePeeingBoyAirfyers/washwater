@@ -2,6 +2,7 @@ package com.thepeeingboyairfryers.washwater.client.fluid_rendering;
 
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
+import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.duck.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.api.util.ColorARGB;
@@ -73,10 +74,39 @@ public class WashFluidRenderer extends FluidRenderer {
         quad.setSprite(sprites[0]);
 
         float generalHeight = (((float) entry.volume()) / WaterInfo.VOLUME_PER_BLOCK);
-        float northWestHeight = generalHeight;
-        float northEastHeight = generalHeight;
-        float southWestHeight = generalHeight;
-        float southEastHeight = generalHeight;
+
+        MultiFluidValue northValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), (blockPos.getZ()-1));
+        MultiFluidValue southValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), (blockPos.getZ()+1));
+        MultiFluidValue westValue = fluids.ww€getFluidFor(blockPos.getX()-1, blockPos.getY(), (blockPos.getZ()));
+        MultiFluidValue eastValue = fluids.ww€getFluidFor(blockPos.getX()+1, blockPos.getY(), (blockPos.getZ()));
+
+        MultiFluidValue northWestValue = fluids.ww€getFluidFor(blockPos.getX()-1, blockPos.getY(), (blockPos.getZ()-1));
+        MultiFluidValue northEastValue = fluids.ww€getFluidFor(blockPos.getX()+1, blockPos.getY(), (blockPos.getZ()-1));
+        MultiFluidValue southWestValue = fluids.ww€getFluidFor(blockPos.getX()-1, blockPos.getY(), (blockPos.getZ()+1));
+        MultiFluidValue southEastValue = fluids.ww€getFluidFor(blockPos.getX()+1, blockPos.getY(), (blockPos.getZ()+1));
+
+
+
+        float northHeight = (((float) (northValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+        float southHeight = (((float) (southValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+        float westHeight = (((float) (westValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+        float eastHeight = (((float) (eastValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+
+        float northWestDiagHeight = (((float) (northWestValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+        float northEastDiagHeight = (((float) (northEastValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+        float southWestDiagHeight = (((float) (southWestValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+        float southEastDiagHeight = (((float) (southEastValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+
+        float northWestHeight = calculateCornerHeight(generalHeight, northHeight, westHeight, northWestDiagHeight);
+        float northEastHeight = calculateCornerHeight(generalHeight, northHeight, eastHeight, northEastDiagHeight);
+        float southWestHeight = calculateCornerHeight(generalHeight, southHeight, westHeight, southWestDiagHeight);
+        float southEastHeight = calculateCornerHeight(generalHeight, southHeight, eastHeight, southEastDiagHeight);
+
+/*        float northWestHeight = 0.01f;
+        float northEastHeight = 0.01f;
+        float southWestHeight = 0.01f;
+        float southEastHeight = 0.01f;*/
+
         float yOffset = 0.001F;
 
         //Bottom Face
@@ -151,6 +181,20 @@ public class WashFluidRenderer extends FluidRenderer {
             setVertex(3, x1, c1, z1, u1, v1);
             writeQuad(builder, collector, material, blockPos, offset, dir, false, level, fluidState);
         }
+    }
+
+    private float calculateCornerHeight(float heightSelf, float heightA, float heightB, float heightDiag) {
+        int divisor = 1;
+        if (heightA > 0)
+            divisor++;
+        if (heightB > 0)
+            divisor++;
+        if (heightDiag > 0)
+            divisor++;
+
+
+        return ((heightSelf + heightA + heightB + heightDiag) / (float) divisor);
+
     }
 
     private void writeQuad(ChunkModelBuilder builder, TranslucentGeometryCollector collector, Material material, BlockPos realPos, BlockPos offset, Direction facing, boolean flip, LevelSlice level, FluidState fluidState) {
