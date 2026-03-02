@@ -35,23 +35,25 @@ public class FluidTickSection extends CachedFluidRegion {
             blockSections[j].acquire();
         }
 
-        for (short s : liveTicks) {
-            int xW = FluidSection.short2localX(s) + 8 + (x << 4);
-            int yW = FluidSection.short2localY(s) + 8 + (y << 4);
-            int zW = FluidSection.short2localZ(s) + 8 + (z << 4);
-            ctx.tickFluid(this, xW, yW, zW, getFluids(xW, yW, zW), random);
-        }
+        toBeTicked.clear();
 
-        for (int j = 0; j < 8; j++) {
-            if (fluidSections[j] == null) continue;
-            blockSections[j].release();
-            fluidSections[j].writeLock().unlock();
+        try {
+            for (short s : liveTicks) {
+                int xW = FluidSection.short2localX(s) + 8 + (x << 4);
+                int yW = FluidSection.short2localY(s) + 8 + (y << 4);
+                int zW = FluidSection.short2localZ(s) + 8 + (z << 4);
+                ctx.tickFluid(this, xW, yW, zW, getFluids(xW, yW, zW), random);
+            }
+        } finally {
+            for (int j = 0; j < 8; j++) {
+                if (fluidSections[j] == null) continue;
+                blockSections[j].release();
+                fluidSections[j].writeLock().unlock();
+            }
         }
 
         liveTicks.clear();
-
         ctx.submitTickSet(toBeTicked);
-        toBeTicked.clear();
     }
 
     public void addLiveTick(int xW, int yW, int zW) {

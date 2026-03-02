@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.util.DummyLock;
+import com.thepeeingboyairfryers.washwater.common.util.parallel.DummyLock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
@@ -148,7 +148,7 @@ public interface FluidSection {
     Lock readLock();
 
     /**
-     * Because of selfupcating properties you should not store the lock locally but get it lock and then later get it again and unlock
+     * Because of selfupdating properties you should not store the lock locally but get it lock and then later get it again and unlock
      */
     Lock writeLock();
 

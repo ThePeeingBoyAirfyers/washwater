@@ -52,8 +52,6 @@ public class DumbFluidSection implements FluidSection {
 
     @Override
     public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
-        assert !writeLock().tryLock();
-
         short p = FluidSection.localPos2Short(x, y, z);
         if (fluids.isEmpty()) {
             if (map.remove(p) != null) {
@@ -101,8 +99,6 @@ public class DumbFluidSection implements FluidSection {
 
     @Override
     public @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
-        assert !(!all && writeLock().tryLock());
-
         if (dirty.isEmpty() && !all) return null;
         var updates = (all ? map.keySet() : dirty).stream().map(s -> Pair.of(s, map.getOrDefault(s, MultiFluidValue.EMPTY))).toList();
         if (!all) dirty.clear();

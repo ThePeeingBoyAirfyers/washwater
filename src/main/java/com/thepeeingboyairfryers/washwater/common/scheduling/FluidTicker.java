@@ -49,10 +49,14 @@ public class FluidTicker {
         currentTick++;
 
         var tLevel = TICK_LEVELS.computeIfAbsent(level, FluidTickLevel::new);
-        if (shouldTick(level))
-            tLevel.tickLevel(0, 4);
-        else
-            tLevel.tickLevel(4, 4);
+
+        if (shouldTick(level)) {
+            tLevel.applyNextTicks();
+            tLevel.tickLevelParallel(0, 4);
+        } else {
+            tLevel.tickLevelParallel(4, 4);
+        }
+
     }
     public static int getCurrentTick() {
         return currentTick;

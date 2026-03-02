@@ -32,35 +32,41 @@ public class WWNetworking {
                 var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
 
                 section.writeLock().lock();
-                for (var u : p.updates()) {
-                    var x = FluidSection.short2localX(u.getFirst());
-                    var y = FluidSection.short2localY(u.getFirst());
-                    var z = FluidSection.short2localZ(u.getFirst());
-                    section.setVolume(x, y, z, u.getSecond());
+                try {
+                    for (var u : p.updates()) {
+                        var x = FluidSection.short2localX(u.getFirst());
+                        var y = FluidSection.short2localY(u.getFirst());
+                        var z = FluidSection.short2localZ(u.getFirst());
+                        section.setVolume(x, y, z, u.getSecond());
+                    }
+                } finally {
+                    section.writeLock().unlock();
                 }
-                section.writeLock().unlock();
             });
         });
 
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post e) -> {
             if (e.getLevel().isClientSide()) return;
             var l = e.getLevel();
-            var dirties = DIRTY_SECTIONS.get(l);
-            if (dirties == null) return;
-            for (var lPos : dirties) {
-                var sectionPos = SectionPos.of(lPos);
-                var chunkPos = sectionPos.chunk();
-                var chunk = l.getChunk(chunkPos.x, chunkPos.z);
-                var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
+            synchronized (DIRTY_SECTIONS) {
+                var dirties = DIRTY_SECTIONS.get(l);
+                if (dirties == null) return;
+                for (var lPos : dirties) {
+                    var sectionPos = SectionPos.of(lPos);
+                    var chunkPos = sectionPos.chunk();
+                    var chunk = l.getChunk(chunkPos.x, chunkPos.z);
+                    var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
 
-                //Write cus we cleanup dirties
-                s.writeLock().lock();
-
-                var update = s.updatePacket(sectionPos, false);
-                if (update == null) continue;
-                PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, chunkPos, update);
-
-                s.writeLock().unlock();
+                    //Write cus we cleanup dirties
+                    s.writeLock().lock();
+                    try {
+                        var update = s.updatePacket(sectionPos, false);
+                        if (update != null)
+                            PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, chunkPos, update);
+                    } finally {
+                        s.writeLock().unlock();
+                    }
+                }
             }
         });
 
@@ -72,17 +78,21 @@ public class WWNetworking {
             for (var s : attachment) {
                 s.readLock().lock(); //Read cus we just send state of water to new player
 
-                var update = s.updatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
-                if (update == null) continue;
-                PacketDistributor.sendToPlayer(e.getPlayer(), update);
-
-                s.readLock().unlock();
+                try {
+                    var update = s.updatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
+                    if (update != null)
+                        PacketDistributor.sendToPlayer(e.getPlayer(), update);
+                } finally {
+                    s.readLock().unlock();
+                }
             }
         });
     }
 
     //SectionPos coordinates
-    public static void queueUpdate(ServerLevel level, int x, int y, int z) {
-        DIRTY_SECTIONS.computeIfAbsent(level, a -> new LongRBTreeSet()).add(SectionPos.asLong(x, y, z));
+    public static void queueUpdate(ServerLevel level, int x, int y, int z) { // TODO notable bottleneck in multithreading
+        synchronized (DIRTY_SECTIONS) {
+            DIRTY_SECTIONS.computeIfAbsent(level, a -> new LongRBTreeSet()).add(SectionPos.asLong(x, y, z));
+        }
     }
 }

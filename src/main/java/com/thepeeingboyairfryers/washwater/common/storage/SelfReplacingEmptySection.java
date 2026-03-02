@@ -2,7 +2,7 @@ package com.thepeeingboyairfryers.washwater.common.storage;
 
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.util.DummyLock;
+import com.thepeeingboyairfryers.washwater.common.util.parallel.DummyLock;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
