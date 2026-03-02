@@ -55,6 +55,8 @@ public class FluidSectionManager {
         fluidSection.readLock().unlock();
 
         if (result.isEmpty()) return og;
+        if (og.isAir() && result.getTotalVolume() > 100)
+            og = Blocks.WATER.defaultBlockState(); // TODO other fluids?
         return new WWBlockState(result, og);
     }
 
