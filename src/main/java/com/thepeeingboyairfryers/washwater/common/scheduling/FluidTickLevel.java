@@ -79,6 +79,8 @@ public class FluidTickLevel implements FluidTickingContext {
                 toBeTicked(BlockPos.getX(p), BlockPos.getY(p), BlockPos.getZ(p));
             }
         }
+
+        nextTickToBeTicked.clear();
     }
 
     private FluidTickSection setupTicker(FluidTickSection section) {
