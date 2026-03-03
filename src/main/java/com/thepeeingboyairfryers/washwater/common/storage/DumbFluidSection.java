@@ -14,18 +14,14 @@ import it.unimi.dsi.fastutil.shorts.ShortList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
-public class DumbFluidSection implements FluidSection {
+public class DumbFluidSection extends UpgradeableFluidSection {
     public static final MapCodec<Short2ObjectMap.Entry<MultiFluidValue>> ENTRY_CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
             Codec.SHORT.fieldOf("pos").forGetter(Short2ObjectMap.Entry::getShortKey),
             MultiFluidValue.CODEC.fieldOf("value").forGetter(Short2ObjectMap.Entry<MultiFluidValue>::getValue)
@@ -36,8 +32,6 @@ public class DumbFluidSection implements FluidSection {
 
     private final Short2ObjectMap<MultiFluidValue> map = new Short2ObjectAVLTreeMap<>();
     private final ShortList dirty = new ShortArrayList();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private FluidSectionContainer container;
 
     public DumbFluidSection() {
     }
@@ -51,7 +45,7 @@ public class DumbFluidSection implements FluidSection {
     }
 
     @Override
-    public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
+    public void volume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
         short p = FluidSection.localPos2Short(x, y, z);
         if (fluids.isEmpty()) {
             if (map.remove(p) != null) {
@@ -62,39 +56,17 @@ public class DumbFluidSection implements FluidSection {
 
         map.put(p, fluids);
         dirty.add(p);
-        container.markDirty();
+        markDirty();
     }
 
     @Override
-    public short getVolumeOf(int x, int y, int z, FluidType type) {
-        return getVolume(x, y, z).forFluid(type);
-    }
-
-    @Override
-    public @NotNull MultiFluidValue getVolume(int x, int y, int z) {
+    public @NotNull MultiFluidValue volume(int x, int y, int z) {
         return map.getOrDefault(FluidSection.localPos2Short(x, y, z), MultiFluidValue.EMPTY);
     }
 
     @Override
-    public short getAllVolume(int x, int y, int z) {
-        MultiFluidValue v = getVolume(x, y, z);
-        short total = 0;
-
-        for (MultiFluidValue.Entry e : v) {
-            total += e.volume();
-        }
-
-        return total;
-    }
-
-    @Override
-    public boolean isEmpty() {
+    protected boolean empty() {
         return map.isEmpty();
-    }
-
-    @Override
-    public void setContainer(@NotNull FluidSectionContainer iContainer) {
-        container = iContainer;
     }
 
     @Override
@@ -106,18 +78,8 @@ public class DumbFluidSection implements FluidSection {
     }
 
     @Override
-    public MapCodec<DumbFluidSection> codec() {
+    protected @NotNull MapCodec<? extends FluidSection> myCodec() {
         return CODEC;
-    }
-
-    @Override
-    public Lock readLock() {
-        return lock.readLock();
-    }
-
-    @Override
-    public Lock writeLock() {
-        return lock.writeLock();
     }
 
     public Stream<BlockPos> allKeys() {

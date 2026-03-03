@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.util.parallel.DummyLock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
@@ -15,7 +14,6 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 
@@ -52,12 +50,13 @@ public interface FluidSection {
 
     short getVolumeOf(int x, int y, int z, FluidType type);
 
-    @NotNull MultiFluidValue getVolume(int x, int y, int z);    /**
+    @NotNull MultiFluidValue getVolume(int x, int y, int z);
+
+    /**
      * An empty FluidSection that does nothing.
      * This is used to avoid null checks in the code.
      */
     FluidSection EMPTY = new FluidSection() {
-
 
         @Override
         public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
@@ -86,11 +85,17 @@ public interface FluidSection {
 
         @Override
         public void setContainer(@NotNull FluidSectionContainer container) {
-            container.update(new SelfReplacingEmptySection());
+            var section = new SelfReplacingEmptySection();
+            section.acquireWriteLock();
+            try {
+                container.update(section);
+            } finally {
+                section.releaseWriteLock();
+            }
         }
 
         @Override
-        public @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
+        public @Nullable CustomPacketPayload buildUpdatePacket(SectionPos pos, boolean all) {
             return null;
         }
 
@@ -100,13 +105,23 @@ public interface FluidSection {
         }
 
         @Override
-        public Lock readLock() {
-            return DummyLock.INSTANCE;
+        public void acquireWriteLock() {
+
         }
 
         @Override
-        public Lock writeLock() {
-            return DummyLock.INSTANCE;
+        public void releaseWriteLock() {
+
+        }
+
+        @Override
+        public void acquireReadLock() {
+
+        }
+
+        @Override
+        public void releaseReadLock() {
+
         }
 
         @Override
@@ -116,8 +131,9 @@ public interface FluidSection {
     };
 
     short getAllVolume(int x, int y, int z);    // Has to be after EMPTY has been defined, dear god help this soul
-    MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
 
+    MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
+    
     boolean isEmpty();
 
     /**
@@ -138,19 +154,17 @@ public interface FluidSection {
      *                   This is used when the chunk is sent to the client for the first time.
      * @return A packet that contains the dirty data of this FluidSection, or null if there is no dirty data.
      */
-    @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean fullUpdate);
+    @Nullable CustomPacketPayload buildUpdatePacket(SectionPos pos, boolean fullUpdate);
 
     MapCodec<? extends FluidSection> codec();
 
-    /**
-     * Because of selfupcating properties you should not store the lock locally but get it lock and then later get it again and unlock
-     */
-    Lock readLock();
+    void acquireWriteLock();
 
-    /**
-     * Because of selfupdating properties you should not store the lock locally but get it lock and then later get it again and unlock
-     */
-    Lock writeLock();
+    void releaseWriteLock();
+
+    void acquireReadLock();
+
+    void releaseReadLock();
 
     default void fill(MultiFluidValue[] fluids) {
         if (fluids.length != 4096) throw new IllegalArgumentException();
@@ -162,8 +176,4 @@ public interface FluidSection {
             }
         }
     }
-
-
-
-
 }

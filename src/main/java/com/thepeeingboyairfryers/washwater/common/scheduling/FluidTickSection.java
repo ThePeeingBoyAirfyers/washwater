@@ -32,7 +32,7 @@ public class FluidTickSection extends CachedFluidRegion {
     public void tick(FluidTickingContext ctx) {
         for (int j = 0; j < 8; j++) {
             if (fluidSections[j] == null) continue;
-            fluidSections[j].writeLock().lock();
+            fluidSections[j].acquireWriteLock();
             blockSections[j].acquire();
         }
 
@@ -49,7 +49,7 @@ public class FluidTickSection extends CachedFluidRegion {
             for (int j = 0; j < 8; j++) {
                 if (fluidSections[j] == null) continue;
                 blockSections[j].release();
-                fluidSections[j].writeLock().unlock();
+                fluidSections[j].releaseWriteLock();
             }
         }
         liveTicks.swap();

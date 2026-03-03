@@ -30,14 +30,14 @@ public class DebugFluidRenderer {
         var attachment = FluidSectionManager.getAttachmentFor(Minecraft.getInstance().level.getChunk(0, 0));
         int y = Minecraft.getInstance().level.getMinBuildHeight();
         for (var s : attachment) {
-            s.readLock().lock();
+            s.acquireReadLock();
             if (s instanceof DumbFluidSection d) {
                 int finalY = y;
                 d.allKeys().forEach(e ->
                         renderFluid(poseStack, source, e.getX(), e.getY() + finalY, e.getZ(), s.getVolume(e.getX(), e.getY(), e.getZ()))
                 );
             }
-            s.readLock().unlock();
+            s.releaseReadLock();
             y += 16;
         }
     }

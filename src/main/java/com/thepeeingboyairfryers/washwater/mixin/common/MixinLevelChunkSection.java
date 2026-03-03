@@ -79,6 +79,13 @@ public class MixinLevelChunkSection implements IChunkFluidSection {
 
     @ModifyReturnValue(at = @At("RETURN"), method = "hasOnlyAir")
     public boolean hasOnlyAir(boolean original) {
-        return original && (ww€fluidSection == null || ww€fluidSection.isEmpty());
+        if (ww€fluidSection == null) return original;
+
+        ww€fluidSection.acquireReadLock();
+        try {
+            return original && ww€fluidSection.isEmpty();
+        } finally {
+            ww€fluidSection.releaseReadLock();
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.thepeeingboyairfryers.washwater.common.storage;
 
 import com.thepeeingboyairfryers.washwater.common.WashWater;
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidChunkAttachment;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
 import com.thepeeingboyairfryers.washwater.common.util.WWBlockState;
@@ -40,9 +41,12 @@ public class FluidSectionManager {
 
     public static BlockState writeStateToFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState state) {
         var iState = (IFluidState) state.getFluidState();
-        fluidSection.writeLock().lock();
-        fluidSection.setVolume(x, y, z, iState.ww€getFluid());
-        fluidSection.writeLock().unlock();
+        fluidSection.acquireWriteLock();
+        try {
+            fluidSection.setVolume(x, y, z, iState.ww€getFluid());
+        } finally {
+            fluidSection.releaseWriteLock();
+        }
 
         if (state.is(Blocks.WATER)) return Blocks.AIR.defaultBlockState();
         if (state instanceof WWBlockState ww) return ww.ww€getOG();
@@ -50,9 +54,13 @@ public class FluidSectionManager {
     }
 
     public static BlockState getBlockStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState og) {
-        fluidSection.readLock().lock();
-        var result = fluidSection.getVolume(x, y, z);
-        fluidSection.readLock().unlock();
+        fluidSection.acquireReadLock();
+        MultiFluidValue result;
+        try {
+            result = fluidSection.getVolume(x, y, z);
+        } finally {
+            fluidSection.releaseReadLock();
+        }
 
         if (result.isEmpty()) return og;
         if (og.isAir() && result.getTotalVolume() > 100)
@@ -61,9 +69,13 @@ public class FluidSectionManager {
     }
 
     public static FluidState getFluidStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, FluidState og) {
-        fluidSection.readLock().lock();
-        var result = fluidSection.getVolume(x, y, z);
-        fluidSection.readLock().unlock();
+        fluidSection.acquireReadLock();
+        MultiFluidValue result;
+        try {
+            result = fluidSection.getVolume(x, y, z);
+        } finally {
+            fluidSection.releaseReadLock();
+        }
 
         if (result.isEmpty()) return og;
         return new WWFluidState(result, og);
