@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.scheduling;
 
+import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.flow.FluidFlow;
 import com.thepeeingboyairfryers.washwater.common.flow.FluidRegion;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
@@ -24,6 +25,7 @@ public class FluidTickLevel implements FluidTickingContext {
     private final Set<FluidTickSection>[] dirtySections;
     private final Set<LongSet> nextTickToBeTicked = ConcurrentHashMap.newKeySet();
     private final Executor executor = Executors.newFixedThreadPool(8);
+    private int misTicks = 0;
 
     public FluidTickLevel(ServerLevel iLevel) {
         this.level = iLevel;
@@ -74,6 +76,11 @@ public class FluidTickLevel implements FluidTickingContext {
     }
 
     public void applyNextTicks() {
+        if (misTicks > 0) {
+            WashWater.LOGGER.warn("Empty fluids were ticked {} times", misTicks);
+            misTicks = 0;
+        }
+
         for (LongSet toBeTicked : nextTickToBeTicked) {
             for (long p : toBeTicked) {
                 toBeTicked(BlockPos.getX(p), BlockPos.getY(p), BlockPos.getZ(p));
@@ -91,6 +98,11 @@ public class FluidTickLevel implements FluidTickingContext {
 
     @Override
     public void tickFluid(FluidRegion region, int x, int y, int z, MultiFluidValue value, int random) {
+        if (value.isEmpty()) {
+            misTicks++;
+            return;
+        }
+
         FluidFlow.tick(region, new BlockPos(x, y, z));
     }
 

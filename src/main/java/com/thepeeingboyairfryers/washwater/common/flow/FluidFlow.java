@@ -43,8 +43,6 @@ public class FluidFlow {
                 //Flow sideways
                 equalizeWater(region, pos, volume);
             }
-        } else {
-            LOGGER.warn("Ticking water with no volume");
         }
     }
 

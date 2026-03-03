@@ -3,6 +3,7 @@ package com.thepeeingboyairfryers.washwater.common.scheduling;
 import com.thepeeingboyairfryers.washwater.common.flow.CachedFluidRegion;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
+import com.thepeeingboyairfryers.washwater.common.util.SwapPair;
 import it.unimi.dsi.fastutil.longs.LongRBTreeSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
@@ -15,7 +16,7 @@ public class FluidTickSection extends CachedFluidRegion {
     private final int x;
     private final int y;
     private final int z;
-    private final ShortSet liveTicks = new ShortArraySet();
+    private final SwapPair<ShortSet> liveTicks = new SwapPair<>(new ShortArraySet(), new ShortArraySet());
     private final LongSet toBeTicked = new LongRBTreeSet();
     private final FluidSection[] fluidSections = new FluidSection[8];
     private final LevelChunkSection[] blockSections = new LevelChunkSection[8];
@@ -38,7 +39,7 @@ public class FluidTickSection extends CachedFluidRegion {
         toBeTicked.clear();
 
         try {
-            for (short s : liveTicks) {
+            for (short s : liveTicks.getCurrent()) {
                 int xW = FluidSection.short2localX(s) + 8 + (x << 4);
                 int yW = FluidSection.short2localY(s) + 8 + (y << 4);
                 int zW = FluidSection.short2localZ(s) + 8 + (z << 4);
@@ -51,13 +52,14 @@ public class FluidTickSection extends CachedFluidRegion {
                 fluidSections[j].writeLock().unlock();
             }
         }
+        liveTicks.swap();
+        liveTicks.getOther().clear();
 
-        liveTicks.clear();
         ctx.submitTickSet(toBeTicked);
     }
 
     public void addLiveTick(int xW, int yW, int zW) {
-        liveTicks.add(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
+        liveTicks.getCurrent().add(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
     }
 
     // Ran on main thread
@@ -92,7 +94,16 @@ public class FluidTickSection extends CachedFluidRegion {
 
     @Override
     protected void toBeTicked(int xW, int yW, int zW) {
-        toBeTicked.add(BlockPos.asLong(xW, yW, zW));
+        int lX = (8 + (x << 4));
+        int lY = (8 + (y << 4));
+        int lZ = (8 + (z << 4));
+        if (xW > lX && xW < lX + 16
+                && yW > lY && yW < lY + 16
+                && zW > lZ && zW < lZ + 16) {
+            liveTicks.getOther().add(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
+        } else {
+            toBeTicked.add(BlockPos.asLong(xW, yW, zW)); // Outside
+        }
     }
 
     @Override
