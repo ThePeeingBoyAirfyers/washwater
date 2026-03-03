@@ -2,7 +2,6 @@ package com.thepeeingboyairfryers.washwater.common.storage;
 
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.util.parallel.DebugThreadDetector;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -13,7 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class UpgradeableFluidSection implements FluidSection {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final DebugThreadDetector debug = DebugThreadDetector.newInstance();
+    //private final DebugThreadDetector debug = DebugThreadDetector.newInstance();
     private FluidSectionContainer container;
     private FluidSection otherSection = null;
 
@@ -59,6 +58,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
             assert lock.getReadLockCount() > 0 || lock.isWriteLockedByCurrentThread();
             return allVolume(x, y, z);
         }
+
         return otherSection.getAllVolume(x, y, z);
     }
 
@@ -73,6 +73,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
             assert lock.getReadLockCount() > 0 || lock.isWriteLockedByCurrentThread();
             return volume(x, y, z);
         }
+
         return otherSection.getVolume(x, y, z);
     }
 
@@ -128,7 +129,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public void acquireWriteLock() {
         if (otherSection == null) {
-            debug.acquire();
+            //debug.acquire();
             lock.writeLock().lock();
             if (otherSection != null)
                 otherSection.acquireWriteLock();
@@ -147,7 +148,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public void releaseWriteLock() {
         if (otherSection == null) {
-            debug.release();
+            //debug.release();
             lock.writeLock().unlock();
         } else otherSection.releaseWriteLock();
     }

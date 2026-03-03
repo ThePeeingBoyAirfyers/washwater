@@ -52,10 +52,12 @@ public class FluidTickSection extends CachedFluidRegion {
                 fluidSections[j].releaseWriteLock();
             }
         }
+
         liveTicks.swap();
         liveTicks.getOther().clear();
 
-        ctx.submitTickSet(toBeTicked);
+        if (!toBeTicked.isEmpty())
+            ctx.submitTickSet(toBeTicked);
     }
 
     public void addLiveTick(int xW, int yW, int zW) {
