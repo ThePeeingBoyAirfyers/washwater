@@ -28,6 +28,7 @@ public class FluidSectionManager {
         bus.addListener((RegisterEvent e) -> e.register(FluidSection.DISPATCH_KEY, r -> {
             r.register(WashWater.resource("empty"), FluidSection.EMPTY.codec());
             r.register(WashWater.resource("dumb"), DumbFluidSection.CODEC);
+            r.register(WashWater.resource("single_fluid"), SingleFluidSection.CODEC);
         }));
     }
 

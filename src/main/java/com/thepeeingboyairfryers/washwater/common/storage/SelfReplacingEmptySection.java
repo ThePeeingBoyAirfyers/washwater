@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,8 +12,14 @@ public class SelfReplacingEmptySection extends UpgradeableFluidSection {
 
     @Override
     protected void volume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
-        upgrade(new DumbFluidSection());
-        setVolume(x, y, z, fluids);
+        if (fluids.size() == 1) {
+            FluidType type = fluids.iterator().next().fluidType();
+            upgrade(new DumbFluidSection()); //upgrade(new SingleFluidSection(type, new short[16 * 16 * 16], 0));
+            setVolume(x, y, z, fluids);
+        } else if (fluids.size() > 1) {
+            upgrade(new DumbFluidSection());
+            setVolume(x, y, z, fluids);
+        }
     }
 
     @Override
