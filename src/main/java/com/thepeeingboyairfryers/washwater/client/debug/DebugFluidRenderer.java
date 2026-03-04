@@ -2,7 +2,6 @@ package com.thepeeingboyairfryers.washwater.client.debug;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.storage.DumbFluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -31,12 +30,15 @@ public class DebugFluidRenderer {
         int y = Minecraft.getInstance().level.getMinBuildHeight();
         for (var s : attachment) {
             s.acquireReadLock();
+
+            //TODO fix
+            /*
             if (s instanceof DumbFluidSection d) {
                 int finalY = y;
                 d.allKeys().forEach(e ->
                         renderFluid(poseStack, source, e.getX(), e.getY() + finalY, e.getZ(), s.getVolume(e.getX(), e.getY(), e.getZ()))
                 );
-            }
+            }*/
             s.releaseReadLock();
             y += 16;
         }
