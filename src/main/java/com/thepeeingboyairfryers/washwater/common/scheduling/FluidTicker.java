@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.scheduling;
 
+import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import net.minecraft.core.BlockPos;
@@ -57,6 +58,8 @@ public class FluidTicker {
             tLevel.tickLevelParallel(4, 4);
         }
 
+        long delta = tLevel.freezeNanos();
+        WashWater.LOGGER.info("{} freeze takes {}ms{}", level.getDescription().getString(), delta / 1000000, delta % 1000000);
     }
     public static int getCurrentTick() {
         return currentTick;

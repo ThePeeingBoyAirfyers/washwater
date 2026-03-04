@@ -24,8 +24,9 @@ public class FluidTickLevel implements FluidTickingContext {
     private final Long2ObjectMap<FluidTickSection> tickSections = new Long2ObjectAVLTreeMap<>();
     private final Set<FluidTickSection>[] dirtySections;
     private final Set<LongSet> nextTickToBeTicked = ConcurrentHashMap.newKeySet();
-    private final Executor executor = Executors.newFixedThreadPool(8);
+    private final Executor executor = Executors.newFixedThreadPool(16);
     private int misTicks = 0;
+    private long frozenTime = 0;
 
     public FluidTickLevel(ServerLevel iLevel) {
         this.level = iLevel;
@@ -55,6 +56,7 @@ public class FluidTickLevel implements FluidTickingContext {
     }
 
     public void tickLevelParallel(int offset, int length) {
+        frozenTime = 0;
         for (int p = 0; p < length; p++) {
             var toBeTicked = dirtySections[p + offset];
             if (toBeTicked.isEmpty()) continue;
@@ -71,7 +73,9 @@ public class FluidTickLevel implements FluidTickingContext {
                 futures[i] = CompletableFuture.runAsync(() -> section.tick(this), executor);
             }
 
+            long start = System.nanoTime();
             CompletableFuture.allOf(futures).join();
+            frozenTime += (System.nanoTime() - start);
         }
     }
 
@@ -120,5 +124,9 @@ public class FluidTickLevel implements FluidTickingContext {
     @Override
     public void submitTickSet(LongSet toBeTicked) {
         nextTickToBeTicked.add(toBeTicked);
+    }
+
+    public long freezeNanos() {
+        return frozenTime;
     }
 }
