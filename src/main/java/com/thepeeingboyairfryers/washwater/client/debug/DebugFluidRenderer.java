@@ -29,7 +29,6 @@ public class DebugFluidRenderer {
         var attachment = FluidSectionManager.getAttachmentFor(Minecraft.getInstance().level.getChunk(0, 0));
         int y = Minecraft.getInstance().level.getMinBuildHeight();
         for (var s : attachment) {
-            s.acquireReadLock();
 
             //TODO fix
             /*
@@ -39,7 +38,6 @@ public class DebugFluidRenderer {
                         renderFluid(poseStack, source, e.getX(), e.getY() + finalY, e.getZ(), s.getVolume(e.getX(), e.getY(), e.getZ()))
                 );
             }*/
-            s.releaseReadLock();
             y += 16;
         }
     }

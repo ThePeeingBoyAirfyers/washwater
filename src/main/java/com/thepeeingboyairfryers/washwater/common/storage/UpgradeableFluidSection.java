@@ -8,29 +8,21 @@ import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 public abstract class UpgradeableFluidSection implements FluidSection {
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    //private final DebugThreadDetector debug = DebugThreadDetector.newInstance();
     private FluidSectionContainer container;
     private FluidSection otherSection = null;
+    private boolean isAcquired = false;
+    private boolean acqDirty = false;
 
     protected void upgrade(@NotNull FluidSection newSection) {
-        if (!lock.isWriteLockedByCurrentThread())
-            throw new IllegalStateException("Original lock not acquired when trying to upgrade?");
-
         otherSection = newSection;
-        otherSection.acquireWriteLock();
+        if (isAcquired) otherSection.acquire();
         container.update(otherSection);
-
-        lock.writeLock().unlock(); // Everyone waiting can now continue and wait again
     }
 
     @Override
     public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
         if (otherSection == null) {
-            assert lock.isWriteLockedByCurrentThread();
             volume(x, y, z, fluids);
         } else otherSection.setVolume(x, y, z, fluids);
     }
@@ -40,7 +32,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public short getVolumeOf(int x, int y, int z, FluidType type) {
         if (otherSection == null) {
-            assert lock.getReadLockCount() > 0  || lock.isWriteLockedByCurrentThread();
             return volumeOf(x, y, z, type);
         }
 
@@ -55,7 +46,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public short getAllVolume(int x, int y, int z) {
         if (otherSection == null) {
-            assert lock.getReadLockCount() > 0 || lock.isWriteLockedByCurrentThread();
             return allVolume(x, y, z);
         }
 
@@ -70,7 +60,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public @NotNull MultiFluidValue getVolume(int x, int y, int z) {
         if (otherSection == null) {
-            assert lock.getReadLockCount() > 0 || lock.isWriteLockedByCurrentThread();
             return volume(x, y, z);
         }
 
@@ -82,7 +71,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public boolean isEmpty() {
         if (otherSection == null) {
-            assert lock.getReadLockCount() > 0 || lock.isWriteLockedByCurrentThread();
             return empty();
         }
 
@@ -94,7 +82,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public void setContainer(@NotNull FluidSectionContainer iContainer) {
         if (otherSection == null) {
-            assert lock.isWriteLockedByCurrentThread();
             container = iContainer;
         } else {
             otherSection.setContainer(iContainer);
@@ -102,14 +89,14 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     }
 
     protected void markDirty() {
-        container.markDirty();
+        if (!isAcquired)
+            container.markDirty();
+        else acqDirty = true;
     }
 
     @Override
     public @Nullable CustomPacketPayload buildUpdatePacket(SectionPos pos, boolean all) {
         if (otherSection == null) {
-            assert (!all && lock.isWriteLockedByCurrentThread())
-                    || (all && (lock.getReadLockCount() > 0 || lock.isWriteLockedByCurrentThread()));
             return updatePacket(pos, all);
         }
 
@@ -127,36 +114,28 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     protected abstract @NotNull MapCodec<? extends FluidSection> myCodec();
 
     @Override
-    public void acquireWriteLock() {
-        if (otherSection == null) {
-            //debug.acquire();
-            lock.writeLock().lock();
-            if (otherSection != null)
-                otherSection.acquireWriteLock();
-        } else otherSection.acquireWriteLock();
+    public void acquire() {
+        if (otherSection != null) {
+            otherSection.acquire();
+            return;
+        }
+
+        if (isAcquired) throw new IllegalStateException("Already acquired");
+        isAcquired = true;
+        acqDirty = false;
     }
 
     @Override
-    public void acquireReadLock() {
-        if (otherSection == null) {
-            lock.readLock().lock();
-            if (otherSection != null)
-                otherSection.acquireReadLock();
-        } else otherSection.acquireReadLock();
-    }
+    public void release() {
+        if (otherSection != null) {
+            otherSection.release();
+            return;
+        }
 
-    @Override
-    public void releaseWriteLock() {
-        if (otherSection == null) {
-            //debug.release();
-            lock.writeLock().unlock();
-        } else otherSection.releaseWriteLock();
-    }
-
-    @Override
-    public void releaseReadLock() {
-        if (otherSection == null) {
-            lock.readLock().unlock();
-        } else otherSection.releaseReadLock();
+        if (!isAcquired) throw new IllegalStateException("Cannot release a non-acquired fluid section");
+        isAcquired = false;
+        if (acqDirty)
+            container.markDirty();
+        // else WashWater.LOGGER.info("Not dirty!");
     }
 }
