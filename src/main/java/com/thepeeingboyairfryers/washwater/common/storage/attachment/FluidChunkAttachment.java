@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class FluidChunkAttachment implements Iterable<FluidSection> {
@@ -48,66 +47,42 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
 
         for (int i = 0; i < chunk.getSectionsCount(); i++) {
             FluidSection section = sections.get(i);
-            section.acquireWriteLock();
-            try {
-                IChunkFluidSection container = ((IChunkFluidSection) chunk.getSection(i));
-                container.ww€configureFluidSectionUpdater(new SectionUpdater(i));
-                container.ww€setFluidSection(section);
-            } finally {
-                section.releaseWriteLock();
-            }
+            IChunkFluidSection container = ((IChunkFluidSection) chunk.getSection(i));
+            container.ww€configureFluidSectionUpdater(new SectionUpdater(i));
+            container.ww€setFluidSection(section);
         }
     }
 
     public void setVolume(int x, int y, int z, MultiFluidValue value) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        section.acquireWriteLock();
-        try {
-            section.setVolume(x & 15, y & 15, z & 15, value);
-        } finally {
-            section.releaseWriteLock();
-        }
+        section.setVolume(x & 15, y & 15, z & 15, value);
     }
 
     public short getVolume(int x, int y, int z, FluidType type) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        section.acquireReadLock();
-        try {
-            return section.getVolumeOf(x & 15, y & 15, z & 15, type);
-        } finally {
-            section.releaseReadLock();
-        }
+        return section.getVolumeOf(x & 15, y & 15, z & 15, type);
+
     }
 
     public short getAllVolume(int x, int y, int z) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        section.acquireReadLock();
-        try {
-            return section.getAllVolume(x & 15, y & 15, z & 15);
-        } finally {
-            section.releaseReadLock();
-        }
+        return section.getAllVolume(x & 15, y & 15, z & 15);
     }
 
     public void addFluidVolume(int x, int y, int z, FluidType type, short volume) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        section.acquireWriteLock();
-        try {
-            var values = section.getVolume(x & 15, y & 15, z & 15);
-            short total = 0;
-            for (MultiFluidValue.Entry e : values) {
-                total += e.volume();
-            }
-            if (total >= FluidUtil.VOLUME_OF_BLOCK) return;
-            volume = (short) Math.min(volume, FluidUtil.VOLUME_OF_BLOCK - total);
-
-            section.setVolume(
-                    x & 15, y & 15, z & 15,
-                    values.setFluid(type, (short) (volume + values.forFluid(type)))
-            );
-        } finally {
-            section.releaseWriteLock();
+        var values = section.getVolume(x & 15, y & 15, z & 15);
+        short total = 0;
+        for (MultiFluidValue.Entry e : values) {
+            total += e.volume();
         }
+        if (total >= FluidUtil.VOLUME_OF_BLOCK) return;
+        volume = (short) Math.min(volume, FluidUtil.VOLUME_OF_BLOCK - total);
+
+        section.setVolume(
+                x & 15, y & 15, z & 15,
+                values.setFluid(type, (short) (volume + values.forFluid(type)))
+        );
     }
 
     public FluidSection getSectionWithY(int y) {
@@ -126,8 +101,6 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
 
     public class SectionUpdater implements Consumer<FluidSection> {
         private final int i;
-        private AtomicBoolean isStillDirty = new AtomicBoolean(false);
-
         private SectionUpdater(int ii) {
             this.i = ii;
         }
@@ -138,20 +111,17 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         }
 
         public void markDirty() {
-            if (!isStillDirty.compareAndExchange(false, true)) return;
-
             int x = chunk.getPos().x;
             int y = chunk.getMinSection() + i;
             int z = chunk.getPos().z;
 
             if (chunk.getLevel().isClientSide) {
-                // TODO no feedback mechanism
                 Minecraft.getInstance().levelRenderer.setSectionDirty(x, y, z);
                 return;
             }
 
             chunk.setUnsaved(true);
-            WWNetworking.queueUpdate((ServerLevel) chunk.getLevel(), x, y, z).whenComplete((v, t) -> isStillDirty.compareAndSet(true, false));
+            WWNetworking.queueUpdate((ServerLevel) chunk.getLevel(), x, y, z);
         }
     }
 }

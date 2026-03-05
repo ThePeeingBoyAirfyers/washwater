@@ -33,7 +33,7 @@ public class FluidSectionManager {
     }
 
     public static FluidChunkAttachment getAttachmentFor(LevelChunk chunk) {
-        synchronized (chunk) {
+        synchronized (chunk) { // TODO this is needed for chunkbuilding threads
             var result = chunk.getData(WWAttachments.FLUID_CHUNK);
             result.configure(chunk);
             return result;
@@ -42,26 +42,14 @@ public class FluidSectionManager {
 
     public static BlockState writeStateToFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState state) {
         var iState = (IFluidState) state.getFluidState();
-        fluidSection.acquireWriteLock();
-        try {
-            fluidSection.setVolume(x, y, z, iState.ww€getFluid());
-        } finally {
-            fluidSection.releaseWriteLock();
-        }
-
+        fluidSection.setVolume(x, y, z, iState.ww€getFluid());
         if (state.is(Blocks.WATER)) return Blocks.AIR.defaultBlockState();
         if (state instanceof WWBlockState ww) return ww.ww€getOG();
         return state;
     }
 
     public static BlockState getBlockStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState og) {
-        fluidSection.acquireReadLock();
-        MultiFluidValue result;
-        try {
-            result = fluidSection.getVolume(x, y, z);
-        } finally {
-            fluidSection.releaseReadLock();
-        }
+        MultiFluidValue result = fluidSection.getVolume(x, y, z);
 
         if (result.isEmpty()) return og;
         if (og.isAir() && result.getTotalVolume() > 100)
@@ -70,13 +58,7 @@ public class FluidSectionManager {
     }
 
     public static FluidState getFluidStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, FluidState og) {
-        fluidSection.acquireReadLock();
-        MultiFluidValue result;
-        try {
-            result = fluidSection.getVolume(x, y, z);
-        } finally {
-            fluidSection.releaseReadLock();
-        }
+        MultiFluidValue result = fluidSection.getVolume(x, y, z);
 
         if (result.isEmpty()) return og;
         return new WWFluidState(result, og);

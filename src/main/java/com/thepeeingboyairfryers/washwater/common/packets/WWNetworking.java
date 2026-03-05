@@ -2,8 +2,8 @@ package com.thepeeingboyairfryers.washwater.common.packets;
 
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
-import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.LongRBTreeSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
@@ -16,10 +16,9 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 public class WWNetworking {
-    private static final Map<ServerLevel, Long2ObjectMap<CompletableFuture<Void>>> DIRTY_SECTIONS = new HashMap<>();
+    private static final Map<ServerLevel, LongSet> DIRTY_SECTIONS = new HashMap<>();
 
     private WWNetworking() {
         throw new IllegalStateException("Utility class");
@@ -32,44 +31,34 @@ public class WWNetworking {
                 var chunk = Minecraft.getInstance().level.getChunk(p.pos().x(), p.pos().z());
                 var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
 
-                section.acquireWriteLock();
-                try {
+
+                ctx.enqueueWork(() -> {
                     for (var u : p.updates()) {
                         var x = FluidSection.short2localX(u.getFirst());
                         var y = FluidSection.short2localY(u.getFirst());
                         var z = FluidSection.short2localZ(u.getFirst());
                         section.setVolume(x, y, z, u.getSecond());
                     }
-                } finally {
-                    section.releaseWriteLock();
-                }
+                });
             });
         });
 
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post e) -> {
             if (e.getLevel().isClientSide()) return;
-            var l = e.getLevel();
-            synchronized (DIRTY_SECTIONS) {
-                var dirties = DIRTY_SECTIONS.get(l);
-                if (dirties == null) return;
-                for (var entries : dirties.long2ObjectEntrySet()) {
-                    var sectionPos = SectionPos.of(entries.getLongKey());
-                    var chunkPos = sectionPos.chunk();
-                    var chunk = l.getChunk(chunkPos.x, chunkPos.z);
-                    var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
+            var level = e.getLevel();
 
-                    //Write cus we cleanup dirties
-                    s.acquireWriteLock();
-                    try {
-                        var update = s.buildUpdatePacket(sectionPos, false);
-                        if (update != null)
-                            PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, chunkPos, update);
-                    } finally {
-                        s.releaseWriteLock();
-                    }
+            var dirties = DIRTY_SECTIONS.get(level);
+            if (dirties == null) return;
+            for (var lPos : dirties) {
+                var sectionPos = SectionPos.of(lPos);
+                var chunkPos = sectionPos.chunk();
+                var chunk = level.getChunk(chunkPos.x, chunkPos.z);
+                var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
 
-                    entries.getValue().complete(null);
-                }
+
+                var update = s.buildUpdatePacket(sectionPos, false);
+                if (update != null)
+                    PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, chunkPos, update);
             }
         });
 
@@ -79,27 +68,17 @@ public class WWNetworking {
             var attachment = FluidSectionManager.getAttachmentFor(l.getChunk(cPos.x, cPos.z));
             int idx = 0;
             for (var s : attachment) {
-                s.acquireReadLock(); //Read cus we just send state of water to new player
-
-                try {
-                    var update = s.buildUpdatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
-                    if (update != null)
-                        PacketDistributor.sendToPlayer(e.getPlayer(), update);
-                } finally {
-                    s.releaseReadLock();
-                }
+                var update = s.buildUpdatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
+                if (update != null)
+                    PacketDistributor.sendToPlayer(e.getPlayer(), update);
             }
         });
     }
 
     //SectionPos coordinates
-    public static CompletableFuture<Void> queueUpdate(ServerLevel level, int x, int y, int z) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-
+    public static void queueUpdate(ServerLevel level, int x, int y, int z) {
         synchronized (DIRTY_SECTIONS) {
-            DIRTY_SECTIONS.computeIfAbsent(level, a -> new Long2ObjectAVLTreeMap<>()).put(SectionPos.asLong(x, y, z), future);
+            DIRTY_SECTIONS.computeIfAbsent(level, a -> new LongRBTreeSet()).add(SectionPos.asLong(x, y, z));
         }
-
-        return future;
     }
 }

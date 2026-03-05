@@ -86,12 +86,17 @@ public interface FluidSection {
         @Override
         public void setContainer(@NotNull FluidSectionContainer container) {
             var section = new SelfReplacingEmptySection();
-            section.acquireWriteLock();
-            try {
-                container.update(section);
-            } finally {
-                section.releaseWriteLock();
-            }
+            container.update(section);
+        }
+
+        @Override
+        public void acquire() {
+
+        }
+
+        @Override
+        public void release() {
+
         }
 
         @Override
@@ -105,26 +110,6 @@ public interface FluidSection {
         }
 
         @Override
-        public void acquireWriteLock() {
-
-        }
-
-        @Override
-        public void releaseWriteLock() {
-
-        }
-
-        @Override
-        public void acquireReadLock() {
-
-        }
-
-        @Override
-        public void releaseReadLock() {
-
-        }
-
-        @Override
         public String toString() {
             return "FluidSection.EMPTY";
         }
@@ -133,7 +118,7 @@ public interface FluidSection {
     short getAllVolume(int x, int y, int z);    // Has to be after EMPTY has been defined, dear god help this soul
 
     MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
-    
+
     boolean isEmpty();
 
     /**
@@ -145,9 +130,13 @@ public interface FluidSection {
     void setContainer(@NotNull FluidSectionContainer container);
 
     /**
+     * Only use this offthread when the main thread is frozen.
+     */
+    void acquire();
+    void release();
+
+    /**
      * Returns a packet that contains the dirty data of this FluidSection.
-     * With fullUpdate == true it's allowed to call this method with the ReadLock
-     * If false you need a WriteLock
      *
      * @param pos        The position of the section in the world.
      * @param fullUpdate If true, the packet should contain all data, not just the dirty data.
@@ -157,14 +146,6 @@ public interface FluidSection {
     @Nullable CustomPacketPayload buildUpdatePacket(SectionPos pos, boolean fullUpdate);
 
     MapCodec<? extends FluidSection> codec();
-
-    void acquireWriteLock();
-
-    void releaseWriteLock();
-
-    void acquireReadLock();
-
-    void releaseReadLock();
 
     default void fill(MultiFluidValue[] fluids) {
         if (fluids.length != 4096) throw new IllegalArgumentException();

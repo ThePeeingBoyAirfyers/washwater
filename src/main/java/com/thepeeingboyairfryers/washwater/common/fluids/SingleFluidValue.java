@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class SingleFluidValue implements MultiFluidValue {
     private final Entry entry;
@@ -55,5 +56,17 @@ public class SingleFluidValue implements MultiFluidValue {
 
     public short getVolume() {
         return entry.volume();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        SingleFluidValue entries = (SingleFluidValue) o;
+        return Objects.equals(entry, entries.entry);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(entry);
     }
 }

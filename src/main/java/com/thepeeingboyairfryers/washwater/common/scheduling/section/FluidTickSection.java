@@ -1,14 +1,12 @@
-package com.thepeeingboyairfryers.washwater.common.scheduling;
+package com.thepeeingboyairfryers.washwater.common.scheduling.section;
 
 import com.thepeeingboyairfryers.washwater.common.flow.CachedFluidRegion;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.common.util.SwapPair;
-import it.unimi.dsi.fastutil.longs.LongRBTreeSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
+import com.thepeeingboyairfryers.washwater.common.util.parallel.MainThreads;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 
@@ -17,9 +15,9 @@ public class FluidTickSection extends CachedFluidRegion {
     private final int y;
     private final int z;
     private final SwapPair<ShortSet> liveTicks = new SwapPair<>(new ShortArraySet(), new ShortArraySet());
-    private final LongSet toBeTicked = new LongRBTreeSet();
     private final FluidSection[] fluidSections = new FluidSection[8];
     private final LevelChunkSection[] blockSections = new LevelChunkSection[8];
+    private TickTracker tickTracker = null;
     private int age;
     private int random;
 
@@ -32,11 +30,11 @@ public class FluidTickSection extends CachedFluidRegion {
     public void tick(FluidTickingContext ctx) {
         for (int j = 0; j < 8; j++) {
             if (fluidSections[j] == null) continue;
-            fluidSections[j].acquireWriteLock();
+            fluidSections[j].acquire();
             blockSections[j].acquire();
         }
 
-        toBeTicked.clear();
+        tickTracker = ctx.makeTickTracker(tickTracker, x, y, z, liveTicks.getOther());
 
         try {
             for (short s : liveTicks.getCurrent()) {
@@ -47,24 +45,40 @@ public class FluidTickSection extends CachedFluidRegion {
             }
         } finally {
             for (int j = 0; j < 8; j++) {
-                if (fluidSections[j] == null) continue;
+                if (blockSections[j] == null) continue;
                 blockSections[j].release();
-                fluidSections[j].releaseWriteLock();
+                fluidSections[j].release();
             }
         }
+
         liveTicks.swap();
         liveTicks.getOther().clear();
 
-        ctx.submitTickSet(toBeTicked);
+        tickTracker.apply();
     }
 
     public void addLiveTick(int xW, int yW, int zW) {
         liveTicks.getCurrent().add(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
     }
 
-    // Ran on main thread
+    public void removeLiveTick(int xW, int yW, int zW) {
+        liveTicks.getCurrent().remove(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
+    }
+
+    public void addLaterTick(int xW, int yW, int zW) {
+        liveTicks.getOther().add(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
+    }
+
+    public void removeLaterTick(int xW, int yW, int zW) {
+        liveTicks.getOther().remove(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
+    }
+
     public void fetchSections(Level level) {
+        assert MainThreads.isServerThread();
+
         random = level.random.nextInt();
+        tickTracker = null; // Reset
+
         for (int xO = 0; xO < 2; xO++) {
             for (int zO = 0; zO < 2; zO++) {
                 var chunk = level.getChunk(x + xO, z + zO);
@@ -94,21 +108,12 @@ public class FluidTickSection extends CachedFluidRegion {
 
     @Override
     protected void toBeTicked(int xW, int yW, int zW) {
-        int lX = (8 + (x << 4));
-        int lY = (8 + (y << 4));
-        int lZ = (8 + (z << 4));
-        if (xW > lX && xW < lX + 16
-                && yW > lY && yW < lY + 16
-                && zW > lZ && zW < lZ + 16) {
-            liveTicks.getOther().add(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
-        } else {
-            toBeTicked.add(BlockPos.asLong(xW, yW, zW)); // Outside
-        }
+        tickTracker.toBeTicked(xW, yW, zW);
     }
 
     @Override
     protected void toBeUnticked(int xW, int yW, int zW) {
-        toBeTicked.remove(BlockPos.asLong(xW, yW, zW));
+        tickTracker.toBeUnticked(xW, yW, zW);
     }
 
     @Override
@@ -131,6 +136,10 @@ public class FluidTickSection extends CachedFluidRegion {
 
     public static int getPhase(int x, int y, int z) {
         return (Math.abs(x) % 2 | (Math.abs(y) % 2 << 1) | (Math.abs(z) % 2 << 2));
+    }
+
+    public static int getSectionCoord(int w) {
+        return (w - 8) >> 4;
     }
 
     @Override
