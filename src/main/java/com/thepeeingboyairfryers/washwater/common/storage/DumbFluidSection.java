@@ -82,6 +82,11 @@ public class DumbFluidSection extends UpgradeableFluidSection {
         return CODEC;
     }
 
+    @Override
+    protected void copy(FluidSection section) {
+        section.fill(array);
+    }
+
     private int getNonEmpty() {
         return nonEmpty;
     }

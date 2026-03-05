@@ -29,7 +29,11 @@ public class SingleFluidSection extends UpgradeableFluidSection {
     private final FluidType fluidType;
     private final short[] volumes;
     private final ShortSet dirty = new ShortRBTreeSet();
-    private int nonEmpty = 0;
+    private int nonEmpty;
+
+    public SingleFluidSection(FluidType iFluidType) {
+        this(iFluidType, new short[16 * 16 * 16], 0);
+    }
 
     public SingleFluidSection(FluidType iFluidType, short[] iVolumes, int iNonEmpty) {
         this.fluidType = iFluidType;
@@ -72,7 +76,7 @@ public class SingleFluidSection extends UpgradeableFluidSection {
 
     @Override
     protected boolean empty() {
-        return nonEmpty > 0;
+        return nonEmpty == 0;
     }
 
     @Override
@@ -98,8 +102,9 @@ public class SingleFluidSection extends UpgradeableFluidSection {
     }
 
     private void upgrade() {
-        // TODO todo copy data over
-        upgrade(new DumbFluidSection());
+        DumbFluidSection section = new DumbFluidSection();
+        section.copyFrom(this);
+        upgrade(section);
     }
 
     public FluidType getFluidType() {

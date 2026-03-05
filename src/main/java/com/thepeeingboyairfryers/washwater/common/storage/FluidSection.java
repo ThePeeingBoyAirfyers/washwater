@@ -110,6 +110,11 @@ public interface FluidSection {
         }
 
         @Override
+        public void copyFrom(FluidSection section) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public String toString() {
             return "FluidSection.EMPTY";
         }
@@ -146,6 +151,8 @@ public interface FluidSection {
     @Nullable CustomPacketPayload buildUpdatePacket(SectionPos pos, boolean fullUpdate);
 
     MapCodec<? extends FluidSection> codec();
+
+    void copyFrom(FluidSection section);
 
     default void fill(MultiFluidValue[] fluids) {
         if (fluids.length != 4096) throw new IllegalArgumentException();

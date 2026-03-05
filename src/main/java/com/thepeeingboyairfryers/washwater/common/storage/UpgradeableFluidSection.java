@@ -118,6 +118,25 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     protected abstract @NotNull MapCodec<? extends FluidSection> myCodec();
 
     @Override
+    public void copyFrom(FluidSection section) {
+        if (otherSection == null) {
+            assert checkAccess();
+            copy(section);
+        } else otherSection.copyFrom(section);
+    }
+
+    // "slow" impl
+    protected void copy(FluidSection section) {
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    volume(x, y, z, section.getVolume(x, y, z));
+                }
+            }
+        }
+    }
+
+    @Override
     public void acquire() {
         if (otherSection != null) {
             otherSection.acquire();

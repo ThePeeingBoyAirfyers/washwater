@@ -14,7 +14,7 @@ public class SelfReplacingEmptySection extends UpgradeableFluidSection {
     protected void volume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
         if (fluids.size() == 1) {
             FluidType type = fluids.iterator().next().fluidType();
-            upgrade(new DumbFluidSection()); //upgrade(new SingleFluidSection(type, new short[16 * 16 * 16], 0));
+            upgrade(new SingleFluidSection(type));
             setVolume(x, y, z, fluids);
         } else if (fluids.size() > 1) {
             upgrade(new DumbFluidSection());
