@@ -3,6 +3,7 @@ package com.thepeeingboyairfryers.washwater.common.scheduling;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.common.util.parallel.MainThreads;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.IEventBus;
@@ -31,11 +32,13 @@ public class FluidTicker {
     }
 
     public static void tickFluid(ServerLevel level, int x, int y, int z) {
+        assert MainThreads.isMainThread();
         TICK_LEVELS.computeIfAbsent(level, FluidTickLevel::new).toBeTicked(x, y, z);
     }
 
 
     public static void tickFluid(ServerLevel level, BlockPos pos) {
+        assert MainThreads.isMainThread();
         TICK_LEVELS.computeIfAbsent(level, FluidTickLevel::new).toBeTicked(pos.getX(), pos.getY(), pos.getZ());
     }
 

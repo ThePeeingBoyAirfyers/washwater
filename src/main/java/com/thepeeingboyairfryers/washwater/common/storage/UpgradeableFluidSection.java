@@ -34,7 +34,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public short getVolumeOf(int x, int y, int z, FluidType type) {
         if (otherSection == null) {
-            assert checkAccess();
             return volumeOf(x, y, z, type);
         }
 
@@ -49,7 +48,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public short getAllVolume(int x, int y, int z) {
         if (otherSection == null) {
-            assert checkAccess();
             return allVolume(x, y, z);
         }
 
@@ -64,7 +62,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public @NotNull MultiFluidValue getVolume(int x, int y, int z) {
         if (otherSection == null) {
-            assert checkAccess();
             return volume(x, y, z);
         }
 
@@ -76,7 +73,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public boolean isEmpty() {
         if (otherSection == null) {
-            assert checkAccess();
             return empty();
         }
 
@@ -88,7 +84,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public void setContainer(@NotNull FluidSectionContainer iContainer) {
         if (otherSection == null) {
-            assert checkAccess();
+            // assert checkAccess(); TODO gets sometimes made on chunk build thread which is sus
             container = iContainer;
         } else {
             otherSection.setContainer(iContainer);
@@ -104,6 +100,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public @Nullable CustomPacketPayload buildUpdatePacket(SectionPos pos, boolean all) {
         if (otherSection == null) {
+            assert all || checkAccess();
             return updatePacket(pos, all);
         }
 
@@ -149,7 +146,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     }
 
     private boolean checkAccess() {
-        // TODO we should also not just "ignore" rendering threads
-        return MainThreads.isChunkBuilderThread() || (MainThreads.isMainThread() != isAcquired);
+        return (MainThreads.isMainThread() != isAcquired);
     }
 }

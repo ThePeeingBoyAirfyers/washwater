@@ -4,9 +4,14 @@ import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.flow.FluidFlow;
 import com.thepeeingboyairfryers.washwater.common.flow.FluidRegion;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.common.scheduling.section.FluidTickSection;
+import com.thepeeingboyairfryers.washwater.common.scheduling.section.FluidTickingContext;
+import com.thepeeingboyairfryers.washwater.common.scheduling.section.TickTracker;
+import com.thepeeingboyairfryers.washwater.common.util.parallel.MainThreads;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
@@ -64,6 +69,10 @@ public class FluidTickLevel implements FluidTickingContext {
             dirtySections[p + offset] = new HashSet<>();
             CompletableFuture<Void>[] futures = new CompletableFuture[toBeTicked.size()];
 
+            for (var section : toBeTicked) {
+                createNeighbors(section.getX(), section.getY(), section.getZ());
+            }
+
             var iter = toBeTicked.iterator();
             for (int i = 0; i < futures.length; i++) {
                 var section = iter.next();
@@ -89,14 +98,34 @@ public class FluidTickLevel implements FluidTickingContext {
             for (long p : toBeTicked) {
                 toBeTicked(BlockPos.getX(p), BlockPos.getY(p), BlockPos.getZ(p));
             }
+            toBeTicked.clear();
         }
 
         nextTickToBeTicked.clear();
     }
 
+    private void createNeighbors(int xS, int yS, int zS) {
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    int xx = x + xS;
+                    int yy = y + yS;
+                    int zz = z + zS;
+
+                    if (yy < level.getMinSection() - 1) continue;
+                    var section = tickSections.computeIfAbsent(
+                            SectionPos.asLong(xx, yy, zz),
+                            l -> new FluidTickSection(xx, yy, zz));
+
+                    section.setAge(FluidTicker.getCurrentTick() - REFRESH_RATE - 10);
+                }
+            }
+        }
+    }
+
     private FluidTickSection setupTicker(FluidTickSection section) {
         section.fetchSections(level);
-        section.setAge(FluidTicker.getCurrentTick());
+        section.setAge(FluidTicker.getCurrentTick() + (level.random.nextInt() % 200)); // Spread out
         return section;
     }
 
@@ -110,20 +139,44 @@ public class FluidTickLevel implements FluidTickingContext {
         FluidFlow.tick(region, new BlockPos(x, y, z));
     }
 
+    @Override
+    public TickTracker makeTickTracker(TickTracker prevTickTracker, int sX, int sY, int sZ, ShortSet nextTickInSection) {
+        if (prevTickTracker == null)
+            //prevTickTracker = new SimpleTickTracker(sX, sY, sZ, this);
+            prevTickTracker = new PasstroughTickTracker(sX, sY, sZ, this);
+
+        if (prevTickTracker instanceof InSectionTickTracker i) {
+            i.setSectionTickList(nextTickInSection);
+        }
+
+        return prevTickTracker;
+    }
+
     public void toBeTicked(int x, int y, int z) {
-        int xS = (x - 8) >> 4;
-        int yS = (y - 8) >> 4;
-        int zS = (z - 8) >> 4;
+        assert MainThreads.isServerThread();
+
+        int xS = FluidTickSection.getSectionCoord(x);
+        int yS = FluidTickSection.getSectionCoord(y);
+        int zS = FluidTickSection.getSectionCoord(z);
 
         FluidTickSection tSection = tickSections.computeIfAbsent(SectionPos.asLong(xS, yS, zS), l -> setupTicker(new FluidTickSection(xS, yS, zS)));
         tSection.addLiveTick(x, y, z);
-
-        dirtySections[FluidTickSection.getPhase(xS, yS, zS)].add(tSection);
+        markSectionDirty(tSection);
     }
 
-    @Override
-    public void submitTickSet(LongSet toBeTicked) {
+    public void markSectionDirty(FluidTickSection section) {
+        var set = dirtySections[FluidTickSection.getPhase(section.getX(), section.getY(), section.getZ())];
+        synchronized (set) {
+            set.add(section);
+        }
+    }
+
+    public void addTickSet(LongSet toBeTicked) {
         nextTickToBeTicked.add(toBeTicked);
+    }
+
+    public FluidTickSection getTickSection(int xS, int yS, int zS) {
+        return tickSections.get(SectionPos.asLong(xS, yS, zS));
     }
 
     public long freezeNanos() {
