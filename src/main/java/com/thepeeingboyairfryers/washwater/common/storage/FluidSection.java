@@ -118,7 +118,7 @@ public interface FluidSection {
     short getAllVolume(int x, int y, int z);    // Has to be after EMPTY has been defined, dear god help this soul
 
     MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
-    
+
     boolean isEmpty();
 
     /**
@@ -130,7 +130,7 @@ public interface FluidSection {
     void setContainer(@NotNull FluidSectionContainer container);
 
     /**
-     * Only use this offthread when the main thread is frozen
+     * Only use this offthread when the main thread is frozen.
      */
     void acquire();
     void release();

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DumbFluidSection extends UpgradeableFluidSection { ;
+public class DumbFluidSection extends UpgradeableFluidSection {
     public static final MapCodec<DumbFluidSection> CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
             MultiFluidValue.CODEC.listOf().fieldOf("array").forGetter(s -> Arrays.asList(s.array)),
             Codec.INT.fieldOf("nonEmpty").forGetter(DumbFluidSection::getNonEmpty)
