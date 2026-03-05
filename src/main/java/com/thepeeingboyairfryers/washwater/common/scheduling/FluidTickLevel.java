@@ -143,7 +143,7 @@ public class FluidTickLevel implements FluidTickingContext {
     public TickTracker makeTickTracker(TickTracker prevTickTracker, int sX, int sY, int sZ, ShortSet nextTickInSection) {
         if (prevTickTracker == null)
             //prevTickTracker = new SimpleTickTracker(sX, sY, sZ, this);
-            prevTickTracker = new PasstroughTickTracker(sX, sY, sZ, this);
+            prevTickTracker = new PassthroughTickTracker(sX, sY, sZ, this);
 
         if (prevTickTracker instanceof InSectionTickTracker i) {
             i.setSectionTickList(nextTickInSection);

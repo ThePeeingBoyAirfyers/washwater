@@ -5,12 +5,12 @@ import com.thepeeingboyairfryers.washwater.common.scheduling.section.FluidTickSe
 import java.util.HashSet;
 import java.util.Set;
 
-public class PasstroughTickTracker extends InSectionTickTracker {
+public class PassthroughTickTracker extends InSectionTickTracker {
     private final int myPhase;
     private final FluidTickLevel level;
     private final Set<FluidTickSection> dirtySections = new HashSet<>();
 
-    public PasstroughTickTracker(int iX, int iY, int iZ, FluidTickLevel iLevel) {
+    public PassthroughTickTracker(int iX, int iY, int iZ, FluidTickLevel iLevel) {
         super(iX, iY, iZ, iLevel);
         this.myPhase = FluidTickSection.getPhase(iX, iY, iZ);
         this.level = iLevel;
