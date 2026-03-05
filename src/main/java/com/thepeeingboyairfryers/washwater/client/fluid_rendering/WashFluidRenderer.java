@@ -47,8 +47,8 @@ public class WashFluidRenderer extends FluidRenderer {
     private final ModelQuad quad = new ModelQuad();
     private final ChunkVertexEncoder.Vertex[] vertices = ChunkVertexEncoder.Vertex.uninitializedQuad();
     private final BlockPos.MutableBlockPos scratchPos = new BlockPos.MutableBlockPos();
-    private final ChunkModelBuilder builder;
-    private final TranslucentGeometryCollector collector;
+    private ChunkModelBuilder builder;
+    private TranslucentGeometryCollector collector;
 
 
     public WashFluidRenderer(ColorProviderRegistry iColorRegistry, LightPipelineProvider iLightPipelineProvider) {
@@ -73,7 +73,8 @@ public class WashFluidRenderer extends FluidRenderer {
         fluidState = FluidManager.dropinFluidState(entry.fluidType());
 
         Material material = DefaultMaterials.forFluidState(fluidState);
-        ChunkModelBuilder builder = buffers.get(material);
+        this.builder = buffers.get(material);
+        this.collector = collector;
         IClientFluidTypeExtensions handler = IClientFluidTypeExtensions.of(fluidState);
         TextureAtlasSprite[] sprites = FluidSpriteCache.getFluidSprites(level, blockPos, fluidState);
 
@@ -125,7 +126,7 @@ public class WashFluidRenderer extends FluidRenderer {
             setVertex(1, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
             setVertex(2, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
             setVertex(3, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-            writeQuad(builder, collector, material, blockPos, offset, Direction.DOWN, false, level, fluidState);
+            writeQuad(material, blockPos, offset, Direction.DOWN, false, level, fluidState);
         }
 
         //Top Face
@@ -134,7 +135,7 @@ public class WashFluidRenderer extends FluidRenderer {
             setVertex(1, 1.0f, southEastHeight, 1.0f, 1.0f, 0.0f);
             setVertex(2, 1.0f, northEastHeight, 0.0f, 1.0f, 1.0f);
             setVertex(3, 0.0f, northWestHeight, 0.0f, 0.0f, 1.0f);
-            writeQuad(builder, collector, material, blockPos, offset, Direction.UP, false, level, fluidState);
+            writeQuad(material, blockPos, offset, Direction.UP, false, level, fluidState);
         }
 
 
@@ -207,7 +208,7 @@ public class WashFluidRenderer extends FluidRenderer {
             setVertex(1, x2, yOffset, z2, u2, v3);
             setVertex(2, x1, yOffset, z1, u1, v3);
             setVertex(3, x1, c1, z1, u1, v1);
-            writeQuad(builder, collector, material, blockPos, offset, dir, false, level, fluidState);
+            writeQuad(material, blockPos, offset, dir, false, level, fluidState);
         }
     }
 
@@ -243,7 +244,7 @@ public class WashFluidRenderer extends FluidRenderer {
         }
     }
 
-    private void writeQuad(ChunkModelBuilder builder, TranslucentGeometryCollector collector, Material material, BlockPos realPos, BlockPos offset, Direction facing, boolean flip, LevelSlice level, FluidState fluidState) {
+    private void writeQuad(Material material, BlockPos realPos, BlockPos offset, Direction facing, boolean flip, LevelSlice level, FluidState fluidState) {
         ChunkVertexEncoder.Vertex[] iVertices = this.vertices;
         var lighter = lightPipelineProvider.getLighter(LightMode.SMOOTH);
         var quadFacing = ModelQuadFacing.fromDirection(facing);
