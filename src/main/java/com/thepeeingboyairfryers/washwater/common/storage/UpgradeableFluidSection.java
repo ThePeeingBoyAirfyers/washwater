@@ -2,6 +2,7 @@ package com.thepeeingboyairfryers.washwater.common.storage;
 
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.common.util.parallel.MainThreads;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class UpgradeableFluidSection implements FluidSection {
     private FluidSectionContainer container;
     private FluidSection otherSection = null;
-    private boolean isAcquired = false;
+    private boolean isAcquired = false; // Yes this is not very safe
     private boolean acqDirty = false;
 
     protected void upgrade(@NotNull FluidSection newSection) {
@@ -23,6 +24,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
         if (otherSection == null) {
+            assert checkAccess();
             volume(x, y, z, fluids);
         } else otherSection.setVolume(x, y, z, fluids);
     }
@@ -32,6 +34,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public short getVolumeOf(int x, int y, int z, FluidType type) {
         if (otherSection == null) {
+            assert checkAccess();
             return volumeOf(x, y, z, type);
         }
 
@@ -46,6 +49,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public short getAllVolume(int x, int y, int z) {
         if (otherSection == null) {
+            assert checkAccess();
             return allVolume(x, y, z);
         }
 
@@ -60,6 +64,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public @NotNull MultiFluidValue getVolume(int x, int y, int z) {
         if (otherSection == null) {
+            assert checkAccess();
             return volume(x, y, z);
         }
 
@@ -71,6 +76,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public boolean isEmpty() {
         if (otherSection == null) {
+            assert checkAccess();
             return empty();
         }
 
@@ -82,6 +88,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     @Override
     public void setContainer(@NotNull FluidSectionContainer iContainer) {
         if (otherSection == null) {
+            assert checkAccess();
             container = iContainer;
         } else {
             otherSection.setContainer(iContainer);
@@ -123,6 +130,8 @@ public abstract class UpgradeableFluidSection implements FluidSection {
         if (isAcquired) throw new IllegalStateException("Already acquired");
         isAcquired = true;
         acqDirty = false;
+
+        assert checkAccess();
     }
 
     @Override
@@ -132,10 +141,15 @@ public abstract class UpgradeableFluidSection implements FluidSection {
             return;
         }
 
+        assert checkAccess();
         if (!isAcquired) throw new IllegalStateException("Cannot release a non-acquired fluid section");
         isAcquired = false;
         if (acqDirty)
             container.markDirty();
-        // else WashWater.LOGGER.info("Not dirty!");
+    }
+
+    private boolean checkAccess() {
+        // TODO we should also not just "ignore" rendering threads
+        return MainThreads.isChunkBuilderThread() || (MainThreads.isMainThread() != isAcquired);
     }
 }

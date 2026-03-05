@@ -32,7 +32,7 @@ public class FluidSectionManager {
     }
 
     public static FluidChunkAttachment getAttachmentFor(LevelChunk chunk) {
-        synchronized (chunk) {
+        synchronized (chunk) { // TODO this is needed for chunkbuilding threads
             var result = chunk.getData(WWAttachments.FLUID_CHUNK);
             result.configure(chunk);
             return result;
