@@ -63,7 +63,7 @@ public class WashFluidRenderer extends FluidRenderer {
             FluidState fluidState,
             BlockPos blockPos,
             BlockPos offset,
-            TranslucentGeometryCollector collector,
+            TranslucentGeometryCollector iCollector,
             ChunkBuildBuffers buffers
     ) {
         ILevelSliceFluids fluids = (ILevelSliceFluids) (Object) level;
@@ -74,7 +74,7 @@ public class WashFluidRenderer extends FluidRenderer {
 
         Material material = DefaultMaterials.forFluidState(fluidState);
         this.builder = buffers.get(material);
-        this.collector = collector;
+        this.collector = iCollector;
         IClientFluidTypeExtensions handler = IClientFluidTypeExtensions.of(fluidState);
         TextureAtlasSprite[] sprites = FluidSpriteCache.getFluidSprites(level, blockPos, fluidState);
 
