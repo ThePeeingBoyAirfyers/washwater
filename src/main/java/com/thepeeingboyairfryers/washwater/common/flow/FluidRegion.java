@@ -1,7 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.flow;
 
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -52,6 +51,4 @@ public interface FluidRegion {
     }
 
     void setVolume(int x, int y, int z, MultiFluidValue fluids);
-
-    void setTickSet(LongSet current);
 }

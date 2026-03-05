@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.util.DummyLock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
@@ -15,7 +14,6 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 
@@ -52,12 +50,13 @@ public interface FluidSection {
 
     short getVolumeOf(int x, int y, int z, FluidType type);
 
-    @NotNull MultiFluidValue getVolume(int x, int y, int z);    /**
+    @NotNull MultiFluidValue getVolume(int x, int y, int z);
+
+    /**
      * An empty FluidSection that does nothing.
      * This is used to avoid null checks in the code.
      */
     FluidSection EMPTY = new FluidSection() {
-
 
         @Override
         public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
@@ -86,11 +85,22 @@ public interface FluidSection {
 
         @Override
         public void setContainer(@NotNull FluidSectionContainer container) {
-            container.update(new SelfReplacingEmptySection());
+            var section = new SelfReplacingEmptySection();
+            container.update(section);
         }
 
         @Override
-        public @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
+        public void acquire() {
+
+        }
+
+        @Override
+        public void release() {
+
+        }
+
+        @Override
+        public @Nullable CustomPacketPayload buildUpdatePacket(SectionPos pos, boolean all) {
             return null;
         }
 
@@ -100,22 +110,13 @@ public interface FluidSection {
         }
 
         @Override
-        public Lock readLock() {
-            return DummyLock.INSTANCE;
-        }
-
-        @Override
-        public Lock writeLock() {
-            return DummyLock.INSTANCE;
-        }
-
-        @Override
         public String toString() {
             return "FluidSection.EMPTY";
         }
     };
 
     short getAllVolume(int x, int y, int z);    // Has to be after EMPTY has been defined, dear god help this soul
+
     MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
 
     boolean isEmpty();
@@ -129,28 +130,22 @@ public interface FluidSection {
     void setContainer(@NotNull FluidSectionContainer container);
 
     /**
+     * Only use this offthread when the main thread is frozen.
+     */
+    void acquire();
+    void release();
+
+    /**
      * Returns a packet that contains the dirty data of this FluidSection.
-     * With fullUpdate == true it's allowed to call this method with the ReadLock
-     * If false you need a WriteLock
      *
      * @param pos        The position of the section in the world.
      * @param fullUpdate If true, the packet should contain all data, not just the dirty data.
      *                   This is used when the chunk is sent to the client for the first time.
      * @return A packet that contains the dirty data of this FluidSection, or null if there is no dirty data.
      */
-    @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean fullUpdate);
+    @Nullable CustomPacketPayload buildUpdatePacket(SectionPos pos, boolean fullUpdate);
 
     MapCodec<? extends FluidSection> codec();
-
-    /**
-     * Because of selfupcating properties you should not store the lock locally but get it lock and then later get it again and unlock
-     */
-    Lock readLock();
-
-    /**
-     * Because of selfupcating properties you should not store the lock locally but get it lock and then later get it again and unlock
-     */
-    Lock writeLock();
 
     default void fill(MultiFluidValue[] fluids) {
         if (fluids.length != 4096) throw new IllegalArgumentException();
@@ -162,8 +157,4 @@ public interface FluidSection {
             }
         }
     }
-
-
-
-
 }

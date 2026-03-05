@@ -28,7 +28,7 @@ public class MixinNeighborUpdater {
     )
     public void tickWater(BlockPos pos, Block neighborBlock, BlockPos neighborPos, CallbackInfo ci) {
         if (level.isClientSide) return;
-        FluidTicker.tickIfWater((ServerLevel) this.level, pos.getX(), pos.getY(), pos.getZ());
+        FluidTicker.tickIfFluid((ServerLevel) this.level, pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Inject(
@@ -37,7 +37,7 @@ public class MixinNeighborUpdater {
     )
     public void tickWater(BlockState state, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston, CallbackInfo ci) {
         if (level.isClientSide) return;
-        FluidTicker.tickIfWater((ServerLevel) this.level, pos.getX(), pos.getY(), pos.getZ());
+        FluidTicker.tickIfFluid((ServerLevel) this.level, pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Inject(
@@ -47,7 +47,7 @@ public class MixinNeighborUpdater {
     public void tickWater(BlockPos pos, Block block, Direction facing, CallbackInfo ci) {
         if (level.isClientSide) return;
         for (var direction : Direction.values()) {
-            FluidTicker.tickIfWater((ServerLevel) this.level, pos.getX() + direction.getStepX(), pos.getY() + direction.getStepY(), pos.getZ() + direction.getStepZ());
+            FluidTicker.tickIfFluid((ServerLevel) this.level, pos.getX() + direction.getStepX(), pos.getY() + direction.getStepY(), pos.getZ() + direction.getStepZ());
         }
     }
 }

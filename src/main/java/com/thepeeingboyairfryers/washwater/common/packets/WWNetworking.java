@@ -31,36 +31,34 @@ public class WWNetworking {
                 var chunk = Minecraft.getInstance().level.getChunk(p.pos().x(), p.pos().z());
                 var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
 
-                section.writeLock().lock();
-                for (var u : p.updates()) {
-                    var x = FluidSection.short2localX(u.getFirst());
-                    var y = FluidSection.short2localY(u.getFirst());
-                    var z = FluidSection.short2localZ(u.getFirst());
-                    section.setVolume(x, y, z, u.getSecond());
-                }
-                section.writeLock().unlock();
+
+                ctx.enqueueWork(() -> {
+                    for (var u : p.updates()) {
+                        var x = FluidSection.short2localX(u.getFirst());
+                        var y = FluidSection.short2localY(u.getFirst());
+                        var z = FluidSection.short2localZ(u.getFirst());
+                        section.setVolume(x, y, z, u.getSecond());
+                    }
+                });
             });
         });
 
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post e) -> {
             if (e.getLevel().isClientSide()) return;
-            var l = e.getLevel();
-            var dirties = DIRTY_SECTIONS.get(l);
+            var level = e.getLevel();
+
+            var dirties = DIRTY_SECTIONS.get(level);
             if (dirties == null) return;
             for (var lPos : dirties) {
                 var sectionPos = SectionPos.of(lPos);
                 var chunkPos = sectionPos.chunk();
-                var chunk = l.getChunk(chunkPos.x, chunkPos.z);
+                var chunk = level.getChunk(chunkPos.x, chunkPos.z);
                 var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
 
-                //Write cus we cleanup dirties
-                s.writeLock().lock();
 
-                var update = s.updatePacket(sectionPos, false);
-                if (update == null) continue;
-                PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) l, chunkPos, update);
-
-                s.writeLock().unlock();
+                var update = s.buildUpdatePacket(sectionPos, false);
+                if (update != null)
+                    PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, chunkPos, update);
             }
         });
 
@@ -70,19 +68,17 @@ public class WWNetworking {
             var attachment = FluidSectionManager.getAttachmentFor(l.getChunk(cPos.x, cPos.z));
             int idx = 0;
             for (var s : attachment) {
-                s.readLock().lock(); //Read cus we just send state of water to new player
-
-                var update = s.updatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
-                if (update == null) continue;
-                PacketDistributor.sendToPlayer(e.getPlayer(), update);
-
-                s.readLock().unlock();
+                var update = s.buildUpdatePacket(SectionPos.of(cPos.x, l.getMinSection() + idx++, cPos.z), true);
+                if (update != null)
+                    PacketDistributor.sendToPlayer(e.getPlayer(), update);
             }
         });
     }
 
     //SectionPos coordinates
     public static void queueUpdate(ServerLevel level, int x, int y, int z) {
-        DIRTY_SECTIONS.computeIfAbsent(level, a -> new LongRBTreeSet()).add(SectionPos.asLong(x, y, z));
+        synchronized (DIRTY_SECTIONS) {
+            DIRTY_SECTIONS.computeIfAbsent(level, a -> new LongRBTreeSet()).add(SectionPos.asLong(x, y, z));
+        }
     }
 }

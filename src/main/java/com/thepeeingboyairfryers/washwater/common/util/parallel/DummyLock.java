@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.common.util;
+package com.thepeeingboyairfryers.washwater.common.util.parallel;
 
 import org.jetbrains.annotations.NotNull;
 

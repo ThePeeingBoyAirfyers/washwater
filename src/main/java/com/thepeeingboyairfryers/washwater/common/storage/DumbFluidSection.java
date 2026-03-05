@@ -6,125 +6,83 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.packets.DumbFluidSectionUpdatePacket;
-import it.unimi.dsi.fastutil.shorts.AbstractShort2ObjectMap;
-import it.unimi.dsi.fastutil.shorts.Short2ObjectAVLTreeMap;
-import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
-import it.unimi.dsi.fastutil.shorts.ShortArrayList;
-import it.unimi.dsi.fastutil.shorts.ShortList;
-import net.minecraft.core.BlockPos;
+import it.unimi.dsi.fastutil.shorts.ShortRBTreeSet;
+import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Stream;
+import java.util.Arrays;
 
-public class DumbFluidSection implements FluidSection {
-    public static final MapCodec<Short2ObjectMap.Entry<MultiFluidValue>> ENTRY_CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
-            Codec.SHORT.fieldOf("pos").forGetter(Short2ObjectMap.Entry::getShortKey),
-            MultiFluidValue.CODEC.fieldOf("value").forGetter(Short2ObjectMap.Entry<MultiFluidValue>::getValue)
-    ).apply(b, AbstractShort2ObjectMap.BasicEntry::new));
+public class DumbFluidSection extends UpgradeableFluidSection {
     public static final MapCodec<DumbFluidSection> CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
-            Codec.list(ENTRY_CODEC.codec()).fieldOf("fluids").forGetter(s -> new ArrayList<>(s.map.short2ObjectEntrySet()))
-    ).apply(b, DumbFluidSection::new));
+            MultiFluidValue.CODEC.listOf().fieldOf("array").forGetter(s -> Arrays.asList(s.array)),
+            Codec.INT.fieldOf("nonEmpty").forGetter(DumbFluidSection::getNonEmpty)
+    ).apply(b, (list, nonEmpty) -> new DumbFluidSection(list.toArray(new MultiFluidValue[16 * 16 * 16]), nonEmpty)));
 
-    private final Short2ObjectMap<MultiFluidValue> map = new Short2ObjectAVLTreeMap<>();
-    private final ShortList dirty = new ShortArrayList();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private FluidSectionContainer container;
+    private final MultiFluidValue[] array;
+    private final ShortSet dirty = new ShortRBTreeSet();
+    private int nonEmpty;
 
     public DumbFluidSection() {
+        this(new MultiFluidValue[16 * 16 * 16], 0);
+        Arrays.fill(array, MultiFluidValue.EMPTY);
     }
 
-    public DumbFluidSection(List<Short2ObjectMap.Entry<MultiFluidValue>> iMap) {
-        for (var e : iMap) {
-            this.map.put(e.getShortKey(), e.getValue());
-        }
-
-        this.dirty.addAll(this.map.keySet());
+    public DumbFluidSection(MultiFluidValue[] iArray, int iNonEmpty) {
+        array = iArray;
+        nonEmpty = iNonEmpty;
     }
 
     @Override
-    public void setVolume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
-        assert !writeLock().tryLock();
-
+    public void volume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
         short p = FluidSection.localPos2Short(x, y, z);
-        if (fluids.isEmpty()) {
-            if (map.remove(p) != null) {
-                dirty.add(p);
-            }
-            return;
-        }
+        var prev = array[p];
+        if (fluids.isEmpty() && !prev.isEmpty()) {
+            nonEmpty--;
+        } else if (!fluids.isEmpty() && prev.isEmpty()) nonEmpty++;
 
-        map.put(p, fluids);
+        array[p] = fluids;
         dirty.add(p);
-        container.markDirty();
+        markDirty();
     }
 
     @Override
-    public short getVolumeOf(int x, int y, int z, FluidType type) {
-        return getVolume(x, y, z).forFluid(type);
+    public @NotNull MultiFluidValue volume(int x, int y, int z) {
+        return array[FluidSection.localPos2Short(x, y, z)];
     }
 
     @Override
-    public @NotNull MultiFluidValue getVolume(int x, int y, int z) {
-        return map.getOrDefault(FluidSection.localPos2Short(x, y, z), MultiFluidValue.EMPTY);
-    }
-
-    @Override
-    public short getAllVolume(int x, int y, int z) {
-        MultiFluidValue v = getVolume(x, y, z);
-        short total = 0;
-
-        for (MultiFluidValue.Entry e : v) {
-            total += e.volume();
-        }
-
-        return total;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return map.isEmpty();
-    }
-
-    @Override
-    public void setContainer(@NotNull FluidSectionContainer iContainer) {
-        container = iContainer;
+    protected boolean empty() {
+        return nonEmpty == 0;
     }
 
     @Override
     public @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
-        assert !(!all && writeLock().tryLock());
-
         if (dirty.isEmpty() && !all) return null;
-        var updates = (all ? map.keySet() : dirty).stream().map(s -> Pair.of(s, map.getOrDefault(s, MultiFluidValue.EMPTY))).toList();
-        if (!all) dirty.clear();
+        var updates = new ArrayList<Pair<Short, MultiFluidValue>>();
+        if (!all) {
+            updates.ensureCapacity(dirty.size());
+            for (short s : dirty) {
+                updates.add(Pair.of(s, array[s]));
+            }
+            dirty.clear();
+        } else {
+            for (short i = 0; i < array.length; i++) {
+                updates.add(Pair.of(i, array[i]));
+            }
+        }
         return new DumbFluidSectionUpdatePacket(pos, updates);
     }
 
     @Override
-    public MapCodec<DumbFluidSection> codec() {
+    protected @NotNull MapCodec<? extends FluidSection> myCodec() {
         return CODEC;
     }
 
-    @Override
-    public Lock readLock() {
-        return lock.readLock();
-    }
-
-    @Override
-    public Lock writeLock() {
-        return lock.writeLock();
-    }
-
-    public Stream<BlockPos> allKeys() {
-        return map.keySet().stream().map(FluidSection::short2localPos);
+    private int getNonEmpty() {
+        return nonEmpty;
     }
 }

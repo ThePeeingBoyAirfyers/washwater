@@ -69,12 +69,7 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
 
         if (section.isEmpty()) {
             Arrays.fill(fluids, MultiFluidValue.EMPTY);
-            return;
-        }
-
-        section.readLock().lock();
-        section.fill(fluids);
-        section.readLock().unlock();
+        } else section.fill(fluids);
     }
 
     @Override
