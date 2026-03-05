@@ -8,6 +8,8 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldOpenFlows;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelSettings;
@@ -23,6 +25,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -44,9 +47,16 @@ public class WorldPerfTest {
 
 
     public static void register(IEventBus modEventBus) {
-        if (System.getProperty("ww.bench") == null) return;
-        NeoForge.EVENT_BUS.addListener(WorldPerfTest::tickPost);
-        NeoForge.EVENT_BUS.addListener(WorldPerfTest::tickPre);
+        if (System.getProperty("ww.bench") == null && System.getProperty("ww.test") == null) return;
+        if (System.getProperty("ww.bench") != null) {
+            NeoForge.EVENT_BUS.addListener(WorldPerfTest::tickPost);
+            NeoForge.EVENT_BUS.addListener(WorldPerfTest::tickPre);
+        }
+
+        if (System.getProperty("ww.test") != null) {
+            NeoForge.EVENT_BUS.addListener(WorldPerfTest::bucketDrop);
+        }
+
         if (FMLEnvironment.dist.isClient()) {
             NeoForge.EVENT_BUS.addListener(WorldPerfTest::screenOpening);
         }
@@ -73,6 +83,10 @@ public class WorldPerfTest {
         mc.doRunTask(() -> flatworld(event.getNewScreen()));
     }
 
+    private static void bucketDrop(PlayerEvent.PlayerLoggedInEvent event) {
+        event.getEntity().getInventory().add(new ItemStack(Items.WATER_BUCKET));
+    }
+
     private static void oldOverworld(Screen screen) {
         Minecraft mc = Minecraft.getInstance();
         WorldOpenFlows openFlows = mc.createWorldOpenFlows();
@@ -93,12 +107,13 @@ public class WorldPerfTest {
     }
 
     private static void flatworld(Screen screen) {
+        boolean test = System.getProperty("ww.test") != null;
         Minecraft mc = Minecraft.getInstance();
         WorldOpenFlows openFlows = mc.createWorldOpenFlows();
         Config.WATER_SOURCE_GAIN.set(150);
 
         var gameRules = new GameRules();
-        gameRules.getRule(GameRules.RULE_RANDOMTICKING).set(3, null);
+        gameRules.getRule(GameRules.RULE_RANDOMTICKING).set(test ? 0 : 3, null);
 
         openFlows.createFreshLevel("bench", new LevelSettings(
                         "bench",
@@ -123,8 +138,10 @@ public class WorldPerfTest {
 
                     var list = flatSettings.getLayersInfo();
                     list.add(new FlatLayerInfo(1, Blocks.BEDROCK));
-                    list.add(new FlatLayerInfo(15, Blocks.AIR));
-                    list.add(new FlatLayerInfo(16, WWBlocks.WATER_SOURCE_AIR_BLOCK.get()));
+                    if (!test) {
+                        list.add(new FlatLayerInfo(15, Blocks.AIR));
+                        list.add(new FlatLayerInfo(16, WWBlocks.WATER_SOURCE_AIR_BLOCK.get()));
+                    }
                     flatSettings.updateLayers();
 
                     return conf.replaceOverworldGenerator(regs, new FlatLevelSource(flatSettings));

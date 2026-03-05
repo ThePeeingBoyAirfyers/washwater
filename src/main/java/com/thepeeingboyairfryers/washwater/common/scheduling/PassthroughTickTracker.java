@@ -45,6 +45,7 @@ public class PassthroughTickTracker extends InSectionTickTracker {
 
     @Override
     public void apply() {
+        super.apply();
         for (var section : dirtySections) {
             level.markSectionDirty(section);
         }

@@ -63,4 +63,10 @@ public abstract class InSectionTickTracker implements TickTracker {
     protected int getZ() {
         return z;
     }
+
+    @Override
+    public void apply() {
+        if (!inSectionTicks.isEmpty())
+            level.markSectionDirty(level.getTickSection(x, y, z));
+    }
 }

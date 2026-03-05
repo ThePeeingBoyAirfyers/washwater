@@ -23,6 +23,7 @@ public class SimpleTickTracker extends InSectionTickTracker {
 
     @Override
     public void apply() {
+        super.apply();
         getLevel().addTickSet(outSectionTicks);
     }
 }
