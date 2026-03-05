@@ -2,7 +2,6 @@ package com.thepeeingboyairfryers.washwater.client.fluid_rendering;
 
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
-import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.duck.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.api.util.ColorARGB;
@@ -29,10 +28,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -50,6 +47,8 @@ public class WashFluidRenderer extends FluidRenderer {
     private final ModelQuad quad = new ModelQuad();
     private final ChunkVertexEncoder.Vertex[] vertices = ChunkVertexEncoder.Vertex.uninitializedQuad();
     private final BlockPos.MutableBlockPos scratchPos = new BlockPos.MutableBlockPos();
+    private final ChunkModelBuilder builder;
+    private final TranslucentGeometryCollector collector;
 
 
     public WashFluidRenderer(ColorProviderRegistry iColorRegistry, LightPipelineProvider iLightPipelineProvider) {
@@ -80,13 +79,12 @@ public class WashFluidRenderer extends FluidRenderer {
 
         quad.setSprite(sprites[0]);
 
-        MultiFluidValue northValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), (blockPos.getZ()-1));
-        MultiFluidValue southValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), (blockPos.getZ()+1));
-        MultiFluidValue westValue = fluids.ww€getFluidFor(blockPos.getX()-1, blockPos.getY(), (blockPos.getZ()));
-        MultiFluidValue eastValue = fluids.ww€getFluidFor(blockPos.getX()+1, blockPos.getY(), (blockPos.getZ()));
-        MultiFluidValue downValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY()-1, (blockPos.getZ()));
-        MultiFluidValue upValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY()+1, (blockPos.getZ()));
-
+        MultiFluidValue northValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), (blockPos.getZ() - 1));
+        MultiFluidValue southValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), (blockPos.getZ() + 1));
+        MultiFluidValue westValue = fluids.ww€getFluidFor(blockPos.getX() - 1, blockPos.getY(), (blockPos.getZ()));
+        MultiFluidValue eastValue = fluids.ww€getFluidFor(blockPos.getX() + 1, blockPos.getY(), (blockPos.getZ()));
+        MultiFluidValue downValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY() - 1, (blockPos.getZ()));
+        MultiFluidValue upValue = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY() + 1, (blockPos.getZ()));
 
         float northHeight = (((float) (northValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
         float southHeight = (((float) (southValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
@@ -102,16 +100,12 @@ public class WashFluidRenderer extends FluidRenderer {
         boolean cullWest = this.isFullBlockFluidOccluded(level, blockPos, Direction.WEST, blockState, fluidState) || westHeight > 0;
         boolean cullEast = this.isFullBlockFluidOccluded(level, blockPos, Direction.EAST, blockState, fluidState) || eastHeight > 0;
 
-
-
-
         float generalHeight = (((float) entry.volume()) / WaterInfo.VOLUME_PER_BLOCK);
 
-        MultiFluidValue northWestValue = fluids.ww€getFluidFor(blockPos.getX()-1, blockPos.getY(), (blockPos.getZ()-1));
-        MultiFluidValue northEastValue = fluids.ww€getFluidFor(blockPos.getX()+1, blockPos.getY(), (blockPos.getZ()-1));
-        MultiFluidValue southWestValue = fluids.ww€getFluidFor(blockPos.getX()-1, blockPos.getY(), (blockPos.getZ()+1));
-        MultiFluidValue southEastValue = fluids.ww€getFluidFor(blockPos.getX()+1, blockPos.getY(), (blockPos.getZ()+1));
-
+        MultiFluidValue northWestValue = fluids.ww€getFluidFor(blockPos.getX() - 1, blockPos.getY(), (blockPos.getZ() - 1));
+        MultiFluidValue northEastValue = fluids.ww€getFluidFor(blockPos.getX() + 1, blockPos.getY(), (blockPos.getZ() - 1));
+        MultiFluidValue southWestValue = fluids.ww€getFluidFor(blockPos.getX() - 1, blockPos.getY(), (blockPos.getZ() + 1));
+        MultiFluidValue southEastValue = fluids.ww€getFluidFor(blockPos.getX() + 1, blockPos.getY(), (blockPos.getZ() + 1));
 
         float northWestDiagHeight = (((float) (northWestValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
         float northEastDiagHeight = (((float) (northEastValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
@@ -126,17 +120,13 @@ public class WashFluidRenderer extends FluidRenderer {
         float yOffset = 0.001F;
 
         //Bottom Face
-        //if (!cullDown) {
-/*            setVertex(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            setVertex(1, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-            setVertex(2, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-            setVertex(3, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);*/
+        if (!cullDown) {
             setVertex(0, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f);
             setVertex(1, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
             setVertex(2, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
             setVertex(3, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
             writeQuad(builder, collector, material, blockPos, offset, Direction.DOWN, false, level, fluidState);
-        //}
+        }
 
         //Top Face
         if (!cullUp) {
@@ -180,7 +170,7 @@ public class WashFluidRenderer extends FluidRenderer {
                     z2 = z1;
                     break;
                 case WEST:
-                    if (cullWest){
+                    if (cullWest) {
                         continue;
                     }
                     c1 = southWestHeight;
@@ -245,7 +235,7 @@ public class WashFluidRenderer extends FluidRenderer {
             if (shape.isEmpty()) {
                 return true;
             } else {
-                VoxelShape threshold = Shapes.box((double)0.0F, (double)0.0F, (double)0.0F, (double)1.0F, (double)height, (double)1.0F);
+                VoxelShape threshold = Shapes.box((double) 0.0F, (double) 0.0F, (double) 0.0F, (double) 1.0F, (double) height, (double) 1.0F);
                 return !Shapes.blockOccudes(threshold, shape, dir);
             }
         } else {
