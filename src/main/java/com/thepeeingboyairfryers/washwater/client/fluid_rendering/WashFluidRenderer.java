@@ -236,7 +236,7 @@ public class WashFluidRenderer extends FluidRenderer {
             if (shape.isEmpty()) {
                 return true;
             } else {
-                VoxelShape threshold = Shapes.box((double) 0.0F, (double) 0.0F, (double) 0.0F, (double) 1.0F, (double) height, (double) 1.0F);
+                VoxelShape threshold = Shapes.box(0.0D, 0.0D, 0.0D, 1.0D, height, 1.0D);
                 return !Shapes.blockOccudes(threshold, shape, dir);
             }
         } else {
