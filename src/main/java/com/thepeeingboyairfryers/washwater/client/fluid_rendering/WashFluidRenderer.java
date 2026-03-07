@@ -50,6 +50,22 @@ public class WashFluidRenderer extends FluidRenderer {
     private ChunkModelBuilder builder;
     private TranslucentGeometryCollector collector;
 
+    private boolean cullUp;
+    private boolean cullDown;
+    private boolean cullNorth;
+    private boolean cullSouth;
+    private boolean cullWest;
+    private boolean cullEast;
+    private float c1;
+    private float c2;
+    private float x1;
+    private float z1;
+    private float x2;
+    private float z2;
+    float northWestHeight;
+    float northEastHeight;
+    float southWestHeight;
+    float southEastHeight;
 
     public WashFluidRenderer(ColorProviderRegistry iColorRegistry, LightPipelineProvider iLightPipelineProvider) {
         this.colorRegistry = iColorRegistry;
@@ -94,12 +110,12 @@ public class WashFluidRenderer extends FluidRenderer {
         float downHeight = (((float) (downValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
         float upHeight = (((float) (upValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
 
-        boolean cullUp = this.isFullBlockFluidOccluded(level, blockPos, Direction.UP, blockState, fluidState) || upHeight > 0;
-        boolean cullDown = this.isFullBlockFluidOccluded(level, blockPos, Direction.DOWN, blockState, fluidState) || downHeight > 0;
-        boolean cullNorth = this.isFullBlockFluidOccluded(level, blockPos, Direction.NORTH, blockState, fluidState) || northHeight > 0;
-        boolean cullSouth = this.isFullBlockFluidOccluded(level, blockPos, Direction.SOUTH, blockState, fluidState) || southHeight > 0;
-        boolean cullWest = this.isFullBlockFluidOccluded(level, blockPos, Direction.WEST, blockState, fluidState) || westHeight > 0;
-        boolean cullEast = this.isFullBlockFluidOccluded(level, blockPos, Direction.EAST, blockState, fluidState) || eastHeight > 0;
+        cullUp = this.isFullBlockFluidOccluded(level, blockPos, Direction.UP, blockState, fluidState) || upHeight > 0;
+        cullDown = this.isFullBlockFluidOccluded(level, blockPos, Direction.DOWN, blockState, fluidState) || downHeight > 0;
+        cullNorth = this.isFullBlockFluidOccluded(level, blockPos, Direction.NORTH, blockState, fluidState) || northHeight > 0;
+        cullSouth = this.isFullBlockFluidOccluded(level, blockPos, Direction.SOUTH, blockState, fluidState) || southHeight > 0;
+        cullWest = this.isFullBlockFluidOccluded(level, blockPos, Direction.WEST, blockState, fluidState) || westHeight > 0;
+        cullEast = this.isFullBlockFluidOccluded(level, blockPos, Direction.EAST, blockState, fluidState) || eastHeight > 0;
 
         float generalHeight = (((float) entry.volume()) / WaterInfo.VOLUME_PER_BLOCK);
 
@@ -138,14 +154,14 @@ public class WashFluidRenderer extends FluidRenderer {
             writeQuad(material, blockPos, offset, Direction.UP, false, level, fluidState);
         }
 
-
         for (Direction dir : DirectionUtil.HORIZONTAL_DIRECTIONS) {
-            float c1;
+            //configureVerticesForFacing(dir);
+/*            float c1;
             float c2;
             float x1;
             float z1;
             float x2;
-            float z2;
+            float z2;*/
             switch (dir) {
                 case NORTH:
                     if (cullNorth) {
@@ -209,6 +225,59 @@ public class WashFluidRenderer extends FluidRenderer {
             setVertex(2, x1, yOffset, z1, u1, v3);
             setVertex(3, x1, c1, z1, u1, v1);
             writeQuad(material, blockPos, offset, dir, false, level, fluidState);
+        }
+    }
+
+    private void configureVerticesForFacing(Direction dir) {
+
+        switch (dir) {
+            case NORTH:
+                if (cullNorth) {
+                    break;
+                }
+                c1 = northWestHeight;
+                c2 = northEastHeight;
+                x1 = 0.0F;
+                x2 = 1.0F;
+                z1 = 0.001F;
+                z2 = z1;
+                break;
+
+            case SOUTH:
+                if (cullSouth) {
+                    break;
+                }
+                c1 = southEastHeight;
+                c2 = southWestHeight;
+                x1 = 1.0F;
+                x2 = 0.0F;
+                z1 = 0.999F;
+                z2 = z1;
+                break;
+            case WEST:
+                if (cullWest) {
+                    break;
+                }
+                c1 = southWestHeight;
+                c2 = northWestHeight;
+                x1 = 0.001F;
+                x2 = x1;
+                z1 = 1.0F;
+                z2 = 0.0F;
+                break;
+            case EAST:
+                if (cullEast) {
+                    break;
+                }
+                c1 = northEastHeight;
+                c2 = southEastHeight;
+                x1 = 0.999F;
+                x2 = x1;
+                z1 = 0.0F;
+                z2 = 1.0F;
+                break;
+            default:
+                break;
         }
     }
 
