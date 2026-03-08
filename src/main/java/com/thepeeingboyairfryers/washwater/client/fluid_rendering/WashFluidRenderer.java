@@ -62,10 +62,16 @@ public class WashFluidRenderer extends FluidRenderer {
     private float z1;
     private float x2;
     private float z2;
-    float northWestHeight;
-    float northEastHeight;
-    float southWestHeight;
-    float southEastHeight;
+    private float northWestHeight;
+    private float northEastHeight;
+    private float southWestHeight;
+    private float southEastHeight;
+    private LevelSlice level;
+    private BlockPos blockPos;
+    private BlockState blockState;
+    private FluidState fluidState;
+    private float downHeight;
+
 
     public WashFluidRenderer(ColorProviderRegistry iColorRegistry, LightPipelineProvider iLightPipelineProvider) {
         this.colorRegistry = iColorRegistry;
@@ -91,6 +97,10 @@ public class WashFluidRenderer extends FluidRenderer {
         Material material = DefaultMaterials.forFluidState(fluidState);
         this.builder = buffers.get(material);
         this.collector = iCollector;
+        this.level = level;
+        this.blockPos = blockPos;
+        this.blockState = blockState;
+        this.fluidState = fluidState;
         IClientFluidTypeExtensions handler = IClientFluidTypeExtensions.of(fluidState);
         TextureAtlasSprite[] sprites = FluidSpriteCache.getFluidSprites(level, blockPos, fluidState);
 
@@ -107,7 +117,7 @@ public class WashFluidRenderer extends FluidRenderer {
         float southHeight = (((float) (southValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
         float westHeight = (((float) (westValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
         float eastHeight = (((float) (eastValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
-        float downHeight = (((float) (downValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
+        this.downHeight = (((float) (downValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
         float upHeight = (((float) (upValue.getTotalVolume()) / WaterInfo.VOLUME_PER_BLOCK));
 
         cullUp = this.isFullBlockFluidOccluded(level, blockPos, Direction.UP, blockState, fluidState) || upHeight > 0;
@@ -139,7 +149,7 @@ public class WashFluidRenderer extends FluidRenderer {
         //Bottom Face
         if (!cullDown) {
             setVertex(0, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-            setVertex(1, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+            setVertex(1, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);cullNorth
             setVertex(2, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
             setVertex(3, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
             writeQuad(material, blockPos, offset, Direction.DOWN, false, level, fluidState);
@@ -155,14 +165,14 @@ public class WashFluidRenderer extends FluidRenderer {
         }
 
         for (Direction dir : DirectionUtil.HORIZONTAL_DIRECTIONS) {
-            //configureVerticesForFacing(dir);
+            configureVerticesForFacing(dir);
 /*            float c1;
             float c2;
             float x1;
             float z1;
             float x2;
             float z2;*/
-            switch (dir) {
+/*            switch (dir) {
                 case NORTH:
                     if (cullNorth) {
                         continue;
@@ -210,7 +220,7 @@ public class WashFluidRenderer extends FluidRenderer {
                     break;
                 default:
                     continue;
-            }
+            }*/
 
             float u1 = 1f;
             float u2 = 1f;
@@ -229,10 +239,9 @@ public class WashFluidRenderer extends FluidRenderer {
     }
 
     private void configureVerticesForFacing(Direction dir) {
-
         switch (dir) {
             case NORTH:
-                if (cullNorth) {
+                if () {
                     break;
                 }
                 c1 = northWestHeight;
@@ -295,6 +304,10 @@ public class WashFluidRenderer extends FluidRenderer {
 
     private boolean isFullBlockFluidOccluded(BlockAndTintGetter world, BlockPos pos, Direction dir, BlockState blockState, FluidState fluid) {
         return !this.occlusionCache.shouldDrawFullBlockFluidSide(blockState, world, pos, dir, fluid, Shapes.block());
+    }
+
+    private boolean shouldCullSide(Direction dir) {
+        return (this.isFullBlockFluidOccluded(level, blockPos, Direction.DOWN, blockState, fluidState) || downHeight > 0);
     }
 
     private boolean isSideExposed(BlockAndTintGetter world, BlockPos blockPos, Direction dir, float height) {
