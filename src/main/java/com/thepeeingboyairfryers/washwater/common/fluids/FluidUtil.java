@@ -20,6 +20,7 @@ public class FluidUtil {
     }
 
     public static void addVolume(ServerLevel level, BlockPos pos, FluidType type, int volume) {
+        if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return;
         if (volume == 0) return;
         short oldVolume = getAllVolume(level, pos);
         if (oldVolume < 0) {
@@ -51,6 +52,7 @@ public class FluidUtil {
     }
 
     public static short getAllVolume(Level level, int x, int y, int z) {
+        if (y < level.getMinBuildHeight() || y > level.getMaxBuildHeight()) return 0;
         var chunk = level.getChunk(x >> 4, z >> 4);
         var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
         return fluidChunk.getAllVolume(x, y, z);
@@ -65,6 +67,7 @@ public class FluidUtil {
     }
 
     public static void setVolume(ServerLevel level, int x, int y, int z, MultiFluidValue fluids) {
+        if (y < level.getMinBuildHeight() || y > level.getMaxBuildHeight()) return;
         var chunk = level.getChunk(x >> 4, z >> 4);
         var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
         fluidChunk.setVolume(x & 15, y, z & 15, fluids);
@@ -87,6 +90,7 @@ public class FluidUtil {
     }
 
     public static short getVolume(LevelChunk chunk, int x, int y, int z, FluidType type) {
+        if (y < chunk.getMinBuildHeight() || y > chunk.getMaxBuildHeight()) return 0;
         return FluidSectionManager.getAttachmentFor(chunk).getVolume(x, y, z, type);
     }
 
