@@ -1,14 +1,12 @@
 package com.thepeeingboyairfryers.washwater.common.fluids;
 
 import com.thepeeingboyairfryers.washwater.common.WashWater;
-import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.scheduling.FluidTicker;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.common.util.DirectionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -80,15 +78,6 @@ public class FluidUtil {
         }
     }
 
-    public static int getVolume(Level level, BlockState state, int x, int y, int z, FluidType type) {
-        return getVolume(
-                level.getChunk(x >> 4, z >> 4),
-                state,
-                x, y, z,
-                type
-        );
-    }
-
     public static short getVolume(Level level, int x, int y, int z, FluidType type) {
         return getVolume(
                 level.getChunk(x >> 4, z >> 4),
@@ -98,20 +87,7 @@ public class FluidUtil {
     }
 
     public static short getVolume(LevelChunk chunk, int x, int y, int z, FluidType type) {
-        return getVolume(
-                chunk,
-                chunk.getBlockState(new BlockPos(x, y, z)), //TODO im not a fan of this
-                x, y, z,
-                type
-        );
-    }
-
-    public static short getVolume(LevelChunk chunk, BlockState state, int x, int y, int z, FluidType type) {
-        var volume = WaterInfo.getWaterVolumeOfState(state);
-        if (volume < 0) return volume;
-
-        var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
-        return fluidChunk.getVolume(x, y, z, type);
+        return FluidSectionManager.getAttachmentFor(chunk).getVolume(x, y, z, type);
     }
 
     public static boolean isFilledUp(Level level, BlockPos pos) {

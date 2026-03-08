@@ -3,7 +3,9 @@ package com.thepeeingboyairfryers.washwater.common.fluids;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidsIndexationAttachment;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -45,5 +47,19 @@ public class FluidManager {
 
     public static FluidState dropinFluidState(FluidType fluidType) { // Think about what you have done
         return fluidsIndexation.getRelatedFluids(fluidType).stream().findAny().orElseThrow().defaultFluidState();
+    }
+
+    public static FluidState getFluidState(MultiFluidValue result) {
+        short vol = result.getTotalVolume(); //TODO multifluids
+
+        if (vol == 0) {
+            return Fluids.EMPTY.defaultFluidState();
+        }
+
+        return Fluids.FLOWING_WATER.getSource(false);
+    }
+
+    public static BlockState getFluidBlockState(MultiFluidValue result) {
+        return getFluidState(result).createLegacyBlock();
     }
 }

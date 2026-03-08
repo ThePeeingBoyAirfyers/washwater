@@ -17,7 +17,8 @@
     "common.fake_blockstates.MixinCrudeIncrementalIntIdentityHashBiMap",
     "common.fake_blockstates.MixinFluidState",
     "common.fake_blockstates.MixinIdMapper",
-    "common.fake_blockstates.MixinMappedRegistry"
+    "common.fake_blockstates.MixinMappedRegistry",
+    "common.fake_blockstates.MixinServerCommonPacketListenerImpl"
   ],
   "client": [
     "client.MixinFluidRendererFactory",

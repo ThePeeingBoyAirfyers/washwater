@@ -37,12 +37,4 @@ public class WaterInfo {
         if (volume < 0) return 0;
         return ((float) volume) / VOLUME_PER_BLOCK;
     }
-
-    public static FluidState getWaterStateOfVolume(int vol) {
-        //TODO MULTIFLUID
-        if (vol == 0) {
-            return Fluids.EMPTY.defaultFluidState();
-        }
-        return Fluids.FLOWING_WATER.getFlowing(((vol / VOLUME_PER_LEVEL) + 1), false);
-    }
 }

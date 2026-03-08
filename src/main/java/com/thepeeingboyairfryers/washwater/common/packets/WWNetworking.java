@@ -13,6 +13,7 @@ import net.neoforged.neoforge.event.level.ChunkWatchEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.HandlerThread;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,20 +27,21 @@ public class WWNetworking {
 
     public static void register(IEventBus bus) {
         bus.addListener((RegisterPayloadHandlersEvent e) -> {
-            var r = e.registrar("1");
+            var r = e.registrar("1").executesOn(HandlerThread.MAIN);
             r.playToClient(DumbFluidSectionUpdatePacket.TYPE, DumbFluidSectionUpdatePacket.STREAM_CODEC, (p, ctx) -> {
                 var chunk = Minecraft.getInstance().level.getChunk(p.pos().x(), p.pos().z());
                 var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
+                for (var u : p.updates()) {
+                    var x = FluidSection.short2localX(u.getFirst());
+                    var y = FluidSection.short2localY(u.getFirst());
+                    var z = FluidSection.short2localZ(u.getFirst());
+                    section.setVolume(x, y, z, u.getSecond());
+                }
+            });
 
-
-                ctx.enqueueWork(() -> {
-                    for (var u : p.updates()) {
-                        var x = FluidSection.short2localX(u.getFirst());
-                        var y = FluidSection.short2localY(u.getFirst());
-                        var z = FluidSection.short2localZ(u.getFirst());
-                        section.setVolume(x, y, z, u.getSecond());
-                    }
-                });
+            r.playToClient(OneFluidUpdatePacket.TYPE,  OneFluidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
+                var chunk = Minecraft.getInstance().level.getChunkAt(p.pos());
+                FluidSectionManager.getAttachmentFor(chunk).setVolume(p.pos().getX(), p.pos().getY(), p.pos().getZ(), p.value());
             });
         });
 
