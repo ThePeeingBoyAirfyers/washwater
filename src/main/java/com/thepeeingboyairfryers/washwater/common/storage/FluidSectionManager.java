@@ -1,6 +1,7 @@
 package com.thepeeingboyairfryers.washwater.common.storage;
 
 import com.thepeeingboyairfryers.washwater.common.WashWater;
+import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidChunkAttachment;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
@@ -53,7 +54,7 @@ public class FluidSectionManager {
 
         if (result.isEmpty()) return og;
         if (og.isAir() && result.getTotalVolume() > 100)
-            og = Blocks.WATER.defaultBlockState(); // TODO other fluids?
+            og = WaterInfo.getWaterStateOfVolume(result.getTotalVolume()).createLegacyBlock();
         return new WWBlockState(result, og);
     }
 
@@ -61,6 +62,8 @@ public class FluidSectionManager {
         MultiFluidValue result = fluidSection.getVolume(x, y, z);
 
         if (result.isEmpty()) return og;
+        if (og.isEmpty() && result.getTotalVolume() > 100)
+            og = WaterInfo.getWaterStateOfVolume(result.getTotalVolume());
         return new WWFluidState(result, og);
     }
 
