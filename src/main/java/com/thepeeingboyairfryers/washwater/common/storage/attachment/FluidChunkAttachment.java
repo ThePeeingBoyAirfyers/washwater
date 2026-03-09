@@ -61,7 +61,6 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
     public short getVolume(int x, int y, int z, FluidType type) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
         return section.getVolumeOf(x & 15, y & 15, z & 15, type);
-
     }
 
     public short getAllVolume(int x, int y, int z) {

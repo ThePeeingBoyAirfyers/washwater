@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.scheduling;
 
+import com.thepeeingboyairfryers.washwater.common.Config;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.flow.FluidFlow;
 import com.thepeeingboyairfryers.washwater.common.flow.FluidRegion;
@@ -25,11 +26,11 @@ import java.util.concurrent.Executors;
 
 public class FluidTickLevel implements FluidTickingContext {
     private static final int REFRESH_RATE = 100;
+    private static final Executor EXECUTOR = Executors.newFixedThreadPool(Config.THREAD_COUNT.getAsInt());
     private final ServerLevel level;
     private final Long2ObjectMap<FluidTickSection> tickSections = new Long2ObjectAVLTreeMap<>();
     private final Set<FluidTickSection>[] dirtySections;
     private final Set<LongSet> nextTickToBeTicked = ConcurrentHashMap.newKeySet();
-    private final Executor executor = Executors.newFixedThreadPool(16);
     private int misTicks = 0;
     private long frozenTime = 0;
 
@@ -79,7 +80,7 @@ public class FluidTickLevel implements FluidTickingContext {
                 if (section.getAge() + REFRESH_RATE < FluidTicker.getCurrentTick())
                     setupTicker(section);
 
-                futures[i] = CompletableFuture.runAsync(() -> section.tick(this), executor);
+                futures[i] = CompletableFuture.runAsync(() -> section.tick(this), EXECUTOR);
             }
 
             long start = System.nanoTime();

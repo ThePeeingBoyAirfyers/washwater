@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.scheduling;
 
+import com.thepeeingboyairfryers.washwater.common.Config;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
@@ -56,13 +57,17 @@ public class FluidTicker {
 
         if (shouldTick(level)) {
             tLevel.applyNextTicks();
-            tLevel.tickLevelParallel(0, 4);
+            if (Config.PARALLEL.getAsBoolean())
+                tLevel.tickLevelParallel(0, 4);
+            else tLevel.tickLevelSequential(4, 4);
         } else {
-            tLevel.tickLevelParallel(4, 4);
+            if (Config.PARALLEL.getAsBoolean())
+                tLevel.tickLevelParallel(4, 4);
+            else tLevel.tickLevelSequential(4, 4);
         }
 
         long delta = tLevel.freezeNanos();
-        WashWater.LOGGER.info("{} freeze takes {}ms{}", level.getDescription().getString(), delta / 1000000, delta % 1000000);
+        WashWater.LOGGER.debug("{} freeze takes {}ms{}", level.getDescription().getString(), delta / 1000000, delta % 1000000);
     }
     public static int getCurrentTick() {
         return currentTick;
