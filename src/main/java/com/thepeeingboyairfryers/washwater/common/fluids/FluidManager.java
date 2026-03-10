@@ -12,6 +12,8 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
+import static com.thepeeingboyairfryers.washwater.common.WaterInfo.VOLUME_PER_LEVEL;
+
 public class FluidManager {
     private static FluidsIndexationAttachment fluidsIndexation;
 
@@ -56,7 +58,7 @@ public class FluidManager {
             return Fluids.EMPTY.defaultFluidState();
         }
 
-        return Fluids.FLOWING_WATER.getSource(false);
+        return Fluids.FLOWING_WATER.getFlowing(((vol / VOLUME_PER_LEVEL) + 1), false);
     }
 
     public static BlockState getFluidBlockState(MultiFluidValue result) {
