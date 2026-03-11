@@ -39,6 +39,7 @@ public class FluidPipetteItem extends Item {
             Direction direction = blockHitResult.getDirection();
             BlockPos blockPos2 = blockPos.relative(direction);
             int oldVolume = FluidUtil.getVolume(level, blockPos2, WaterInfo.WATER_TYPE);
+            System.out.println("pipet: " + oldVolume);
             int newVolume = (oldVolume < 1) ? oldVolume : oldVolume - 1;
             FluidUtil.setVolume((ServerLevel) level, blockPos2, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
         }

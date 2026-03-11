@@ -3,6 +3,7 @@ package com.thepeeingboyairfryers.washwater.common;
 import com.mojang.logging.LogUtils;
 import com.thepeeingboyairfryers.washwater.common.block.WWBlocks;
 import com.thepeeingboyairfryers.washwater.common.blockentity.WWBlockEntities;
+import com.thepeeingboyairfryers.washwater.common.component.ModDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.item.WWItems;
 import com.thepeeingboyairfryers.washwater.common.packets.WWNetworking;
@@ -39,6 +40,7 @@ public class WashWater {
 
         WWBlocks.register(modEventBus);
         WWItems.register(modEventBus);
+        ModDataComponentTypes.register(modEventBus);
         WWBlockEntities.register(modEventBus);
         WWAttachments.register(modEventBus);
         WWNetworking.register(modEventBus);
