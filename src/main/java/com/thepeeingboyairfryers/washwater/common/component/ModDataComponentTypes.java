@@ -2,10 +2,7 @@ package com.thepeeingboyairfryers.washwater.common.component;
 
 import com.mojang.serialization.Codec;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
-import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -13,6 +10,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.UnaryOperator;
 
 public class ModDataComponentTypes {
+
+    private ModDataComponentTypes() {
+        throw new IllegalStateException("Utility class");
+    }
+
 
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES =
             DeferredRegister.createDataComponents(WashWater.MOD_ID);
