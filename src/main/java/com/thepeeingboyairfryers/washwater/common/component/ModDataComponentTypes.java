@@ -29,17 +29,4 @@ public class ModDataComponentTypes {
         DATA_COMPONENT_TYPES.register(eventBus);
     }
 
-
-/*    public static final DataComponentType<Integer> BUCKET_FILL_LEVEL = register("bucket_fill_level", builder -> builder.persistent(Codec.INT));
-
-
-    private static <T>DataComponentType<T> register(String name, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
-        return Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceLocation.fromNamespaceAndPath(WashWater.MOD_ID, name),
-                builderOperator.apply(DataComponentType.builder()).build());
-    }
-
-    public static void registerDataComponentTypes() {
-
-    }*/
-
 }

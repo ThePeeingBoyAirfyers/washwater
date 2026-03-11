@@ -56,10 +56,10 @@ public class PrecisionBucketItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
-        if (false) {
-/*            int bucketFillLevel = DataComponentUtils.getOrCreateComponent(ModDataComponentTypes.BUCKET_FILL_LEVEL, itemStack);
-            String toolTipText = "Bucket contains: " + bucketFillLevel + "levels " + "of fluid";
-            list.add(Component.literal(toolTipText));*/
+        if (itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            int bucketFillLevel = itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
+            String toolTipText = "Bucket contains: " + bucketFillLevel + " levels " + "of fluid";
+            list.add(Component.literal(toolTipText));
         }
         else {
             String toolTipText = "Bucket contains: " + 0 + " levels " + "of fluid";
