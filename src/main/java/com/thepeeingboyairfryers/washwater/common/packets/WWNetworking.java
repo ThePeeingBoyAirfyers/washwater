@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.packets;
 
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import it.unimi.dsi.fastutil.longs.LongRBTreeSet;
@@ -28,7 +29,7 @@ public class WWNetworking {
     public static void register(IEventBus bus) {
         bus.addListener((RegisterPayloadHandlersEvent e) -> {
             var r = e.registrar("1").executesOn(HandlerThread.MAIN);
-            r.playToClient(DumbFluidSectionUpdatePacket.TYPE, DumbFluidSectionUpdatePacket.STREAM_CODEC, (p, ctx) -> {
+            r.playToClient(DumbFluidUpdatePacket.TYPE, DumbFluidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
                 var chunk = Minecraft.getInstance().level.getChunk(p.pos().x(), p.pos().z());
                 var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
                 for (var u : p.updates()) {
@@ -42,6 +43,19 @@ public class WWNetworking {
             r.playToClient(OneFluidUpdatePacket.TYPE,  OneFluidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
                 var chunk = Minecraft.getInstance().level.getChunkAt(p.pos());
                 FluidSectionManager.getAttachmentFor(chunk).setVolume(p.pos().getX(), p.pos().getY(), p.pos().getZ(), p.value());
+            });
+
+            r.playToClient(SingleFuidUpdatePacket.TYPE, SingleFuidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
+                var chunk = Minecraft.getInstance().level.getChunk(p.pos().x(), p.pos().z());
+                var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
+                for (var u : p.positionValues()) {
+                    short pos = (short) (u >>> 16);
+                    short volume = (short) (u & 0xFFFF);
+                    var x = FluidSection.short2localX(pos);
+                    var y = FluidSection.short2localY(pos);
+                    var z = FluidSection.short2localZ(pos);
+                    section.setVolume(x, y, z, MultiFluidValue.single(p.fluidType(), volume));
+                }
             });
         });
 

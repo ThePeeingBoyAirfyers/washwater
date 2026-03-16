@@ -2,6 +2,9 @@ package com.thepeeingboyairfryers.washwater.common.fluids;
 
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidsIndexationAttachment;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -15,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.thepeeingboyairfryers.washwater.common.WaterInfo.VOLUME_PER_LEVEL;
 
 public class FluidManager {
+    public static final StreamCodec<ByteBuf, FluidType> FLUID_STREAM_CODEC = ByteBufCodecs.SHORT.map(FluidManager::getFluidType, FluidManager::getFluidId);
     private static FluidsIndexationAttachment fluidsIndexation;
 
     private FluidManager() {

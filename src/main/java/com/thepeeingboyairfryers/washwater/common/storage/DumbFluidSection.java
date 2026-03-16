@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.packets.DumbFluidSectionUpdatePacket;
+import com.thepeeingboyairfryers.washwater.common.packets.DumbFluidUpdatePacket;
 import it.unimi.dsi.fastutil.shorts.ShortRBTreeSet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.core.SectionPos;
@@ -74,7 +74,7 @@ public class DumbFluidSection extends UpgradeableFluidSection {
                 updates.add(Pair.of(i, array[i]));
             }
         }
-        return new DumbFluidSectionUpdatePacket(pos, updates);
+        return new DumbFluidUpdatePacket(pos, updates);
     }
 
     @Override

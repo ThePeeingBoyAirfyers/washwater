@@ -14,20 +14,20 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import java.util.ArrayList;
 import java.util.List;
 
-public record DumbFluidSectionUpdatePacket(
+public record DumbFluidUpdatePacket(
         SectionPos pos,
         List<Pair<Short, MultiFluidValue>> updates
 ) implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Type<DumbFluidSectionUpdatePacket> TYPE =
+    public static final CustomPacketPayload.Type<DumbFluidUpdatePacket> TYPE =
             new CustomPacketPayload.Type<>(WashWater.resource("dumb_fluid_update"));
-    public static final StreamCodec<ByteBuf, DumbFluidSectionUpdatePacket> STREAM_CODEC =
+    public static final StreamCodec<ByteBuf, DumbFluidUpdatePacket> STREAM_CODEC =
             StreamCodec.composite(
                     WWStreamCodecs.SECTION_POS,
-                    DumbFluidSectionUpdatePacket::pos,
+                    DumbFluidUpdatePacket::pos,
                     ByteBufCodecs.collection(ArrayList::new, WWStreamCodecs.pair(ByteBufCodecs.SHORT, MultiFluidValue.STREAM_CODEC)),
-                    DumbFluidSectionUpdatePacket::updates,
-                    DumbFluidSectionUpdatePacket::new
+                    DumbFluidUpdatePacket::updates,
+                    DumbFluidUpdatePacket::new
             );
 
 
