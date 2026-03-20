@@ -4,7 +4,9 @@ import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.component.ModDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.common.util.PathfinderBFS;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -17,9 +19,13 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class PrecisionBucketItem extends Item {
+
+    boolean isBucketFull;
+    static int bucketRadius = 2;
 
     public PrecisionBucketItem(Item.Properties properties) {
         super(properties);
@@ -36,7 +42,8 @@ public class PrecisionBucketItem extends Item {
                 precisionBucketPlace(level, targetPos, itemStack, player);
             }
             else {
-                precisionBucketPickup(level, targetPos, itemStack, player);
+                //precisionBucketPickup(level, targetPos, itemStack, player);
+                smartPickup(level, targetPos, itemStack, player);
             }
         }
         return InteractionResult.PASS;
@@ -82,8 +89,12 @@ public class PrecisionBucketItem extends Item {
         }
         int newBucketFillLevel = 0;
         if (fillLevel > 0 && !level.isClientSide) {
-            FluidUtil.addVolume((ServerLevel) level, targetPos, WaterInfo.WATER_TYPE, fillLevel);
-            itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
+            if (level.getBlockState(targetPos).isAir() || !level.getBlockState(targetPos).getFluidState().isEmpty()) {
+                FluidUtil.addVolume((ServerLevel) level, targetPos, WaterInfo.WATER_TYPE, fillLevel);
+                itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
+                return true;
+            }
+            return false;
         }
         return true;
     }
@@ -93,6 +104,8 @@ public class PrecisionBucketItem extends Item {
         if (itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
             fillLevel = itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
         }
+        if (fillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY)
+            return true;
 
         int bucketRemainingSpace = WaterInfo.PRECISION_BUCKET_CAPACITY - fillLevel;
         if (!level.isClientSide) {
@@ -113,7 +126,60 @@ public class PrecisionBucketItem extends Item {
                 FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
             }
             itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    public static boolean smartPickup(Level level, BlockPos centrePos, ItemStack itemStack, Player player) {
+        if (!level.isClientSide) {
+        /*    boolean isFull;
+            isFull = precisionBucketPickup(level, centrePos, itemStack, player);
+            if (isFull) {
+                System.out.println("returned early");
+                return true;
+            }
+
+            for (Direction dir : Direction.values()) {
+                isFull = precisionBucketPickup(level, centrePos.relative(dir), itemStack, player);
+                if (isFull)
+                    break;
+            }*/
+            doBFSStuff(level, centrePos);
+
+            return true;
         }
         return true;
+    }
+
+    public static void doBFSStuff(Level level, BlockPos pos) {
+        final int PUDDLE_RADIUS = 2;
+        final int PUDDLE_DIAMETER = PUDDLE_RADIUS * 2 + 1;
+        int bfsMatrix[][] = new int[PUDDLE_DIAMETER][PUDDLE_DIAMETER];
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        // fill in the bfsMatrix
+        int xX = x - PUDDLE_RADIUS;
+        int zZ = z - PUDDLE_RADIUS;
+
+        for (int iX = 0; iX < PUDDLE_DIAMETER; iX++) {
+            for (int iZ = 0; iZ < PUDDLE_DIAMETER; iZ++) {
+                BlockPos internalPos = new BlockPos(iX + xX, y, iZ + zZ);
+                bfsMatrix[iX][iZ] = level.getBlockState(internalPos).isAir() ? 9 : -1;
+            }
+        }
+        System.out.println("printing matrix");
+        for (int iX = 0; iX < PUDDLE_DIAMETER; iX++) {
+                System.out.println(Arrays.toString(bfsMatrix[iX]));
+        }
+        System.out.println("printing final matrix");
+        int[][] finalMatrix = PathfinderBFS.distanceMapperBFS(bfsMatrix)
+        for (int iX = 0; iX < PUDDLE_DIAMETER; iX++) {
+            System.out.println(Arrays.toString(bfsMatrix[iX]));
+        }
     }
 }
