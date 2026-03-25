@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.packets;
 
+import com.thepeeingboyairfryers.washwater.common.Config;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
@@ -8,6 +9,7 @@ import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.ChunkWatchEvent;
@@ -62,6 +64,7 @@ public class WWNetworking {
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post e) -> {
             if (e.getLevel().isClientSide()) return;
             var level = e.getLevel();
+            if (!shouldSendPackets(level)) return;
 
             var dirties = DIRTY_SECTIONS.get(level);
             if (dirties == null) return;
@@ -89,6 +92,10 @@ public class WWNetworking {
                     PacketDistributor.sendToPlayer(e.getPlayer(), update);
             }
         });
+    }
+
+    private static boolean shouldSendPackets(Level level) {
+        return level.getDayTime() % Config.SEND_UPDATE_PACKETS_EVERY.getAsInt() == 0;
     }
 
     //SectionPos coordinates

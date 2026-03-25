@@ -1,4 +1,4 @@
-﻿package com.thepeeingboyairfryers.washwater.common.packets;
+package com.thepeeingboyairfryers.washwater.common.packets;
 
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
