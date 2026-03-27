@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.common.packets.SingleFuidSectionPacket;
 import com.thepeeingboyairfryers.washwater.common.packets.SingleFuidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.common.util.WWCodecs;
 import it.unimi.dsi.fastutil.shorts.ShortRBTreeSet;
@@ -78,8 +79,7 @@ public class SingleFluidSection extends UpgradeableFluidSection {
     @Override
     protected @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
         if (all) {
-            // TODO
-            return null;
+            return new SingleFuidSectionPacket(pos, fluidType, volumes);
         } else {
             if (dirty.isEmpty()) return null;
             int[] updates = new int[dirty.size()];

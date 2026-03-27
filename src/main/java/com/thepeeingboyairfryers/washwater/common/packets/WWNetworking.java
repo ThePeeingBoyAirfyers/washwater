@@ -1,8 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.packets;
 
 import com.thepeeingboyairfryers.washwater.common.Config;
-import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
 import it.unimi.dsi.fastutil.longs.LongRBTreeSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -16,6 +14,7 @@ import net.neoforged.neoforge.event.level.ChunkWatchEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.HandlerThread;
 
 import java.util.HashMap;
@@ -31,34 +30,15 @@ public class WWNetworking {
     public static void register(IEventBus bus) {
         bus.addListener((RegisterPayloadHandlersEvent e) -> {
             var r = e.registrar("1").executesOn(HandlerThread.MAIN);
-            r.playToClient(DumbFluidUpdatePacket.TYPE, DumbFluidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
-                var chunk = Minecraft.getInstance().level.getChunk(p.pos().x(), p.pos().z());
-                var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
-                for (var u : p.updates()) {
-                    var x = FluidSection.short2localX(u.getFirst());
-                    var y = FluidSection.short2localY(u.getFirst());
-                    var z = FluidSection.short2localZ(u.getFirst());
-                    section.setVolume(x, y, z, u.getSecond());
-                }
-            });
 
             r.playToClient(OneFluidUpdatePacket.TYPE,  OneFluidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
                 var chunk = Minecraft.getInstance().level.getChunkAt(p.pos());
                 FluidSectionManager.getAttachmentFor(chunk).setVolume(p.pos().getX(), p.pos().getY(), p.pos().getZ(), p.value());
             });
 
-            r.playToClient(SingleFuidUpdatePacket.TYPE, SingleFuidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
-                var chunk = Minecraft.getInstance().level.getChunk(p.pos().x(), p.pos().z());
-                var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(p.pos().y());
-                for (var u : p.positionValues()) {
-                    short pos = (short) (u >>> 16);
-                    short volume = (short) (u & 0xFFFF);
-                    var x = FluidSection.short2localX(pos);
-                    var y = FluidSection.short2localY(pos);
-                    var z = FluidSection.short2localZ(pos);
-                    section.setVolume(x, y, z, MultiFluidValue.single(p.fluidType(), volume));
-                }
-            });
+            r.playToClient(DumbFluidUpdatePacket.TYPE, DumbFluidUpdatePacket.STREAM_CODEC, WWNetworking::handleSectionUpdate);
+            r.playToClient(SingleFuidUpdatePacket.TYPE, SingleFuidUpdatePacket.STREAM_CODEC, WWNetworking::handleSectionUpdate);
+            r.playToClient(SingleFuidSectionPacket.TYPE, SingleFuidSectionPacket.STREAM_CODEC, WWNetworking::handleSectionUpdate);
         });
 
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post e) -> {
@@ -92,6 +72,13 @@ public class WWNetworking {
                     PacketDistributor.sendToPlayer(e.getPlayer(), update);
             }
         });
+    }
+
+    private static void handleSectionUpdate(SectionUpdatePacket packet, IPayloadContext ctx) {
+        var pos = packet.getPos();
+        var chunk = Minecraft.getInstance().level.getChunk(pos.x(), pos.z());
+        var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(pos.y());
+        packet.handle(section);
     }
 
     private static boolean shouldSendPackets(Level level) {

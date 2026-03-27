@@ -11,27 +11,27 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
-public class SingleFuidUpdatePacket extends SectionUpdatePacket {
-    public static final CustomPacketPayload.Type<SingleFuidUpdatePacket> TYPE = newType("single_fluid_update");
-    public static final StreamCodec<FriendlyByteBuf, SingleFuidUpdatePacket> STREAM_CODEC =
+public class SingleFuidSectionPacket extends SectionUpdatePacket {
+    public static final Type<SingleFuidSectionPacket> TYPE = newType("single_fluid_section_update");
+    public static final StreamCodec<FriendlyByteBuf, SingleFuidSectionPacket> STREAM_CODEC =
             StreamCodec.composite(
                     WWStreamCodecs.SECTION_POS,
-                    SingleFuidUpdatePacket::getPos,
+                    SingleFuidSectionPacket::getPos,
                     FluidManager.FLUID_STREAM_CODEC,
-                    SingleFuidUpdatePacket::getFluidType,
-                    WWStreamCodecs.INT_ARRAY,
-                    SingleFuidUpdatePacket::getPositionValues,
-                    SingleFuidUpdatePacket::new
+                    SingleFuidSectionPacket::getFluidType,
+                    WWStreamCodecs.SHORT_ARRAY,
+                    SingleFuidSectionPacket::getVolumes,
+                    SingleFuidSectionPacket::new
             );
 
     private final SectionPos pos;
     private final FluidType fluidType;
-    private final int[] positionValues;
+    private final short[] volumes;
 
-    public SingleFuidUpdatePacket(SectionPos iPos, FluidType iFluidType, int[] iPositionValues) {
+    public SingleFuidSectionPacket(SectionPos iPos, FluidType iFluidType, short[] iVolumes) {
         this.pos = iPos;
         this.fluidType = iFluidType;
-        this.positionValues = iPositionValues;
+        this.volumes = iVolumes;
     }
 
     @Override
@@ -43,19 +43,19 @@ public class SingleFuidUpdatePacket extends SectionUpdatePacket {
         return fluidType;
     }
 
-    public int[] getPositionValues() {
-        return positionValues;
+    public short[] getVolumes() {
+        return volumes;
     }
 
     @Override
     public void handle(FluidSection section) {
-        for (var u : positionValues) {
-            short p = (short) (u >>> 16);
-            short volume = (short) (u & 0xFFFF);
-            var x = FluidSection.short2localX(p);
-            var y = FluidSection.short2localY(p);
-            var z = FluidSection.short2localZ(p);
-            section.setVolume(x, y, z, MultiFluidValue.single(fluidType, volume));
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    short volume = volumes[FluidSection.localPos2Short(x, y, z)];
+                    section.setVolume(x, y, z, MultiFluidValue.single(fluidType, volume));
+                }
+            }
         }
     }
 
