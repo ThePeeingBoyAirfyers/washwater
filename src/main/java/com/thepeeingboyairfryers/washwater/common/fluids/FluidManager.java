@@ -41,12 +41,6 @@ public class FluidManager {
         return fluidsIndexation.getFluid(id);
     }
 
-    private static void levelLoaded(LevelEvent.Load event) {
-        if (event.getLevel() instanceof ServerLevel level && level.getServer().overworld() == level) {
-            fluidsIndexation = level.getData(WWAttachments.FLUIDS_INDEXATION.get());
-        }
-    }
-
     public static int lowestTick(ServerLevel level) {
         return 2;
     }
@@ -67,5 +61,15 @@ public class FluidManager {
 
     public static BlockState getFluidBlockState(MultiFluidValue result) {
         return getFluidState(result).createLegacyBlock();
+    }
+
+    public static void setFluidsIndexation(FluidsIndexationAttachment iFluidsIndexation) {
+        fluidsIndexation = iFluidsIndexation;
+    }
+
+    private static void levelLoaded(LevelEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel level && level.getServer().overworld() == level) {
+            setFluidsIndexation(level.getData(WWAttachments.FLUIDS_INDEXATION.get()));
+        }
     }
 }
