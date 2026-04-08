@@ -156,6 +156,6 @@ public class PrecisionBucketItem extends Item {
 
     public static void doBFSStuff(Level level, BlockPos pos) {
         int[][] result = distanceBFS.runDistanceMapBFS(pos, level);
-        System.out.println("result matrix: " + result);
+        //System.out.println("result matrix: " + result);
     }
 }
