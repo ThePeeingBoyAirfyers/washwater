@@ -4,7 +4,7 @@ import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.component.ModDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.util.PathfinderBFS;
+import com.thepeeingboyairfryers.washwater.common.util.distanceBFS;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -155,31 +155,7 @@ public class PrecisionBucketItem extends Item {
     }
 
     public static void doBFSStuff(Level level, BlockPos pos) {
-        final int PUDDLE_RADIUS = 2;
-        final int PUDDLE_DIAMETER = PUDDLE_RADIUS * 2 + 1;
-        int bfsMatrix[][] = new int[PUDDLE_DIAMETER][PUDDLE_DIAMETER];
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
-        // fill in the bfsMatrix
-        int xX = x - PUDDLE_RADIUS;
-        int zZ = z - PUDDLE_RADIUS;
-
-        for (int iX = 0; iX < PUDDLE_DIAMETER; iX++) {
-            for (int iZ = 0; iZ < PUDDLE_DIAMETER; iZ++) {
-                BlockPos internalPos = new BlockPos(iX + xX, y, iZ + zZ);
-                bfsMatrix[iX][iZ] = level.getBlockState(internalPos).isAir() ? 9 : -1;
-            }
-        }
-        System.out.println("printing matrix");
-        for (int iX = 0; iX < PUDDLE_DIAMETER; iX++) {
-                System.out.println(Arrays.toString(bfsMatrix[iX]));
-        }
-        System.out.println("printing final matrix");
-        int[][] finalMatrix = PathfinderBFS.distanceMapperBFS(bfsMatrix)
-        for (int iX = 0; iX < PUDDLE_DIAMETER; iX++) {
-            System.out.println(Arrays.toString(bfsMatrix[iX]));
-        }
+        int[][] result = distanceBFS.runDistanceMapBFS(pos, level);
+        System.out.println("result matrix: " + result);
     }
 }
