@@ -6,7 +6,6 @@ import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.util.distanceBFS;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -19,7 +18,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class PrecisionBucketItem extends Item {
@@ -127,24 +125,23 @@ public class PrecisionBucketItem extends Item {
                 FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
             }
             itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
-            return false;
+            return newBucketFillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY;
         }
         else {
             return true;
         }
     }
 
-/*    public static boolean bfsPickup(Level level, BlockPos centrePos, ItemStack stack, Player player) {
-        boolean isFull;
-        int[][] distanceMatrix = distanceBFS.runDistanceMapBFS(centrePos, level);
-
-
-        for (int x = 0; x < bucketDiameter; x++) {
-            for (int y = 0; y < bucketDiameter; y++) {
-                if distanceMatrix[][]
-            }
+    public static boolean bfsPickup(Level level, BlockPos pos, ItemStack stack, Player player) {
+        int fillLevel = 0;
+        if (stack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            fillLevel = stack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
+            if (fillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY)
+                return false;
         }
-    }*/
+        distanceBFS.runBucketBFS(level, pos, stack, player);
+        return false;
+    }
 
     public static boolean smartPickup(Level level, BlockPos centrePos, ItemStack itemStack, Player player) {
         if (!level.isClientSide) {
@@ -160,15 +157,15 @@ public class PrecisionBucketItem extends Item {
                 if (isFull)
                     break;
             }*/
-            doBFSStuff(level, centrePos);
+            doBFSStuff(level, centrePos, itemStack, player);
 
             return true;
         }
         return true;
     }
 
-    public static void doBFSStuff(Level level, BlockPos pos) {
-        int[][] result = distanceBFS.runDistanceMapBFS(pos, level);
-        System.out.println("result matrix: " + result);
+    public static void doBFSStuff(Level level, BlockPos pos, ItemStack stack, Player player) {
+        distanceBFS.runBucketBFS(level, pos, stack, player);
+        //System.out.println("result matrix: " + result);
     }
 }
