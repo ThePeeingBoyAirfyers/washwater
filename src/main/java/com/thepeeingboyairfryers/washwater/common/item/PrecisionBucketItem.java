@@ -26,6 +26,7 @@ public class PrecisionBucketItem extends Item {
 
     boolean isBucketFull;
     static int bucketRadius = 2;
+    static final int bucketDiameter = 2 * bucketRadius + 1;
 
     public PrecisionBucketItem(Item.Properties properties) {
         super(properties);
@@ -133,6 +134,18 @@ public class PrecisionBucketItem extends Item {
         }
     }
 
+/*    public static boolean bfsPickup(Level level, BlockPos centrePos, ItemStack stack, Player player) {
+        boolean isFull;
+        int[][] distanceMatrix = distanceBFS.runDistanceMapBFS(centrePos, level);
+
+
+        for (int x = 0; x < bucketDiameter; x++) {
+            for (int y = 0; y < bucketDiameter; y++) {
+                if distanceMatrix[][]
+            }
+        }
+    }*/
+
     public static boolean smartPickup(Level level, BlockPos centrePos, ItemStack itemStack, Player player) {
         if (!level.isClientSide) {
         /*    boolean isFull;
@@ -156,6 +169,6 @@ public class PrecisionBucketItem extends Item {
 
     public static void doBFSStuff(Level level, BlockPos pos) {
         int[][] result = distanceBFS.runDistanceMapBFS(pos, level);
-        //System.out.println("result matrix: " + result);
+        System.out.println("result matrix: " + result);
     }
 }
