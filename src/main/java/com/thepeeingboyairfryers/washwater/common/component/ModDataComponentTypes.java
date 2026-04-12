@@ -22,12 +22,12 @@ public class ModDataComponentTypes {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> BUCKET_FILL_LEVEL = register("bucket_fill_level",
             builder -> builder.persistent(Codec.INT));
 
-    private static <T>DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(String name,
+    private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(String name,
                                                                                           UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
         return DATA_COMPONENT_TYPES.register(name, () -> builderOperator.apply(DataComponentType.builder()).build());
     }
 
-    public static void register (IEventBus eventBus) {
+    public static void register(IEventBus eventBus) {
         DATA_COMPONENT_TYPES.register(eventBus);
     }
 

@@ -4,7 +4,7 @@ import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.component.ModDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.util.distanceBFS;
+import com.thepeeingboyairfryers.washwater.common.util.BucketBfs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -21,10 +21,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import java.util.List;
 
 public class PrecisionBucketItem extends Item {
-
-    boolean isBucketFull;
-    static int bucketRadius = 2;
-    static final int bucketDiameter = 2 * bucketRadius + 1;
 
     public PrecisionBucketItem(Item.Properties properties) {
         super(properties);
@@ -139,7 +135,7 @@ public class PrecisionBucketItem extends Item {
             if (fillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY)
                 return false;
         }
-        distanceBFS.runBucketBFS(level, pos, stack, player);
+        BucketBfs.runBucketBFS(level, pos, stack, player);
         return false;
     }
 
@@ -157,15 +153,11 @@ public class PrecisionBucketItem extends Item {
                 if (isFull)
                     break;
             }*/
-            doBFSStuff(level, centrePos, itemStack, player);
+            BucketBfs.runBucketBFS(level, centrePos, itemStack, player);
 
             return true;
         }
         return true;
     }
 
-    public static void doBFSStuff(Level level, BlockPos pos, ItemStack stack, Player player) {
-        distanceBFS.runBucketBFS(level, pos, stack, player);
-        //System.out.println("result matrix: " + result);
-    }
 }
