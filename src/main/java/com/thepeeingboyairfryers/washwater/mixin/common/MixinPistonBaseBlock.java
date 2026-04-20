@@ -1,8 +1,6 @@
 package com.thepeeingboyairfryers.washwater.mixin.common;
 
 import com.thepeeingboyairfryers.washwater.common.flow.WaterPushing;
-import io.github.SirWashington.features.NonCachedWater;
-import io.github.SirWashington.features.SpecialFlow;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -23,12 +21,9 @@ public class MixinPistonBaseBlock {
         if (!level.isClientSide) {
             if (WaterPushing.checkIfCanPushWater((ServerLevel) level, blockPos, direction)) {
                 BlockPos blockPos2 = blockPos.relative(direction);
-                if (level.getBlockState(blockPos2).is(Blocks.WATER)) {
-                    boolean returnValue = WaterPushing.tryPushWater((ServerLevel) level, blockPos, direction);
-                    if (returnValue == true) {
-                        NonCachedWater.setWaterLevel(0, blockPos2, level);
-                    }
-                    //cir.setReturnValue(returnValue);
+                boolean returnValue = WaterPushing.tryPushWater((ServerLevel) level, blockPos, direction);
+                if (returnValue == true) {
+                    level.setBlock(blockPos2, Blocks.AIR.defaultBlockState(), 11);;
                 }
             } else {
                 cir.setReturnValue(false);

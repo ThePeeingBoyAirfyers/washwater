@@ -50,44 +50,47 @@ public class FluidUtil {
     public static int addWaterVolumeAndReturnRemaining(ServerLevel level, BlockPos pos, FluidType type, int volume) {
         if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return volume;
         if (volume == 0) return volume;
+        if (FluidUtil.isSolid(level, pos.above())) return volume;
         short oldVolume = getAllVolume(level, pos);
         if (oldVolume < 0) {
             WashWater.LOGGER.warn("Tried to add water volume to a non-air block");
             return volume;
         }
-        short remainder;
-        short spaceLeft = (short) (VOLUME_OF_BLOCK - oldVolume);
-        int newWaterLevel = oldVolume + volume;
+        int remainder;
+        int newWaterVolume = oldVolume + volume;
         var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
         var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
-        if (newWaterLevel > VOLUME_OF_BLOCK) {
-            fluidChunk.addFluidVolume(
+        if (newWaterVolume > VOLUME_OF_BLOCK) {
+            fluidChunk.setVolume(
                     pos.getX(), pos.getY(), pos.getZ(),
-                    type, (short) Math.min(spaceLeft, volume)
+                    MultiFluidValue.single(type, VOLUME_OF_BLOCK)
             );
-            remainder = (short) addWaterVolumeAndReturnRemaining(level, pos.above(), type, newWaterLevel - VOLUME_OF_BLOCK);
+            remainder = addWaterVolumeAndReturnRemaining(level, pos.above(), type, newWaterVolume - VOLUME_OF_BLOCK);
         } else {
             remainder = 0;
-            fluidChunk.addFluidVolume(
+            fluidChunk.setVolume(
                     pos.getX(), pos.getY(), pos.getZ(),
-                    type, (short) Math.min(spaceLeft, newWaterLevel)
+                    MultiFluidValue.single(type, (short) newWaterVolume)
             );
+            FluidTicker.tickFluid(level, pos.above());
         }
+        FluidTicker.tickFluid(level, pos);
         return remainder;
     }
 
     public static int addWaterVolumeAndReturnRemainingImaginary(ServerLevel level, BlockPos pos, FluidType type, int volume) {
         if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return volume;
         if (volume == 0) return volume;
+        if (FluidUtil.isSolid(level, pos.above())) return volume;
         short oldVolume = getAllVolume(level, pos);
         if (oldVolume < 0) {
             WashWater.LOGGER.warn("Tried to add water volume to a non-air block");
             return volume;
         }
-        short remainder;
+        int remainder;
         int newWaterLevel = oldVolume + volume;
         if (newWaterLevel > VOLUME_OF_BLOCK) {
-            remainder = (short) addWaterVolumeAndReturnRemaining(level, pos.above(), type, newWaterLevel - VOLUME_OF_BLOCK);
+            remainder = addWaterVolumeAndReturnRemainingImaginary(level, pos.above(), type, newWaterLevel - VOLUME_OF_BLOCK);
         } else {
             remainder = 0;
         }
@@ -154,7 +157,7 @@ public class FluidUtil {
     }
 
     public static boolean isSolid(Level level, BlockPos pos) {
-        return level.getBlockState(pos).isAir() || hasFluid(level, pos) ;
+        return !level.getBlockState(pos).isAir() && !hasFluid(level, pos) ;
     }
 
 }
