@@ -15,6 +15,7 @@
     "common.MixinNoiseBasedChunkGenerator",
     "common.MixinServerLevel",
     "common.MixinPistonBaseBlock",
+    "common.MixinBlockItem",
     "common.fake_blockstates.MixinCrudeIncrementalIntIdentityHashBiMap",
     "common.fake_blockstates.MixinFluidState",
     "common.fake_blockstates.MixinIdMapper",
