@@ -82,7 +82,7 @@ public class FluidUtil {
         return remainder;
     }
 
-    public static int addWaterVolumeAndReturnRemainingImaginary(ServerLevel level, BlockPos pos, FluidType type, int volume) {
+    public static int addWaterVolumeAndReturnRemainingImaginary(ServerLevel level, BlockPos pos, FluidType type, int volume, boolean doAddAbove) {
         if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return volume;
         if (volume == 0) return volume;
         if (FluidUtil.isSolid(level, pos.above())) return volume;
@@ -92,9 +92,13 @@ public class FluidUtil {
             return volume;
         }
         int remainder;
-        int newWaterLevel = oldVolume + volume;
-        if (newWaterLevel > VOLUME_OF_BLOCK) {
-            remainder = addWaterVolumeAndReturnRemainingImaginary(level, pos.above(), type, newWaterLevel - VOLUME_OF_BLOCK);
+        int newWaterVolume = oldVolume + volume;
+        if (newWaterVolume > VOLUME_OF_BLOCK) {
+            if (!doAddAbove)
+                remainder = newWaterVolume - VOLUME_OF_BLOCK;
+            else {
+                remainder = addWaterVolumeAndReturnRemainingImaginary(level, pos.above(), type, newWaterVolume - VOLUME_OF_BLOCK, true);
+            }
         } else {
             remainder = 0;
         }

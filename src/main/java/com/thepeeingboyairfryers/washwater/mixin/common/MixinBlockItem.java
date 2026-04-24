@@ -94,15 +94,22 @@ public class MixinBlockItem {
             if (FluidUtil.hasFluid(level, pos)) {
                 boolean success = true;
                 System.out.println("oui");
-                if (!WaterPushing.displaceFluids((ServerLevel) level, pos)) {
+                if (WaterPushing.checkIfCanDisplaceFluids((ServerLevel) level, pos)) {
+                    System.out.println("can displace");
+                    WaterPushing.displaceFluids((ServerLevel) level, pos);
 
                 }
+                else {
+                    cir.setReturnValue(InteractionResult.FAIL);
+                }
+/*                if (!WaterPushing.displaceFluids((ServerLevel) level, pos)) {
+
+                }*/
 
 
             }
         }
-        cir.setReturnValue(InteractionResult.FAIL);
-        cir.cancel();
+
 
     }
 

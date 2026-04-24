@@ -55,7 +55,7 @@ public class WaterPushing {
                 return false;
             }
             currentDistance++;
-            volumeToDisplace = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, newPos, originType, volumeToDisplace);
+            volumeToDisplace = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, newPos, originType, volumeToDisplace, true);
         }
 
         return volumeToDisplace == 0;
@@ -94,6 +94,7 @@ public class WaterPushing {
                         //availableVolume - stepSize
                         int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, scratchPos, type, cut, false);
                         availableVolume = availableVolume - cut + remainder;
+                        System.out.println("available real: " + availableVolume);
                 }
                 i++;
             }
@@ -122,7 +123,8 @@ public class WaterPushing {
             if (!FluidUtil.isSolid(level, pos.above())) {
                 //TODO Here
                 //success = (FluidUtil.addVolume(level, pos, availableVolume);
-                FluidUtil.addVolume(level, pos, type, availableVolume);
+                //FluidUtil.addVolume(level, pos, type, availableVolume);
+                result = true;
                 return result;
             }
         }
@@ -134,9 +136,10 @@ public class WaterPushing {
                 for (Direction dir : viableHorDirections) {
                     scratchPos = pos.relative(dir).mutable();
                     //if (FluidUtil.addVolume(level, pos.relative(dir), type, stepSize))
-                    //availableVolume - stepSize
+
                     int remainder = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, scratchPos, type, cut, false);
                     availableVolume = availableVolume - cut + remainder;
+                    System.out.println("available imaginary: " + availableVolume);
                 }
                 i++;
             }
