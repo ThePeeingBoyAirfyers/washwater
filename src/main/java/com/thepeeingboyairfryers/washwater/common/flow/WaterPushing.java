@@ -5,6 +5,7 @@ import com.thepeeingboyairfryers.washwater.common.util.PseudoRandom;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidType;
 
@@ -65,9 +66,9 @@ public class WaterPushing {
     public static boolean displaceFluids(ServerLevel level, BlockPos pos) {
         FluidType type = level.getFluidState(pos).getFluidType();
         int availableVolume = FluidUtil.getVolume(level, pos, type);
+        int initialVolume = availableVolume;
         ArrayList<Direction> viableHorDirections = new ArrayList<>(0);
-        int maxLoops = 10;
-
+        
         boolean result = false;
         for (Direction dir : PseudoRandom.getRandomDirectionArray()) {
             if (!FluidUtil.isSolid(level, pos.relative(dir)) && !FluidUtil.isFilledUp(level, pos.relative(dir))) {
@@ -84,19 +85,19 @@ public class WaterPushing {
             }
         }
         else {
-            BlockPos.MutableBlockPos scratchPos = pos.mutable();
-            int i = 0;
-            while (availableVolume > 0 && i <= maxLoops) {
-                int cut = availableVolume / viableHorDirections.size();
+            if (availableVolume > 0 ) {
+                int i = 0;
                 for (Direction dir : viableHorDirections) {
-                    scratchPos = pos.relative(dir).mutable();
-                        //if (FluidUtil.addVolume(level, pos.relative(dir), type, stepSize))
-                        //availableVolume - stepSize
-                        int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, scratchPos, type, cut, false);
-                        availableVolume = availableVolume - cut + remainder;
-                        System.out.println("available real: " + availableVolume);
+                    int cut = initialVolume / viableHorDirections.size();
+                    System.out.println("cut is: " + cut);
+                    if (i == 0)
+                        cut += availableVolume % viableHorDirections.size();
+
+                    int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, false);
+                    availableVolume = availableVolume - cut + remainder;
+                    System.out.println("available imaginary: " + availableVolume);
+                    i++;
                 }
-                i++;
             }
         }
         //System.out.println("available " + availableVolume);
@@ -106,9 +107,10 @@ public class WaterPushing {
     }
 
     //TODO Fix Ewoud not making addFluid return a bool (ability to fail)
-    public static boolean checkIfCanDisplaceFluids(ServerLevel level, BlockPos pos) {
+    public static boolean checkIfCanDisplaceFluids(Level level, BlockPos pos) {
         FluidType type = level.getFluidState(pos).getFluidType();
         int availableVolume = FluidUtil.getVolume(level, pos, type);
+        int initialVolume = availableVolume;
         ArrayList<Direction> viableHorDirections = new ArrayList<>(0);
 
         boolean result;
@@ -117,25 +119,32 @@ public class WaterPushing {
                 viableHorDirections.add(dir);
             }
         }
+        System.out.println("initial vol in can place: " + availableVolume);
 
         if (viableHorDirections.isEmpty()) {
             if (!FluidUtil.isSolid(level, pos.above())) {
                 //TODO Here
                 //success = (FluidUtil.addVolume(level, pos, availableVolume);
                 //FluidUtil.addVolume(level, pos, type, availableVolume);
+                System.out.println("return 1");
                 result = true;
                 return result;
             }
         }
         else {
             if (availableVolume > 0 ) {
+                int i = 0;
                 for (Direction dir : viableHorDirections) {
-                    int cut = availableVolume / viableHorDirections.size() + availableVolume % viableHorDirections.size();
+                    int cut = initialVolume / viableHorDirections.size();
+                    System.out.println("cut is: " + cut);
+                    if (i == 0)
+                        cut += availableVolume % viableHorDirections.size();
+
                     int remainder = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, pos.relative(dir).mutable(), type, cut, false);
                     availableVolume = availableVolume - cut + remainder;
                     System.out.println("available imaginary: " + availableVolume);
+                    i++;
                 }
-
             }
         }
         result = availableVolume == 0;

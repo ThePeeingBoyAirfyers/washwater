@@ -90,13 +90,14 @@ public class MixinBlockItem {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         System.out.println("Tu as mis un bloc");
-        if (!level.isClientSide()) {
+        if (true) {
             if (FluidUtil.hasFluid(level, pos)) {
                 boolean success = true;
                 System.out.println("oui");
-                if (WaterPushing.checkIfCanDisplaceFluids((ServerLevel) level, pos)) {
+                if (WaterPushing.checkIfCanDisplaceFluids(level, pos)) {
                     System.out.println("can displace");
-                    WaterPushing.displaceFluids((ServerLevel) level, pos);
+                    if (!level.isClientSide)
+                        WaterPushing.displaceFluids((ServerLevel) level, pos);
 
                 }
                 else {
