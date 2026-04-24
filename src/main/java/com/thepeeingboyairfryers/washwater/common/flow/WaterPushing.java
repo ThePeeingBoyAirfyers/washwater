@@ -89,20 +89,15 @@ public class WaterPushing {
                 int i = 0;
                 for (Direction dir : viableHorDirections) {
                     int cut = initialVolume / viableHorDirections.size();
-                    System.out.println("cut is: " + cut);
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
-
                     int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, true);
                     availableVolume = availableVolume - cut + remainder;
-                    System.out.println("available imaginary: " + availableVolume);
                     i++;
                 }
             }
         }
-        //System.out.println("available " + availableVolume);
-        result = availableVolume <= 4;
-        System.out.println("result: " + result);
+        result = availableVolume == 0;
         return result;
     }
 
@@ -119,14 +114,12 @@ public class WaterPushing {
                 viableHorDirections.add(dir);
             }
         }
-        System.out.println("initial vol in can place: " + availableVolume);
 
         if (viableHorDirections.isEmpty()) {
             if (!FluidUtil.isSolid(level, pos.above())) {
                 //TODO Here
                 //success = (FluidUtil.addVolume(level, pos, availableVolume);
                 //FluidUtil.addVolume(level, pos, type, availableVolume);
-                System.out.println("return 1");
                 result = true;
                 return result;
             }
@@ -136,19 +129,16 @@ public class WaterPushing {
                 int i = 0;
                 for (Direction dir : viableHorDirections) {
                     int cut = initialVolume / viableHorDirections.size();
-                    System.out.println("cut is: " + cut);
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
 
                     int remainder = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, pos.relative(dir).mutable(), type, cut, true);
                     availableVolume = availableVolume - cut + remainder;
-                    System.out.println("available imaginary: " + availableVolume);
                     i++;
                 }
             }
         }
         result = availableVolume == 0;
-        System.out.println("result: " + result);
         return result;
     }
 
