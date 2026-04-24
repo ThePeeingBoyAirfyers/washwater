@@ -101,6 +101,7 @@ public class MixinBlockItem {
                 }
                 else {
                     cir.setReturnValue(InteractionResult.FAIL);
+                    cir.cancel();
                 }
 /*                if (!WaterPushing.displaceFluids((ServerLevel) level, pos)) {
 

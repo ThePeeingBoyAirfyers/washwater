@@ -110,9 +110,8 @@ public class WaterPushing {
         FluidType type = level.getFluidState(pos).getFluidType();
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         ArrayList<Direction> viableHorDirections = new ArrayList<>(0);
-        int maxLoops = 10;
 
-        boolean result = false;
+        boolean result;
         for (Direction dir : PseudoRandom.getRandomDirectionArray()) {
             if (!FluidUtil.isSolid(level, pos.relative(dir)) && !FluidUtil.isFilledUp(level, pos.relative(dir))) {
                 viableHorDirections.add(dir);
@@ -129,23 +128,17 @@ public class WaterPushing {
             }
         }
         else {
-            BlockPos.MutableBlockPos scratchPos = pos.mutable();
-            int i = 0;
-            while (availableVolume > 0 && i <= maxLoops) {
-                int cut = availableVolume / viableHorDirections.size();
+            if (availableVolume > 0 ) {
                 for (Direction dir : viableHorDirections) {
-                    scratchPos = pos.relative(dir).mutable();
-                    //if (FluidUtil.addVolume(level, pos.relative(dir), type, stepSize))
-
-                    int remainder = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, scratchPos, type, cut, false);
+                    int cut = availableVolume / viableHorDirections.size() + availableVolume % viableHorDirections.size();
+                    int remainder = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, pos.relative(dir).mutable(), type, cut, false);
                     availableVolume = availableVolume - cut + remainder;
                     System.out.println("available imaginary: " + availableVolume);
                 }
-                i++;
+
             }
         }
-        //System.out.println("available " + availableVolume);
-        result = availableVolume <= 4;
+        result = availableVolume == 0;
         System.out.println("result: " + result);
         return result;
     }
