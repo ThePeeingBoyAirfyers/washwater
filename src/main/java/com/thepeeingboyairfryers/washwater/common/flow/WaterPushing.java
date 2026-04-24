@@ -68,7 +68,7 @@ public class WaterPushing {
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
         ArrayList<Direction> viableHorDirections = new ArrayList<>(0);
-        
+
         boolean result = false;
         for (Direction dir : PseudoRandom.getRandomDirectionArray()) {
             if (!FluidUtil.isSolid(level, pos.relative(dir)) && !FluidUtil.isFilledUp(level, pos.relative(dir))) {
@@ -93,7 +93,7 @@ public class WaterPushing {
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
 
-                    int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, false);
+                    int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, true);
                     availableVolume = availableVolume - cut + remainder;
                     System.out.println("available imaginary: " + availableVolume);
                     i++;
@@ -140,7 +140,7 @@ public class WaterPushing {
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
 
-                    int remainder = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, pos.relative(dir).mutable(), type, cut, false);
+                    int remainder = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, pos.relative(dir).mutable(), type, cut, true);
                     availableVolume = availableVolume - cut + remainder;
                     System.out.println("available imaginary: " + availableVolume);
                     i++;
