@@ -19,38 +19,50 @@ public class FluidUtil {
         throw new IllegalStateException();
     }
 
-    public static void addVolume(ServerLevel level, BlockPos pos, FluidType type, int volume) {
-        if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return;
-        if (volume == 0) return;
+    public static boolean addVolume(Level level, BlockPos pos, FluidType type, int volume, boolean real) {
+        if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return false;
+        if (volume == 0) return false;
         short oldVolume = getAllVolume(level, pos);
+        boolean success = true;
+        //System.out.println("pos: " + pos);
+        WashWater.LOGGER.warn("pos: " + pos);
+        if (FluidUtil.isSolid(level, pos)) {
+            //System.out.println("returned false");
+            WashWater.LOGGER.warn("Returned false");
+            return false;
+        }
         if (oldVolume < 0) {
             WashWater.LOGGER.warn("Tried to add water volume to a non-air block");
-            return;
+            return false;
         }
 
         short spaceLeft = (short) (VOLUME_OF_BLOCK - oldVolume);
 
         int newVolume = oldVolume + volume;
         if (spaceLeft > 0) {
-            var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-            var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
-            fluidChunk.addFluidVolume(
-                    pos.getX(), pos.getY(), pos.getZ(),
-                    type, (short) Math.min(spaceLeft, volume)
-            );
-
-            FluidTicker.tickFluid(level, pos);
+            if (real) {
+                var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+                var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
+                fluidChunk.addFluidVolume(
+                        pos.getX(), pos.getY(), pos.getZ(),
+                        type, (short) Math.min(spaceLeft, volume)
+                );
+                FluidTicker.tickFluid((ServerLevel) level, pos);
+            }
         }
 
         if (spaceLeft < volume) {
-            addVolume(level, pos.above(), type, volume - spaceLeft);
+            success = addVolume(level, pos.above(), type, volume - spaceLeft, real);
         }
+        WashWater.LOGGER.warn("Returned: " + success);
+        //System.out.println("returned true");
+        return success;
     }
 
     public static int addWaterVolumeAndReturnRemaining(ServerLevel level, BlockPos pos, FluidType type, int volume, boolean doAddAbove) {
         if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return volume;
         if (volume == 0) return volume;
-        if (FluidUtil.isSolid(level, pos.above())) return volume;
+        if (FluidUtil.isSolid(level, pos)) return volume;
         short oldVolume = getAllVolume(level, pos);
         if (oldVolume < 0) {
             WashWater.LOGGER.warn("Tried to add water volume to a non-air block");
@@ -85,7 +97,7 @@ public class FluidUtil {
     public static int addWaterVolumeAndReturnRemainingImaginary(Level level, BlockPos pos, FluidType type, int volume, boolean doAddAbove) {
         if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return volume;
         if (volume == 0) return volume;
-        if (FluidUtil.isSolid(level, pos.above())) return volume;
+        if (FluidUtil.isSolid(level, pos)) return volume;
         short oldVolume = getAllVolume(level, pos);
         if (oldVolume < 0) {
             WashWater.LOGGER.warn("Tried to add water volume to a non-air block");

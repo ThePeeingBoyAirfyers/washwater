@@ -13,15 +13,7 @@ import java.util.ArrayList;
 
 public class WaterPushing {
 
-
-    //GET FLUID LEVEL
-    // FluidUtil.getVolume(level, newPos, fluidType);
-    //SET FLUID LEVEL
-    // FluidUtil.setVolume(level, newPos, MultiFluidValue.single(fluidType, (short) newVolume));
-
     static int maxPistonPushingDistance = 8;
-
-
 
     public static boolean tryPushWater(ServerLevel level, BlockPos origin, Direction direction) {
         int maxDistance = maxPistonPushingDistance;
@@ -47,12 +39,9 @@ public class WaterPushing {
         int currentDistance = 0;
         int volumeToDisplace = FluidUtil.getVolume(level, newPos, originType);
 
-
-
         while (volumeToDisplace > 0 && currentDistance < maxDistance) {
             newPos = newPos.relative(direction);
             if (FluidUtil.isSolid(level, newPos) || level.getBlockState(newPos).getFluidState().getFluidType() != originType) {
-                //System.out.println("falsed");
                 return false;
             }
             currentDistance++;
@@ -62,14 +51,12 @@ public class WaterPushing {
         return volumeToDisplace == 0;
     }
 
-    //TODO Fix Ewoud not making addFluid return a bool (ability to fail)
     public static boolean displaceFluids(ServerLevel level, BlockPos pos) {
         FluidType type = level.getFluidState(pos).getFluidType();
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
         ArrayList<Direction> viableHorDirections = new ArrayList<>(0);
 
-        boolean result = false;
         for (Direction dir : PseudoRandom.getRandomDirectionArray()) {
             if (!FluidUtil.isSolid(level, pos.relative(dir)) && !FluidUtil.isFilledUp(level, pos.relative(dir))) {
                 viableHorDirections.add(dir);
@@ -77,12 +64,7 @@ public class WaterPushing {
         }
 
         if (viableHorDirections.isEmpty()) {
-            if (!FluidUtil.isSolid(level, pos.above())) {
-                //TODO Here
-                //success = (FluidUtil.addVolume(level, pos, availableVolume);
-                FluidUtil.addVolume(level, pos, type, availableVolume);
-                return result;
-            }
+            return FluidUtil.addVolume(level, pos, type, availableVolume, true);
         }
         else {
             if (availableVolume > 0 ) {
@@ -97,18 +79,15 @@ public class WaterPushing {
                 }
             }
         }
-        result = availableVolume == 0;
-        return result;
+        return availableVolume == 0;
     }
 
-    //TODO Fix Ewoud not making addFluid return a bool (ability to fail)
     public static boolean checkIfCanDisplaceFluids(Level level, BlockPos pos) {
         FluidType type = level.getFluidState(pos).getFluidType();
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
         ArrayList<Direction> viableHorDirections = new ArrayList<>(0);
 
-        boolean result;
         for (Direction dir : PseudoRandom.getRandomDirectionArray()) {
             if (!FluidUtil.isSolid(level, pos.relative(dir)) && !FluidUtil.isFilledUp(level, pos.relative(dir))) {
                 viableHorDirections.add(dir);
@@ -116,13 +95,7 @@ public class WaterPushing {
         }
 
         if (viableHorDirections.isEmpty()) {
-            if (!FluidUtil.isSolid(level, pos.above())) {
-                //TODO Here
-                //success = (FluidUtil.addVolume(level, pos, availableVolume);
-                //FluidUtil.addVolume(level, pos, type, availableVolume);
-                result = true;
-                return result;
-            }
+            return FluidUtil.addVolume(level, pos, type, availableVolume, false);
         }
         else {
             if (availableVolume > 0 ) {
@@ -138,23 +111,7 @@ public class WaterPushing {
                 }
             }
         }
-        result = availableVolume == 0;
-        return result;
+        return availableVolume == 0;
     }
 
-/*            else {
-        BlockPos.MutableBlockPos scratchPos = pos.mutable();
-        int cut = availableVolume / viableHorDirections.size();
-        while (availableVolume > 0) {
-            for (Direction dir : viableHorDirections) {
-                scratchPos.move(dir);
-                //if (FluidUtil.addVolume(level, pos.relative(dir), type, stepSize))
-                //availableVolume - stepSize
-                FluidUtil.addVolume(level, pos.relative(dir), type, cut);
-                availableVolume -= cut;
-
-
-            }
-        }
-    }*/
 }

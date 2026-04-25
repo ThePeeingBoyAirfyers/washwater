@@ -85,7 +85,7 @@ public class PrecisionBucketItem extends Item {
         int newBucketFillLevel = 0;
         if (fillLevel > 0 && !level.isClientSide) {
             if (level.getBlockState(targetPos).isAir() || !level.getBlockState(targetPos).getFluidState().isEmpty()) {
-                FluidUtil.addVolume((ServerLevel) level, targetPos, WaterInfo.WATER_TYPE, fillLevel);
+                FluidUtil.addVolume((ServerLevel) level, targetPos, WaterInfo.WATER_TYPE, fillLevel, true);
                 itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
                 return true;
             }
