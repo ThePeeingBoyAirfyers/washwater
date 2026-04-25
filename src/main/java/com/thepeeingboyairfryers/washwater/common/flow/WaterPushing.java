@@ -26,7 +26,7 @@ public class WaterPushing {
         while (volumeToDisplace > 0 && currentDistance < maxDistance) {
             newPos = newPos.relative(direction);
             currentDistance++;
-            volumeToDisplace = FluidUtil.addWaterVolumeAndReturnRemaining(level, newPos, type, volumeToDisplace, true);
+            volumeToDisplace = FluidUtil.addWaterVolumeAndReturnRemaining(level, newPos, type, volumeToDisplace, true, true);
         }
 
         return volumeToDisplace == 0;
@@ -45,7 +45,7 @@ public class WaterPushing {
                 return false;
             }
             currentDistance++;
-            volumeToDisplace = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, newPos, originType, volumeToDisplace, true);
+            volumeToDisplace = FluidUtil.addWaterVolumeAndReturnRemaining(level, newPos, originType, volumeToDisplace, true, false);
         }
 
         return volumeToDisplace == 0;
@@ -73,7 +73,7 @@ public class WaterPushing {
                     int cut = initialVolume / viableHorDirections.size();
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
-                    int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, true);
+                    int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, true, true);
                     availableVolume = availableVolume - cut + remainder;
                     i++;
                 }
@@ -105,7 +105,7 @@ public class WaterPushing {
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
 
-                    int remainder = FluidUtil.addWaterVolumeAndReturnRemainingImaginary(level, pos.relative(dir).mutable(), type, cut, true);
+                    int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, true, false);
                     availableVolume = availableVolume - cut + remainder;
                     i++;
                 }

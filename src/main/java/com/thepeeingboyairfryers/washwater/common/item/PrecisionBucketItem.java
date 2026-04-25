@@ -8,16 +8,25 @@ import com.thepeeingboyairfryers.washwater.common.util.BucketBfs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.neoforge.common.SoundActions;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class PrecisionBucketItem extends Item {
@@ -34,10 +43,13 @@ public class PrecisionBucketItem extends Item {
         BlockPos targetPos = blockHitResult.getBlockPos().relative(blockHitResult.getDirection());
         if (player != null) {
             if (!player.isCrouching()) {
-                precisionBucketPlace(level, targetPos, itemStack, player);
+                if (precisionBucketPlace(level, targetPos, itemStack, player)) {
+                    playEmptySound(player, level, targetPos);
+                    return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide()).getResult();
+                }
+
             }
             else {
-                //precisionBucketPickup(level, targetPos, itemStack, player);
                 smartPickup(level, targetPos, itemStack, player);
             }
         }
@@ -82,16 +94,18 @@ public class PrecisionBucketItem extends Item {
         if (itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
             fillLevel = itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
         }
-        int newBucketFillLevel = 0;
-        if (fillLevel > 0 && !level.isClientSide) {
-            if (level.getBlockState(targetPos).isAir() || !level.getBlockState(targetPos).getFluidState().isEmpty()) {
-                FluidUtil.addVolume((ServerLevel) level, targetPos, WaterInfo.WATER_TYPE, fillLevel, true);
-                itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
-                return true;
-            }
+        if (fillLevel == 0)
             return false;
-        }
-        return true;
+        int newBucketFillLevel = 0;
+            if (level.getBlockState(targetPos).isAir() || !level.getBlockState(targetPos).getFluidState().isEmpty()) {
+                if (FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel, false)) {
+                    if (!level.isClientSide)
+                        FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel, true);
+                    itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
+                    return true;
+                }
+            }
+        return false;
     }
 
     public static boolean precisionBucketPickup(Level level, BlockPos targetPos, ItemStack itemStack, Player player) {
@@ -158,6 +172,16 @@ public class PrecisionBucketItem extends Item {
             return true;
         }
         return true;
+    }
+
+    protected void playEmptySound(@Nullable Player player, LevelAccessor level, BlockPos pos) {
+        SoundEvent soundevent = WaterInfo.WATER_TYPE.getSound(player, level, pos, SoundActions.BUCKET_EMPTY);
+        if (soundevent == null) {
+            soundevent = SoundEvents.BUCKET_EMPTY;
+        }
+
+        level.playSound(player, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.gameEvent(player, GameEvent.FLUID_PLACE, pos);
     }
 
 }
