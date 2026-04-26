@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 
 public class FluidTickLevel implements FluidTickingContext {
     private static final int REFRESH_RATE = 100;
-    private static final Executor EXECUTOR = Executors.newFixedThreadPool(Config.THREAD_COUNT.getAsInt());
+    private static final Executor EXECUTOR = Executors.newFixedThreadPool(decideThreadCount());
     private final ServerLevel level;
     private final Long2ObjectMap<FluidTickSection> tickSections = new Long2ObjectAVLTreeMap<>();
     private final Set<FluidTickSection>[] dirtySections;
@@ -182,5 +182,12 @@ public class FluidTickLevel implements FluidTickingContext {
 
     public long freezeNanos() {
         return frozenTime;
+    }
+
+    private static int decideThreadCount() {
+        int config = Config.THREAD_COUNT.getAsInt();
+        if (config != 0) return config;
+
+        return Runtime.getRuntime().availableProcessors() - 2;
     }
 }

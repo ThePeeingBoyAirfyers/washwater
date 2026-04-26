@@ -8,11 +8,17 @@ public class Config {
             .comment("Should fluid be simulated on multiple threads")
             .define("multithread", true);
     public static final ModConfigSpec.IntValue THREAD_COUNT = BUILDER
-            .comment("How many threads we should use to simulate fluids")
-            .defineInRange("threadCount", 8, 1, Integer.MAX_VALUE);
+            .comment("How many threads we should use to simulate fluids, 0 means let WW decide")
+            .defineInRange("threadCount", 0, 0, Integer.MAX_VALUE);
     public static final ModConfigSpec.IntValue WATER_SOURCE_GAIN = BUILDER
             .comment("Water source gain per randomtick")
             .defineInRange("waterSourceGain", 1, 0, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue SEND_UPDATE_PACKETS_EVERY = BUILDER
+            .comment("How often should we send update packets to all clients?, in ticks")
+            .defineInRange("sendUpdatePacketEvery", 2, 1, Integer.MAX_VALUE);
+
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private Config() {

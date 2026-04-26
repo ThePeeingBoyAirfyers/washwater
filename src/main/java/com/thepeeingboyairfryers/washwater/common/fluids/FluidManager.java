@@ -2,6 +2,9 @@ package com.thepeeingboyairfryers.washwater.common.fluids;
 
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.FluidsIndexationAttachment;
 import com.thepeeingboyairfryers.washwater.common.storage.attachment.WWAttachments;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -15,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.thepeeingboyairfryers.washwater.common.WaterInfo.VOLUME_PER_LEVEL;
 
 public class FluidManager {
+    public static final StreamCodec<ByteBuf, FluidType> FLUID_STREAM_CODEC = ByteBufCodecs.SHORT.map(FluidManager::getFluidType, FluidManager::getFluidId);
     private static FluidsIndexationAttachment fluidsIndexation;
 
     private FluidManager() {
@@ -37,12 +41,6 @@ public class FluidManager {
         return fluidsIndexation.getFluid(id);
     }
 
-    private static void levelLoaded(LevelEvent.Load event) {
-        if (event.getLevel() instanceof ServerLevel level && level.getServer().overworld() == level) {
-            fluidsIndexation = level.getData(WWAttachments.FLUIDS_INDEXATION.get());
-        }
-    }
-
     public static int lowestTick(ServerLevel level) {
         return 2;
     }
@@ -63,5 +61,15 @@ public class FluidManager {
 
     public static BlockState getFluidBlockState(MultiFluidValue result) {
         return getFluidState(result).createLegacyBlock();
+    }
+
+    public static void setFluidsIndexation(FluidsIndexationAttachment iFluidsIndexation) {
+        fluidsIndexation = iFluidsIndexation;
+    }
+
+    private static void levelLoaded(LevelEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel level && level.getServer().overworld() == level) {
+            setFluidsIndexation(level.getData(WWAttachments.FLUIDS_INDEXATION.get()));
+        }
     }
 }

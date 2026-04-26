@@ -1,11 +1,11 @@
 package com.thepeeingboyairfryers.washwater.common.storage;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.packets.DumbFluidSectionUpdatePacket;
+import com.thepeeingboyairfryers.washwater.common.packets.SingleFuidSectionPacket;
+import com.thepeeingboyairfryers.washwater.common.packets.SingleFuidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.common.util.WWCodecs;
 import it.unimi.dsi.fastutil.shorts.ShortRBTreeSet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
@@ -15,9 +15,6 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SingleFluidSection extends UpgradeableFluidSection {
     public static final MapCodec<SingleFluidSection> CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
@@ -82,17 +79,17 @@ public class SingleFluidSection extends UpgradeableFluidSection {
     @Override
     protected @Nullable CustomPacketPayload updatePacket(SectionPos pos, boolean all) {
         if (all) {
-            // TODO
-            return null;
+            return new SingleFuidSectionPacket(pos, fluidType, volumes);
         } else {
             if (dirty.isEmpty()) return null;
-            List<Pair<Short, MultiFluidValue>> updates = new ArrayList<>();
+            int[] updates = new int[dirty.size()];
+            int i = 0;
             for (short s : dirty) {
-                updates.add(Pair.of(s, MultiFluidValue.single(fluidType, volumes[s])));
+                updates[i++] = (s << 16) | volumes[s];
             }
 
             dirty.clear();
-            return new DumbFluidSectionUpdatePacket(pos, updates);
+            return new SingleFuidUpdatePacket(pos, fluidType, updates);
         }
     }
 
