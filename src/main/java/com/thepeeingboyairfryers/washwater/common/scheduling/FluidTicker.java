@@ -1,7 +1,6 @@
 package com.thepeeingboyairfryers.washwater.common.scheduling;
 
 import com.thepeeingboyairfryers.washwater.common.Config;
-import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.util.parallel.MainThreads;

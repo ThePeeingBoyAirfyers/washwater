@@ -13,14 +13,13 @@ import java.util.Queue;
 
 public class BucketBfs {
 
-    //public static final int BFSRadius = 2;
+    private BucketBfs() { }
+
     private static final int RADIUS = WaterInfo.PRECISION_BUCKET_RADIUS;
     private static int xX;
     private static int zZ;
     private static Level level;
     private static BlockPos pos;
-
-
 
     public static void runBucketBFS(Level iLevel, BlockPos iPos, ItemStack iStack, Player iPlayer) {
         level = iLevel;

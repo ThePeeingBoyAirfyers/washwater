@@ -136,7 +136,7 @@ public class FluidUtil {
     }
 
     public static boolean isSolid(Level level, BlockPos pos) {
-        return !level.getBlockState(pos).isAir() && !hasFluid(level, pos) ;
+        return !level.getBlockState(pos).isAir() && !hasFluid(level, pos);
     }
 
 }

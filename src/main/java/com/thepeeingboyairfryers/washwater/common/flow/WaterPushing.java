@@ -1,22 +1,22 @@
 package com.thepeeingboyairfryers.washwater.common.flow;
 
+import com.thepeeingboyairfryers.washwater.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.util.PseudoRandom;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidType;
 
 import java.util.ArrayList;
 
 public class WaterPushing {
 
-    static int maxPistonPushingDistance = 8;
+    private WaterPushing() { }
 
     public static boolean tryPushWater(ServerLevel level, BlockPos origin, Direction direction) {
-        int maxDistance = maxPistonPushingDistance;
+        int maxDistance = WaterInfo.MAX_PISTON_PUSHING_DISTANCE;
         BlockPos newPos = origin.relative(direction);
         System.out.println(direction);
         int currentDistance = 0;
@@ -33,7 +33,7 @@ public class WaterPushing {
     }
 
     public static boolean checkIfCanPushWater(ServerLevel level, BlockPos origin,  Direction direction) {
-        int maxDistance = maxPistonPushingDistance;
+        int maxDistance = WaterInfo.MAX_PISTON_PUSHING_DISTANCE;
         BlockPos newPos = origin.relative(direction);
         FluidType originType = level.getBlockState(newPos).getFluidState().getType().getFluidType();
         int currentDistance = 0;
@@ -67,7 +67,7 @@ public class WaterPushing {
             return FluidUtil.addVolume(level, pos, type, availableVolume, true);
         }
         else {
-            if (availableVolume > 0 ) {
+            if (availableVolume > 0) {
                 int i = 0;
                 for (Direction dir : viableHorDirections) {
                     int cut = initialVolume / viableHorDirections.size();
@@ -98,7 +98,7 @@ public class WaterPushing {
             return FluidUtil.addVolume(level, pos, type, availableVolume, false);
         }
         else {
-            if (availableVolume > 0 ) {
+            if (availableVolume > 0) {
                 int i = 0;
                 for (Direction dir : viableHorDirections) {
                     int cut = initialVolume / viableHorDirections.size();
