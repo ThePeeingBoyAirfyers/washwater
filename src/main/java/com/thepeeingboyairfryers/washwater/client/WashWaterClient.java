@@ -3,7 +3,7 @@ package com.thepeeingboyairfryers.washwater.client;
 import com.thepeeingboyairfryers.washwater.client.debug.DebugFluidRenderer;
 import com.thepeeingboyairfryers.washwater.common.WashWater;
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
-import com.thepeeingboyairfryers.washwater.common.component.ModDataComponentTypes;
+import com.thepeeingboyairfryers.washwater.common.component.WWDataComponentTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -32,11 +32,11 @@ public class WashWaterClient {
 
     public static void registerItemProperties() {
         ItemProperties.register(PRECISION_BUCKET.get(), ResourceLocation.parse("bucketlevel"), (itemStack, clientWorld, livingEntity, seed) -> {
-            if (!itemStack.has(ModDataComponentTypes.BUCKET_FILL_LEVEL)) {
-                itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, 0);
+            if (!itemStack.has(WWDataComponentTypes.BUCKET_FILL_LEVEL)) {
+                itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, 0);
                 return 0f;
             }
-            return (itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) / (float) WaterInfo.VOLUME_PER_BLOCK);
+            return (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) / (float) WaterInfo.VOLUME_PER_BLOCK);
         });
     }
 

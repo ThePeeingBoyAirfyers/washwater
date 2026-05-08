@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.common.item;
 
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
-import com.thepeeingboyairfryers.washwater.common.component.ModDataComponentTypes;
+import com.thepeeingboyairfryers.washwater.common.component.WWDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.util.BucketBfs;
@@ -57,8 +57,8 @@ public class PrecisionBucketItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
-        if (itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            int bucketFillLevel = itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
+        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            int bucketFillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
             String toolTipText = "Bucket contains: " + bucketFillLevel + " levels " + "of fluid";
             list.add(Component.literal(toolTipText));
         }
@@ -81,8 +81,8 @@ public class PrecisionBucketItem extends Item {
     @Override
     public int getBarWidth(ItemStack itemStack) {
         int fillLevel = 0;
-        if (itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            fillLevel = itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
+        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            fillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
         }
         float fraction = (float) fillLevel / (float) WaterInfo.PRECISION_BUCKET_CAPACITY;
         return (int) (13f * fraction);
@@ -90,8 +90,8 @@ public class PrecisionBucketItem extends Item {
 
     public static boolean precisionBucketPlace(Level level, BlockPos targetPos, ItemStack itemStack, Player player) {
         int fillLevel = 0;
-        if (itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            fillLevel = itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
+        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            fillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
         }
         if (fillLevel == 0)
             return false;
@@ -100,7 +100,7 @@ public class PrecisionBucketItem extends Item {
                 if (FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel, false)) {
                     if (!level.isClientSide)
                         FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel, true);
-                    itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
+                    itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
                     return true;
                 }
             }
@@ -109,8 +109,8 @@ public class PrecisionBucketItem extends Item {
 
     public static boolean precisionBucketPickup(Level level, BlockPos targetPos, ItemStack itemStack, Player player) {
         int fillLevel = 0;
-        if (itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            fillLevel = itemStack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
+        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            fillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
         }
         if (fillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY)
             return true;
@@ -133,7 +133,7 @@ public class PrecisionBucketItem extends Item {
             else {
                 FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
             }
-            itemStack.set(ModDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
+            itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
             return newBucketFillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY;
         }
         else {
@@ -143,8 +143,8 @@ public class PrecisionBucketItem extends Item {
 
     public static boolean bfsPickup(Level level, BlockPos pos, ItemStack stack, Player player) {
         int fillLevel = 0;
-        if (stack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            fillLevel = stack.get(ModDataComponentTypes.BUCKET_FILL_LEVEL);
+        if (stack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            fillLevel = stack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
             if (fillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY)
                 return false;
         }

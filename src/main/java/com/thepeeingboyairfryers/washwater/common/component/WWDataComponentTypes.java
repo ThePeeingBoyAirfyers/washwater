@@ -9,9 +9,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.UnaryOperator;
 
-public class ModDataComponentTypes {
+public class WWDataComponentTypes {
 
-    private ModDataComponentTypes() {
+    private WWDataComponentTypes() {
         throw new IllegalStateException("Utility class");
     }
 
