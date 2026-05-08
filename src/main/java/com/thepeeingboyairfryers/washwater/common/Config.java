@@ -18,6 +18,14 @@ public class Config {
             .comment("How often should we send update packets to all clients?, in ticks")
             .defineInRange("sendUpdatePacketEvery", 2, 1, Integer.MAX_VALUE);
 
+    public static final ModConfigSpec.IntValue PRECISION_BUCKET_CAPACITY = BUILDER
+            .comment("How many units of volume the precision bucket should hold")
+            .defineInRange("precisionBucketCapacity", 1000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue VOLUME_PER_BLOCK = BUILDER
+            .comment("How many units of volume should be in a block")
+            .defineInRange("volumePerBlock", 1000, 1, Integer.MAX_VALUE);
+
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
