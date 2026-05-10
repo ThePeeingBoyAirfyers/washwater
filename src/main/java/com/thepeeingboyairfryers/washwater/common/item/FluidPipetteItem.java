@@ -27,7 +27,7 @@ public class FluidPipetteItem extends Item {
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();
             BlockPos blockPos2 = blockPos.relative(direction);
-            FluidUtil.addVolume((ServerLevel) level, blockPos2, FluidUtil.WATER_TYPE, 1, true);
+            FluidUtil.addVolume((ServerLevel) level, blockPos2, FluidUtil.WATER_TYPE, 1);
         }
         return true;
     }

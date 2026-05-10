@@ -26,7 +26,7 @@ public class WaterSourceAirBlock extends Block {
     }
 
     protected void randomTick(@NotNull BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos, @NotNull RandomSource random) {
-        FluidUtil.addVolume(level, pos, NeoForgeMod.WATER_TYPE.value(), Config.WATER_SOURCE_GAIN.getAsInt(), true);
+        FluidUtil.addVolume(level, pos, NeoForgeMod.WATER_TYPE.value(), Config.WATER_SOURCE_GAIN.getAsInt());
     }
 
     protected @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {

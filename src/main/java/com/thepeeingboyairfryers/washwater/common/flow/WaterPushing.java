@@ -64,7 +64,7 @@ public class WaterPushing {
         }
 
         if (viableHorDirections.isEmpty()) {
-            return FluidUtil.addVolume(level, pos, type, availableVolume, true);
+            return FluidUtil.addVolume(level, pos, type, availableVolume);
         }
         else {
             if (availableVolume > 0) {
@@ -95,7 +95,7 @@ public class WaterPushing {
         }
 
         if (viableHorDirections.isEmpty()) {
-            return FluidUtil.addVolume(level, pos, type, availableVolume, false);
+            return FluidUtil.canAddVolume(level, pos, type, availableVolume);
         }
         else {
             if (availableVolume > 0) {

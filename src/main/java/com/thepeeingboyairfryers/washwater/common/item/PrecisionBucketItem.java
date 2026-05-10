@@ -97,9 +97,9 @@ public class PrecisionBucketItem extends Item {
             return false;
         int newBucketFillLevel = 0;
             if (level.getBlockState(targetPos).isAir() || !level.getBlockState(targetPos).getFluidState().isEmpty()) {
-                if (FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel, false)) {
+                if (FluidUtil.canAddVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel)) {
                     if (!level.isClientSide)
-                        FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel, true);
+                        FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel);
                     itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
                     return true;
                 }

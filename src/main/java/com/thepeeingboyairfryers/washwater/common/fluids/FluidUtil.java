@@ -19,7 +19,32 @@ public class FluidUtil {
         throw new IllegalStateException();
     }
 
-    public static boolean addVolume(Level level, BlockPos pos, FluidType type, int volume, boolean real) {
+    public static boolean addVolume(Level level, BlockPos pos, FluidType type, int volume) {
+        if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return false;
+        short oldVolume = getAllVolume(level, pos);
+        boolean success = true;
+
+        if (!canAddVolume(level, pos, type, volume)) {
+            return false;
+        }
+
+        short spaceLeft = (short) (VOLUME_OF_BLOCK - oldVolume);
+        if (spaceLeft > 0) {
+                var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+                var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
+                fluidChunk.addFluidVolume(
+                        pos.getX(), pos.getY(), pos.getZ(),
+                        type, (short) Math.min(spaceLeft, volume)
+                );
+                FluidTicker.tickFluid((ServerLevel) level, pos);
+        }
+        if (spaceLeft < volume) {
+            success = addVolume(level, pos.above(), type, volume - spaceLeft);
+        }
+        return success;
+    }
+
+    public static boolean canAddVolume(Level level, BlockPos pos, FluidType type, int volume) {
         if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return false;
         if (volume == 0) return false;
         short oldVolume = getAllVolume(level, pos);
@@ -32,22 +57,12 @@ public class FluidUtil {
             return false;
         }
         short spaceLeft = (short) (VOLUME_OF_BLOCK - oldVolume);
-        if (spaceLeft > 0) {
-            if (real) {
-                var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-                var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
-                fluidChunk.addFluidVolume(
-                        pos.getX(), pos.getY(), pos.getZ(),
-                        type, (short) Math.min(spaceLeft, volume)
-                );
-                FluidTicker.tickFluid((ServerLevel) level, pos);
-            }
-        }
         if (spaceLeft < volume) {
-            success = addVolume(level, pos.above(), type, volume - spaceLeft, real);
+            success = canAddVolume(level, pos.above(), type, volume - spaceLeft);
         }
         return success;
     }
+
 
     public static int addWaterVolumeAndReturnRemaining(Level level, BlockPos pos, FluidType type, int volume, boolean doAddAbove, boolean real) {
         if (pos.getY() < level.getMinBuildHeight() || pos.getY() > level.getMaxBuildHeight()) return volume;
