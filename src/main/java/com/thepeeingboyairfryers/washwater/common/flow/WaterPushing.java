@@ -26,7 +26,7 @@ public class WaterPushing {
         while (volumeToDisplace > 0 && currentDistance < maxDistance) {
             newPos = newPos.relative(direction);
             currentDistance++;
-            volumeToDisplace = FluidUtil.addWaterVolumeAndReturnRemaining(level, newPos, type, volumeToDisplace, true, true);
+            volumeToDisplace = (volumeToDisplace - FluidUtil.addVolume(level, newPos, type, volumeToDisplace));
         }
 
         return volumeToDisplace == 0;
@@ -45,7 +45,7 @@ public class WaterPushing {
                 return false;
             }
             currentDistance++;
-            volumeToDisplace = FluidUtil.addWaterVolumeAndReturnRemaining(level, newPos, originType, volumeToDisplace, true, false);
+            volumeToDisplace = (volumeToDisplace - FluidUtil.canAddVolume(level, newPos, originType, volumeToDisplace));
         }
 
         return volumeToDisplace == 0;
@@ -64,7 +64,7 @@ public class WaterPushing {
         }
 
         if (viableHorDirections.isEmpty()) {
-            return FluidUtil.addVolume(level, pos, type, availableVolume);
+            return (FluidUtil.addVolume(level, pos, type, availableVolume) == availableVolume);
         }
         else {
             if (availableVolume > 0) {
@@ -73,7 +73,7 @@ public class WaterPushing {
                     int cut = initialVolume / viableHorDirections.size();
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
-                    int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, true, true);
+                    int remainder = (cut - FluidUtil.addVolume(level, pos.relative(dir).mutable(), type, cut));
                     availableVolume = availableVolume - cut + remainder;
                     i++;
                 }
@@ -95,7 +95,7 @@ public class WaterPushing {
         }
 
         if (viableHorDirections.isEmpty()) {
-            return FluidUtil.canAddVolume(level, pos, type, availableVolume);
+            return (FluidUtil.canAddVolume(level, pos, type, availableVolume) == availableVolume);
         }
         else {
             if (availableVolume > 0) {
@@ -105,7 +105,7 @@ public class WaterPushing {
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
 
-                    int remainder = FluidUtil.addWaterVolumeAndReturnRemaining(level, pos.relative(dir).mutable(), type, cut, true, false);
+                    int remainder = (cut - FluidUtil.canAddVolume(level, pos.relative(dir).mutable(), type, cut));
                     availableVolume = availableVolume - cut + remainder;
                     i++;
                 }

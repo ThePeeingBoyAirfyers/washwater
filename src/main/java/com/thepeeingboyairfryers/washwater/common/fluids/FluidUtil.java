@@ -27,7 +27,7 @@ public class FluidUtil {
 
         short oldVolume = getAllVolume(level, pos);
         short spaceLeft = (short) (VOLUME_OF_BLOCK - oldVolume);
-        int transaction = Math.max(volume, spaceLeft);
+        int transaction = Math.min(volume, spaceLeft);
         var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
         var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
         
@@ -39,7 +39,7 @@ public class FluidUtil {
         if (transaction < volume) {
             transaction += addVolume(level, pos.above(), type, volume - transaction);
         }
-
+        System.out.println("transaction: " + transaction);
         return transaction;
     }
 
@@ -56,11 +56,11 @@ public class FluidUtil {
         }
 
         short spaceLeft = (short) (VOLUME_OF_BLOCK - oldVolume);
-        int transaction = Math.max(volume, spaceLeft);
+        int transaction = Math.min(volume, spaceLeft);
         if (transaction < volume) {
             transaction += canAddVolume(level, pos.above(), type, volume - transaction);
         }
-
+        System.out.println("transaction client: " + transaction);
         return transaction;
     }
 

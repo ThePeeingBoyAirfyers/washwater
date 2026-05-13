@@ -26,9 +26,9 @@ public abstract class MixinBucketItem {
         if (pos.getY() == WaterInfo.MIN_Y)
             return false;
         if (!level.isClientSide) {
-            return FluidUtil.addVolume(level, pos, WaterInfo.WATER_TYPE, WaterInfo.VOLUME_PER_BLOCK);
+            return (FluidUtil.addVolume(level, pos, WaterInfo.WATER_TYPE, WaterInfo.VOLUME_PER_BLOCK) == WaterInfo.VOLUME_PER_BLOCK);
         } else {
-            return FluidUtil.canAddVolume(level, pos, WaterInfo.WATER_TYPE, WaterInfo.VOLUME_PER_BLOCK);
+            return (FluidUtil.canAddVolume(level, pos, WaterInfo.WATER_TYPE, WaterInfo.VOLUME_PER_BLOCK) == WaterInfo.VOLUME_PER_BLOCK);
         }
     }
 
