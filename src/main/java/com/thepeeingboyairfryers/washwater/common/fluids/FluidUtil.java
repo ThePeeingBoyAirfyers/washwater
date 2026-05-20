@@ -39,7 +39,6 @@ public class FluidUtil {
         if (transaction < volume) {
             transaction += addVolume(level, pos.above(), type, volume - transaction);
         }
-        System.out.println("transaction: " + transaction);
         return transaction;
     }
 
@@ -60,7 +59,6 @@ public class FluidUtil {
         if (transaction < volume) {
             transaction += canAddVolume(level, pos.above(), type, volume - transaction);
         }
-        System.out.println("transaction client: " + transaction);
         return transaction;
     }
 

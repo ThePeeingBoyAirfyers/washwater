@@ -16,9 +16,8 @@ public class WaterPushing {
     private WaterPushing() { }
 
     public static boolean tryPushWater(ServerLevel level, BlockPos origin, Direction direction) {
-        int maxDistance = WaterInfo.MAX_PISTON_PUSHING_DISTANCE;
+        int maxDistance = WaterInfo.MAX_PUSHING_DISTANCE;
         BlockPos newPos = origin.relative(direction);
-        System.out.println(direction);
         int currentDistance = 0;
         FluidType type = level.getBlockState(newPos).getFluidState().getType().getFluidType();
         int volumeToDisplace = FluidUtil.getVolume(level, newPos, type);
@@ -33,7 +32,7 @@ public class WaterPushing {
     }
 
     public static boolean checkIfCanPushWater(ServerLevel level, BlockPos origin,  Direction direction) {
-        int maxDistance = WaterInfo.MAX_PISTON_PUSHING_DISTANCE;
+        int maxDistance = WaterInfo.MAX_PUSHING_DISTANCE;
         BlockPos newPos = origin.relative(direction);
         FluidType originType = level.getBlockState(newPos).getFluidState().getType().getFluidType();
         int currentDistance = 0;
@@ -64,7 +63,7 @@ public class WaterPushing {
         }
 
         if (viableHorDirections.isEmpty()) {
-            return (FluidUtil.addVolume(level, pos, type, availableVolume) == availableVolume);
+            return (FluidUtil.addVolume(level, pos, type, availableVolume) == 0);
         }
         else {
             if (availableVolume > 0) {
@@ -96,8 +95,7 @@ public class WaterPushing {
 
         if (viableHorDirections.isEmpty()) {
             return (FluidUtil.canAddVolume(level, pos, type, availableVolume) == availableVolume);
-        }
-        else {
+        } else {
             if (availableVolume > 0) {
                 int i = 0;
                 for (Direction dir : viableHorDirections) {
