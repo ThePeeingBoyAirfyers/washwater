@@ -63,9 +63,8 @@ public class WaterPushing {
         }
 
         if (viableHorDirections.isEmpty()) {
-            return (FluidUtil.addVolume(level, pos, type, availableVolume) == 0);
-        }
-        else {
+            return (FluidUtil.addVolume(level, pos, type, availableVolume) == availableVolume);
+        } else {
             if (availableVolume > 0) {
                 int i = 0;
                 for (Direction dir : viableHorDirections) {
