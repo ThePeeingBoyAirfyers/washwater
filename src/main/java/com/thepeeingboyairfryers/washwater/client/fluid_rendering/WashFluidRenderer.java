@@ -20,11 +20,13 @@ import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.Transl
 import net.caffeinemc.mods.sodium.client.render.chunk.vertex.builder.ChunkMeshBufferBuilder;
 import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkVertexEncoder;
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import net.caffeinemc.mods.sodium.neoforge.render.ForgeColorProviders;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.textures.FluidSpriteCache;
 
 
@@ -37,6 +39,8 @@ public class WashFluidRenderer extends FluidRenderer {
     private final BlockPos.MutableBlockPos scratchPos = new BlockPos.MutableBlockPos();
     private final ColorProviderRegistry colorRegistry;
     private final LightPipelineProvider lightPipelineProvider;
+    private final int[] quadColors = new int[4];
+    private ColorProvider<FluidState> colorProvider;
     private ChunkModelBuilder builder;
     private TranslucentGeometryCollector collector;
 
@@ -64,6 +68,10 @@ public class WashFluidRenderer extends FluidRenderer {
         Material material = DefaultMaterials.forFluidState(fluidState);
         this.builder = buffers.get(material);
         this.collector = iCollector;
+        colorProvider = colorRegistry.getColorProvider(fluidState.getType());
+        if (colorProvider == null)
+            colorProvider = ForgeColorProviders.adapt(IClientFluidTypeExtensions.of(fluidState));
+
         handler.configure(level, blockPos, blockState, fluidState);
         TextureAtlasSprite[] sprites = FluidSpriteCache.getFluidSprites(level, blockPos, fluidState);
 
@@ -78,15 +86,15 @@ public class WashFluidRenderer extends FluidRenderer {
 
     private void writeQuad(Material material, BlockPos realPos, BlockPos offset, Direction facing, LevelSlice level, FluidState fluidState) {
         ChunkVertexEncoder.Vertex[] iVertices = this.vertices;
+        TextureAtlasSprite sprite = quad.getSprite();
+
         var lighter = lightPipelineProvider.getLighter(LightMode.SMOOTH);
         var quadFacing = ModelQuadFacing.fromDirection(facing);
         int normal = quadFacing.getPackedAlignedNormal();
-        TextureAtlasSprite sprite = quad.getSprite();
-        quad.setFaceNormal(normal);
-        lighter.calculate(quad, realPos, quadLightData, null, facing, false, false);
 
-        int[] quadColors = new int[4];
-        ColorProvider<FluidState> colorProvider = colorRegistry.getColorProvider(fluidState.getType());
+        quad.setFaceNormal(normal);
+
+        lighter.calculate(quad, realPos, quadLightData, null, facing, false, false);
         colorProvider.getColors(level, realPos, scratchPos.set(realPos), fluidState, quad, quadColors);
 
         for (int i = 0; i < 4; ++i) {

@@ -1,7 +1,8 @@
 package com.thepeeingboyairfryers.washwater.duck;
 
 import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
+import org.jetbrains.annotations.NotNull;
 
 public interface ILevelSliceFluids {
-    MultiFluidValue ww€getFluidFor(int x, int y, int z);
+    @NotNull MultiFluidValue ww€getFluidFor(int x, int y, int z);
 }
