@@ -107,40 +107,6 @@ public class PrecisionBucketItem extends Item {
         return false;
     }
 
-    public static boolean precisionBucketPickup(Level level, BlockPos targetPos, ItemStack itemStack, Player player) {
-        int fillLevel = 0;
-        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            fillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
-        }
-        if (fillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY)
-            return true;
-
-        int bucketRemainingSpace = WaterInfo.PRECISION_BUCKET_CAPACITY - fillLevel;
-        if (!level.isClientSide) {
-            short oldVolume = FluidUtil.getVolume(level, targetPos, WaterInfo.WATER_TYPE);
-            int newVolume = 0;
-            int newBucketFillLevel;
-            if (oldVolume > bucketRemainingSpace) {
-                newVolume = oldVolume - bucketRemainingSpace;
-                newBucketFillLevel = WaterInfo.PRECISION_BUCKET_CAPACITY;
-            }
-            else {
-                newBucketFillLevel = fillLevel + oldVolume;
-            }
-            if (newVolume > 0) {
-                FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
-                }
-            else {
-                FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
-            }
-            itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
-            return newBucketFillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY;
-        }
-        else {
-            return true;
-        }
-    }
-
     public static boolean bfsPickup(Level level, BlockPos pos, ItemStack stack, Player player) {
         int fillLevel = 0;
         if (stack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {

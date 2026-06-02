@@ -1,9 +1,13 @@
 package com.thepeeingboyairfryers.washwater.common.util;
 
 import com.thepeeingboyairfryers.washwater.common.WaterInfo;
+import com.thepeeingboyairfryers.washwater.common.component.WWDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.common.item.PrecisionBucketItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -35,26 +39,54 @@ public class BucketBfs {
             if (!isBlockWater(nodePos) || popped.distance > RADIUS) {
                 continue;
             }
-            if (PrecisionBucketItem.precisionBucketPickup(level, nodePos, iStack, iPlayer)) {
+            if (precisionBucketPickup(level, nodePos, iStack, iPlayer)) {
                 return;
             }
             addNeighbours(popped, queue);
         }
     }
 
+    public static boolean precisionBucketPickup(Level level, BlockPos targetPos, ItemStack itemStack, Player player) {
+        int fillLevel = 0;
+        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            fillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
+        }
+        if (fillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY)
+            return true;
+
+        int bucketRemainingSpace = WaterInfo.PRECISION_BUCKET_CAPACITY - fillLevel;
+        if (!level.isClientSide) {
+            short oldVolume = FluidUtil.getVolume(level, targetPos, WaterInfo.WATER_TYPE);
+            int newVolume = 0;
+            int newBucketFillLevel;
+            if (oldVolume > bucketRemainingSpace) {
+                newVolume = oldVolume - bucketRemainingSpace;
+                newBucketFillLevel = WaterInfo.PRECISION_BUCKET_CAPACITY;
+            }
+            else {
+                newBucketFillLevel = fillLevel + oldVolume;
+            }
+            if (newVolume > 0) {
+                FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
+            }
+            else {
+                FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
+            }
+            itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
+            return newBucketFillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY;
+        }
+        else {
+            return true;
+        }
+    }
+
     private static void addNeighbours(Node popped, Queue<Node> queue) {
-        int diameter = 2 * RADIUS + 1;
-        if ((popped.x - 1 >= 0 && popped.x - 1 < diameter)) {
-            queue.add(new Node(popped.x - 1, popped.z, popped.distance + 1));
-        }
-        if ((popped.x + 1 >= 0 && popped.x + 1 < diameter)) {
-            queue.add(new Node(popped.x + 1, popped.z, popped.distance + 1));
-        }
-        if ((popped.z - 1 >= 0 && popped.z - 1 < diameter)) {
-            queue.add(new Node(popped.x, popped.z - 1, popped.distance + 1));
-        }
-        if ((popped.z + 1 >= 0 && popped.z + 1 < diameter)) {
-            queue.add(new Node(popped.x, popped.z + 1, popped.distance + 1));
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            int xDist = Math.abs(popped.x + dir.getStepX() - RADIUS);
+            int zDist = Math.abs(popped.z + dir.getStepZ() - RADIUS);
+            if (xDist <= RADIUS && zDist <= RADIUS) {
+                queue.add(new Node(popped.x + dir.getStepX(), popped.z + dir.getStepZ(), popped.distance + 1));
+            }
         }
     }
 
