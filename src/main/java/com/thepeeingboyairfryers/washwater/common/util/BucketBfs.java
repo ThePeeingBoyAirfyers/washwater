@@ -29,32 +29,32 @@ public class BucketBfs {
 
         Queue<Node> queue = new LinkedList<>();
         queue.add(new Node(RADIUS, RADIUS, 0));
-        while (!queue.isEmpty()) {
+        while (!queue.isEmpty()) {  
             Node popped = queue.poll();
             BlockPos nodePos = getAbsolutePos(popped, 0, 0);
             if (!isBlockWater(nodePos) || popped.distance > RADIUS) {
                 continue;
             }
-            if (PrecisionBucketItem.precisionBucketPickup(level, nodePos, iStack, iPlayer))
+            if (PrecisionBucketItem.precisionBucketPickup(level, nodePos, iStack, iPlayer)) {
                 return;
+            }
             addNeighbours(popped, queue);
-
         }
     }
 
     private static void addNeighbours(Node popped, Queue<Node> queue) {
         int diameter = 2 * RADIUS + 1;
         if ((popped.x - 1 >= 0 && popped.x - 1 < diameter)) {
-            queue.add(new Node(popped.x - 1, popped.y, popped.distance + 1));
+            queue.add(new Node(popped.x - 1, popped.z, popped.distance + 1));
         }
         if ((popped.x + 1 >= 0 && popped.x + 1 < diameter)) {
-            queue.add(new Node(popped.x + 1, popped.y, popped.distance + 1));
+            queue.add(new Node(popped.x + 1, popped.z, popped.distance + 1));
         }
-        if ((popped.y - 1 >= 0 && popped.y - 1 < diameter)) {
-            queue.add(new Node(popped.x, popped.y - 1, popped.distance + 1));
+        if ((popped.z - 1 >= 0 && popped.z - 1 < diameter)) {
+            queue.add(new Node(popped.x, popped.z - 1, popped.distance + 1));
         }
-        if ((popped.y + 1 >= 0 && popped.y + 1 < diameter)) {
-            queue.add(new Node(popped.x, popped.y + 1, popped.distance + 1));
+        if ((popped.z + 1 >= 0 && popped.z + 1 < diameter)) {
+            queue.add(new Node(popped.x, popped.z + 1, popped.distance + 1));
         }
     }
 
@@ -63,17 +63,17 @@ public class BucketBfs {
     }
 
     private static BlockPos getAbsolutePos(Node popped, int offsetX, int offsetZ) {
-        return new BlockPos(xX + popped.x + offsetX, pos.getY(), zZ + popped.y + offsetZ);
+        return new BlockPos(xX + popped.x + offsetX, pos.getY(), zZ + popped.z + offsetZ);
     }
 
     public static class Node {
         private int x;
-        private int y;
+        private int z;
         private int distance;
 
-        public Node(int iX, int iY, int iDistance) {
+        public Node(int iX, int iZ, int iDistance) {
             this.x = iX;
-            this.y = iY;
+            this.z = iZ;
             this.distance = iDistance;
         }
     }
