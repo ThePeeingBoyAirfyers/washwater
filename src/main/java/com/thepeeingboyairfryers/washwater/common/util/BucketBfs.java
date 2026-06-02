@@ -62,20 +62,17 @@ public class BucketBfs {
             if (oldVolume > bucketRemainingSpace) {
                 newVolume = oldVolume - bucketRemainingSpace;
                 newBucketFillLevel = WaterInfo.PRECISION_BUCKET_CAPACITY;
-            }
-            else {
+            } else {
                 newBucketFillLevel = fillLevel + oldVolume;
             }
             if (newVolume > 0) {
                 FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
-            }
-            else {
+            } else {
                 FluidUtil.setVolume((ServerLevel) level, targetPos, MultiFluidValue.single(WaterInfo.WATER_TYPE, (short) newVolume));
             }
             itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
             return newBucketFillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY;
-        }
-        else {
+        } else {
             return true;
         }
     }

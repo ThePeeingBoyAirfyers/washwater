@@ -47,8 +47,7 @@ public class PrecisionBucketItem extends Item {
                     return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide()).getResult();
                 }
 
-            }
-            else {
+            } else {
                 smartPickup(level, targetPos, itemStack, player);
             }
         }
@@ -61,8 +60,7 @@ public class PrecisionBucketItem extends Item {
             int bucketFillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
             String toolTipText = "Bucket contains: " + bucketFillLevel + " levels " + "of fluid";
             list.add(Component.literal(toolTipText));
-        }
-        else {
+        } else {
             String toolTipText = "Bucket contains: " + 0 + " levels " + "of fluid";
             list.add(Component.literal(toolTipText));
         }

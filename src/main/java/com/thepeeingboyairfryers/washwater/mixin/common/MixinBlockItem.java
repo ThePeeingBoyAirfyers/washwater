@@ -25,8 +25,7 @@ public class MixinBlockItem {
                     if (!level.isClientSide) {
                         WaterPushing.displaceFluids((ServerLevel) level, pos);
                     }
-                }
-                else {
+                } else {
                     cir.setReturnValue(InteractionResult.FAIL);
                 }
             }
