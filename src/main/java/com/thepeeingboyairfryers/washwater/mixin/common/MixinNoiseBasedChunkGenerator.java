@@ -1,6 +1,6 @@
 package com.thepeeingboyairfryers.washwater.mixin.common;
 
-import com.thepeeingboyairfryers.washwater.common.block.WWBlocks;
+import com.thepeeingboyairfryers.washwater.collections.WWBlocks;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;

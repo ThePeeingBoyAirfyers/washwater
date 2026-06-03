@@ -1,0 +1,38 @@
+package com.thepeeingboyairfryers.washwater.gameplay.common.features.infinite;
+
+import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.collections.WWBlockEntities;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+public class CosmicMonoxideSpoutBlockEntity extends BlockEntity {
+
+    public CosmicMonoxideSpoutBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(WWBlockEntities.COSMIC_MONOXIDE_SPOUT.get(), blockPos, blockState);
+    }
+
+    public static void tick(Level level, BlockPos pos, BlockState state, CosmicMonoxideSpoutBlockEntity entity) {
+        if (!level.isClientSide) {
+            performSpoutAction(level, pos);
+        }
+    }
+
+    public static void performSpoutAction(Level level, BlockPos pos) {
+        int vol0 = FluidUtil.getVolume(level, pos.below(), FluidUtil.WATER_TYPE);
+        if (vol0 >= 0 && vol0 < 1000) {
+            FluidUtil.setVolume((ServerLevel) level, pos.below(), MultiFluidValue.single(FluidUtil.WATER_TYPE, (short) 1000));
+        }
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            if (!FluidUtil.isFilledUp(level, pos.relative(dir))) {
+                FluidUtil.setVolume((ServerLevel) level, pos.relative(dir), MultiFluidValue.single(FluidUtil.WATER_TYPE, (short) 1000));
+            }
+        }
+
+    }
+
+}

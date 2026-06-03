@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.mixin.common;
 
-import com.thepeeingboyairfryers.washwater.common.WaterInfo;
-import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.Level;
