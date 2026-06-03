@@ -20,23 +20,19 @@ public class BucketBfs {
     private BucketBfs() { }
 
     private static final int RADIUS = WaterInfo.PRECISION_BUCKET_RADIUS;
-    private static int xX;
-    private static int zZ;
-    private static Level level;
-    private static BlockPos pos;
 
     public static void runBucketBFS(Level iLevel, BlockPos iPos, ItemStack iStack, Player iPlayer) {
-        level = iLevel;
-        pos = iPos;
-        xX = pos.getX() - RADIUS;
-        zZ = pos.getZ() - RADIUS;
+        Level level = iLevel;
+        BlockPos pos = iPos;
+        int xX = pos.getX() - RADIUS;
+        int zZ = pos.getZ() - RADIUS;
 
         Queue<Node> queue = new LinkedList<>();
         queue.add(new Node(RADIUS, RADIUS, 0));
         while (!queue.isEmpty()) {  
             Node popped = queue.poll();
-            BlockPos nodePos = getAbsolutePos(popped, 0, 0);
-            if (!isBlockWater(nodePos) || popped.distance > RADIUS) {
+            BlockPos nodePos = getAbsolutePos(xX, zZ, pos, popped, 0, 0);
+            if (!isBlockWater(level, nodePos) || popped.distance > RADIUS) {
                 continue;
             }
             if (precisionBucketPickup(level, nodePos, iStack, iPlayer)) {
@@ -87,11 +83,11 @@ public class BucketBfs {
         }
     }
 
-    private static boolean isBlockWater(BlockPos iPos) {
+    private static boolean isBlockWater(Level level, BlockPos iPos) {
         return FluidUtil.getVolume(level, iPos, FluidUtil.WATER_TYPE) > 0;
     }
 
-    private static BlockPos getAbsolutePos(Node popped, int offsetX, int offsetZ) {
+    private static BlockPos getAbsolutePos(int xX, int zZ, BlockPos pos, Node popped, int offsetX, int offsetZ) {
         return new BlockPos(xX + popped.x + offsetX, pos.getY(), zZ + popped.z + offsetZ);
     }
 
