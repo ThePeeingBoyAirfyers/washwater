@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class WaterPushing {
 
@@ -50,17 +51,24 @@ public class WaterPushing {
         return volumeToDisplace == 0;
     }
 
-    public static boolean displaceFluids(ServerLevel level, BlockPos pos) {
-        FluidType type = level.getFluidState(pos).getFluidType();
-        int availableVolume = FluidUtil.getVolume(level, pos, type);
-        int initialVolume = availableVolume;
-        ArrayList<Direction> viableHorDirections = new ArrayList<>(0);
+    public static List<Direction> createAndFillViableHorDirectionList(Level level, BlockPos pos) {
+        List<Direction> viableHorDirections = new ArrayList<>(0);
 
         for (Direction dir : PseudoRandom.getRandomDirectionArray()) {
             if (!FluidUtil.isSolid(level, pos.relative(dir)) && !FluidUtil.isFilledUp(level, pos.relative(dir))) {
                 viableHorDirections.add(dir);
             }
         }
+
+        return viableHorDirections;
+    }
+
+    public static boolean displaceFluids(ServerLevel level, BlockPos pos) {
+        FluidType type = level.getFluidState(pos).getFluidType();
+        int availableVolume = FluidUtil.getVolume(level, pos, type);
+        int initialVolume = availableVolume;
+        List<Direction> viableHorDirections = createAndFillViableHorDirectionList(level, pos);
+
 
         if (viableHorDirections.isEmpty()) {
             return (FluidUtil.addVolume(level, pos, type, availableVolume) == availableVolume);
@@ -84,13 +92,8 @@ public class WaterPushing {
         FluidType type = level.getFluidState(pos).getFluidType();
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
-        ArrayList<Direction> viableHorDirections = new ArrayList<>(0);
+        List<Direction> viableHorDirections = createAndFillViableHorDirectionList(level, pos);
 
-        for (Direction dir : PseudoRandom.getRandomDirectionArray()) {
-            if (!FluidUtil.isSolid(level, pos.relative(dir)) && !FluidUtil.isFilledUp(level, pos.relative(dir))) {
-                viableHorDirections.add(dir);
-            }
-        }
 
         if (viableHorDirections.isEmpty()) {
             return (FluidUtil.canAddVolume(level, pos, type, availableVolume) == availableVolume);

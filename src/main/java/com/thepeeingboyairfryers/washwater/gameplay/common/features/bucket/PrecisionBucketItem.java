@@ -34,27 +34,31 @@ public class PrecisionBucketItem extends Item {
     public InteractionResult useOn(UseOnContext useOnContext) {
         Level level = useOnContext.getLevel();
         Player player = useOnContext.getPlayer();
+
+        if (player == null)
+            return InteractionResult.FAIL;
+
         ItemStack itemStack = useOnContext.getItemInHand();
         BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
         BlockPos targetPos = blockHitResult.getBlockPos().relative(blockHitResult.getDirection());
-        if (player != null) {
-            if (!player.isCrouching()) {
-                if (precisionBucketPlace(level, targetPos, itemStack, player)) {
-                    playEmptySound(player, level, targetPos);
-                    return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide()).getResult();
-                }
-
-            } else {
-                smartPickup(level, targetPos, itemStack, player);
+        if (!player.isCrouching()) {
+            if (precisionBucketPlace(level, targetPos, itemStack, player)) {
+                playEmptySound(player, level, targetPos);
+                return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide()).getResult();
             }
+
+        } else {
+            smartPickup(level, targetPos, itemStack, player);
         }
+
         return InteractionResult.PASS;
     }
 
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
-        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            int bucketFillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
+        Integer bucketFillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
+
+        if (bucketFillLevel != null) {
             String toolTipText = "Bucket contains: " + bucketFillLevel + " levels " + "of fluid";
             list.add(Component.literal(toolTipText));
         } else {
@@ -102,33 +106,9 @@ public class PrecisionBucketItem extends Item {
         return false;
     }
 
-    public static boolean bfsPickup(Level level, BlockPos pos, ItemStack stack, Player player) {
-        int fillLevel = 0;
-        if (stack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            fillLevel = stack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
-            if (fillLevel == WaterInfo.PRECISION_BUCKET_CAPACITY)
-                return false;
-        }
-        BucketBfs.runBucketBFS(level, pos, stack, player);
-        return false;
-    }
-
     public static boolean smartPickup(Level level, BlockPos centrePos, ItemStack itemStack, Player player) {
         if (!level.isClientSide) {
-        /*    boolean isFull;
-            isFull = precisionBucketPickup(level, centrePos, itemStack, player);
-            if (isFull) {
-                System.out.println("returned early");
-                return true;
-            }
-
-            for (Direction dir : Direction.values()) {
-                isFull = precisionBucketPickup(level, centrePos.relative(dir), itemStack, player);
-                if (isFull)
-                    break;
-            }*/
             BucketBfs.runBucketBFS(level, centrePos, itemStack, player);
-
             return true;
         }
         return true;
