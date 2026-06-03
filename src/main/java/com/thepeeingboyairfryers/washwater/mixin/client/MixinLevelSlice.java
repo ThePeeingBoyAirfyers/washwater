@@ -9,6 +9,7 @@ import net.caffeinemc.mods.sodium.client.world.cloned.ChunkRenderContext;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -73,7 +74,7 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
     }
 
     @Override
-    public MultiFluidValue ww€getFluidFor(int x, int y, int z) {
+    public @NotNull MultiFluidValue ww€getFluidFor(int x, int y, int z) {
         if (!this.volume.isInside(x, y, z)) {
             return MultiFluidValue.EMPTY;
         } else {
