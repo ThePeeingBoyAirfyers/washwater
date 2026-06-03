@@ -54,6 +54,13 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
         throw new AssertionError();
     }
 
+    @Inject(method = "<init>", at = @At("RETURN"))
+    void ww€init(ClientLevel iLevel, CallbackInfo ci) {
+        for (var fluids : ww€fluids) {
+            Arrays.fill(fluids, MultiFluidValue.EMPTY);
+        }
+    }
+
     @Inject(method = "copySectionData", at = @At("HEAD"))
     void ww€copyFluidSection(ChunkRenderContext context, int sectionIndex, CallbackInfo ci) {
         int x = sectionIndex % SECTION_ARRAY_LENGTH;

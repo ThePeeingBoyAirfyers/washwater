@@ -123,7 +123,11 @@ public class FluidTickSection extends CachedFluidRegion {
 
     @Override
     protected FluidSection getFluidSection(int xS, int yS, int zS) {
-        return fluidSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
+        FluidSection section = fluidSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
+        if (section == null)
+            throw new IllegalStateException("Fetching a null section? x: " + xS + " y: " + yS + " z: " + zS);
+
+        return section;
     }
 
     public int getAge() {

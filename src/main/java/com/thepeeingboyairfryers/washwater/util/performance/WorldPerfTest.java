@@ -85,6 +85,7 @@ public class WorldPerfTest {
 
     private static void bucketDrop(PlayerEvent.PlayerLoggedInEvent event) {
         event.getEntity().getInventory().add(new ItemStack(Items.WATER_BUCKET));
+        event.getEntity().getInventory().add(new ItemStack(Items.LAVA_BUCKET));
     }
 
     private static void oldOverworld(Screen screen) {
