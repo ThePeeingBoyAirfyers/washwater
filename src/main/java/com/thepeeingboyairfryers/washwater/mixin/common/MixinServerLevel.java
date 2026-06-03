@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.mixin.common;
 
 
-import com.thepeeingboyairfryers.washwater.common.scheduling.FluidTicker;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTicker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.material.Fluid;

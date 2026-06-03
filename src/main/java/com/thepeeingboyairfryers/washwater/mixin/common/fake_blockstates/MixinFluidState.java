@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.mixin.common.fake_blockstates;
 
-import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.duck.IFluidState;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.ducks.IFluidState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.NotNull;

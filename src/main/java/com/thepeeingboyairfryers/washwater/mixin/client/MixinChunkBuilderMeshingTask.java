@@ -1,8 +1,8 @@
 package com.thepeeingboyairfryers.washwater.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.duck.ILevelSliceFluids;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.ducks.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildContext;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildOutput;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.tasks.ChunkBuilderMeshingTask;

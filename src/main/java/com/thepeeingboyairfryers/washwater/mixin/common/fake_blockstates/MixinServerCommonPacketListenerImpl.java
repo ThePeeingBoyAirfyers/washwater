@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.mixin.common.fake_blockstates;
 
-import com.thepeeingboyairfryers.washwater.common.packets.OneFluidUpdatePacket;
-import com.thepeeingboyairfryers.washwater.duck.IFluidState;
+import com.thepeeingboyairfryers.washwater.base.common.packets.OneFluidUpdatePacket;
+import com.thepeeingboyairfryers.washwater.ducks.IFluidState;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;

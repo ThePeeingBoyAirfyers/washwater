@@ -1,6 +1,6 @@
 package com.thepeeingboyairfryers.washwater.mixin.client;
 
-import com.thepeeingboyairfryers.washwater.client.fluid_rendering.WashFluidRendererFactory;
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.WashFluidRendererFactory;
 import net.caffeinemc.mods.sodium.client.services.FluidRendererFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
