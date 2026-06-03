@@ -26,6 +26,10 @@ public class Config {
             .comment("How many units of volume should be in a block")
             .defineInRange("volumePerBlock", 1000, 1, Integer.MAX_VALUE);
 
+    public static final ModConfigSpec.IntValue MAX_PUSHING_DISTANCE = BUILDER
+            .comment("How far should water be able to be pushed (by pistons etc.)")
+            .defineInRange("maxPushingDistance", 8, 0, Integer.MAX_VALUE);
+
 
     static final ModConfigSpec SPEC = BUILDER.build();
 

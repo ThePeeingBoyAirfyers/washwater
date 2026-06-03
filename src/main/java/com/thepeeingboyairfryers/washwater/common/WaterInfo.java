@@ -16,7 +16,7 @@ public class WaterInfo {
     public static final int FLOW_DIVIDER = 8;
     public static final int MIN_Y = -64;
     public static final int PRECISION_BUCKET_RADIUS = 2;
-    public static final int MAX_PUSHING_DISTANCE = 8;
+    public static final int MAX_PUSHING_DISTANCE = Config.MAX_PUSHING_DISTANCE.getAsInt();
     private WaterInfo() {
         throw new IllegalStateException();
     }
