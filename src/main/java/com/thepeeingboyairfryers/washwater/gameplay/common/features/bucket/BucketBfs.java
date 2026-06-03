@@ -1,9 +1,9 @@
 package com.thepeeingboyairfryers.washwater.gameplay.common.features.bucket;
 
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
-import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -16,9 +16,10 @@ import java.util.Queue;
 
 public class BucketBfs {
 
-    private BucketBfs() { }
-
     private static final int RADIUS = WaterInfo.PRECISION_BUCKET_RADIUS;
+
+    private BucketBfs() {
+    }
 
     public static void runBucketBFS(Level iLevel, BlockPos iPos, ItemStack iStack, Player iPlayer) {
         Level level = iLevel;
@@ -28,7 +29,7 @@ public class BucketBfs {
 
         Queue<Node> queue = new LinkedList<>();
         queue.add(new Node(RADIUS, RADIUS, 0));
-        while (!queue.isEmpty()) {  
+        while (!queue.isEmpty()) {
             Node popped = queue.poll();
             BlockPos nodePos = getAbsolutePos(xX, zZ, pos, popped, 0, 0);
             if (!isBlockWater(level, nodePos) || popped.distance > RADIUS) {

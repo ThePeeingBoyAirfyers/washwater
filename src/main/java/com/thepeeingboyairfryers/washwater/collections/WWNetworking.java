@@ -36,7 +36,7 @@ public class WWNetworking {
         bus.addListener((RegisterPayloadHandlersEvent e) -> {
             var r = e.registrar("1").executesOn(HandlerThread.MAIN);
 
-            r.playToClient(OneFluidUpdatePacket.TYPE,  OneFluidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
+            r.playToClient(OneFluidUpdatePacket.TYPE, OneFluidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
                 var chunk = Minecraft.getInstance().level.getChunkAt(p.pos());
                 FluidSectionManager.getAttachmentFor(chunk).setVolume(p.pos().getX(), p.pos().getY(), p.pos().getZ(), p.value());
             });

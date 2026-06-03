@@ -198,18 +198,18 @@
 
     <module name="SuppressionSingleFilter">
         <metadata name="net.sf.eclipsecs.core.comment" value="Suppress MethodNameRegular check on ducks"/>
-        <property name="files" value="[/\\](duck|mixin)[/\\]"/>
+        <property name="files" value="[/\\](ducks|mixin)[/\\]"/>
         <property name="id" value="MethodNameRegular"/>
     </module>
     <module name="SuppressionSingleFilter">
         <metadata name="net.sf.eclipsecs.core.comment" value="Suppress MethodNameDuckInterface check except on ducks"/>
-        <property name="files" value="[/\\](?!duck[/\\])"/>
+        <property name="files" value="[/\\](?!ducks[/\\])"/>
         <property name="id" value="MethodNameDuckInterface"/>
     </module>
 
     <module name="SuppressionSingleFilter">
         <metadata name="net.sf.eclipsecs.core.comment" value="Suppress StaticVariableName check except on mixins (@Final)"/>
-        <property name="files" value="[/\\](duck|mixin)[/\\]"/>
+        <property name="files" value="[/\\](ducks|mixin)[/\\]"/>
         <property name="id" value="StaticVariableName"/>
     </module>
 

@@ -1,5 +1,7 @@
 {
   "variants": {
-    "": { "model": "washwater:block/fathomless_fluid_chasm" }
+    "": {
+      "model": "washwater:block/fathomless_fluid_chasm"
+    }
   }
 }

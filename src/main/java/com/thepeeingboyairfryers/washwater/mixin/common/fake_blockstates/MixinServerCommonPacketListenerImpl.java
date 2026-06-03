@@ -21,7 +21,7 @@ public abstract class MixinServerCommonPacketListenerImpl {
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V", at = @At("TAIL"))
     private void includeWater(Packet<?> packet, PacketSendListener listener, CallbackInfo ci) {
         if (packet.type() == GamePacketTypes.CLIENTBOUND_BLOCK_UPDATE) {
-            var update = (ClientboundBlockUpdatePacket)  packet;
+            var update = (ClientboundBlockUpdatePacket) packet;
             var fluid = ((IFluidState) update.getBlockState().getFluidState()).ww€getFluid();
             if (!fluid.isEmpty())
                 send(new OneFluidUpdatePacket(update.getPos(), fluid).toVanillaClientbound());

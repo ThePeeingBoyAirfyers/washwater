@@ -11,15 +11,14 @@ import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
 public class WWCodecs {
-    private WWCodecs() {
-        throw new IllegalStateException("Utility class");
-    }
-
     public static final Codec<short[]> SHORT_ARRAY = RecordCodecBuilder.create(b -> b.group(
             Codec.INT.fieldOf("length").forGetter(a -> a.length),
             Codec.LONG_STREAM.fieldOf("values").forGetter(WWCodecs::toLongs)
     ).apply(b, WWCodecs::fromLongs));
 
+    private WWCodecs() {
+        throw new IllegalStateException("Utility class");
+    }
 
     private static LongStream toLongs(short[] values) {
         Spliterator.OfLong spliterator = new Spliterators.AbstractLongSpliterator(Long.MAX_VALUE,
@@ -45,6 +44,7 @@ public class WWCodecs {
         };
         return StreamSupport.longStream(spliterator, false);
     }
+
     private static short[] fromLongs(int length, LongStream values) {
         short[] array = new short[length];
         var iter = values.iterator();

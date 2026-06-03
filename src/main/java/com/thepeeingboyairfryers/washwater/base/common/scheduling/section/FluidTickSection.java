@@ -27,6 +27,14 @@ public class FluidTickSection extends CachedFluidRegion {
         this.z = iZ;
     }
 
+    public static int getPhase(int x, int y, int z) {
+        return (Math.abs(x) % 2 | (Math.abs(y) % 2 << 1) | (Math.abs(z) % 2 << 2));
+    }
+
+    public static int getSectionCoord(int w) {
+        return (w - 8) >> 4;
+    }
+
     public void tick(FluidTickingContext ctx) {
         for (int j = 0; j < 8; j++) {
             if (fluidSections[j] == null) continue;
@@ -136,14 +144,6 @@ public class FluidTickSection extends CachedFluidRegion {
 
     public void setAge(int iAge) {
         this.age = iAge;
-    }
-
-    public static int getPhase(int x, int y, int z) {
-        return (Math.abs(x) % 2 | (Math.abs(y) % 2 << 1) | (Math.abs(z) % 2 << 2));
-    }
-
-    public static int getSectionCoord(int w) {
-        return (w - 8) >> 4;
     }
 
     @Override

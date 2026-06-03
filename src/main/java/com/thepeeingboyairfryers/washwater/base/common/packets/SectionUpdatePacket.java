@@ -11,5 +11,6 @@ public abstract class SectionUpdatePacket implements CustomPacketPayload {
     }
 
     public abstract SectionPos getPos();
+
     public abstract void handle(FluidSection section);
 }

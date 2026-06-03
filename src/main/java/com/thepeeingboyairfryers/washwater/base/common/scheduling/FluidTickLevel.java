@@ -36,7 +36,7 @@ public class FluidTickLevel implements FluidTickingContext {
 
     public FluidTickLevel(ServerLevel iLevel) {
         this.level = iLevel;
-        dirtySections = new HashSet[] {
+        dirtySections = new HashSet[]{
                 new HashSet<>(),
                 new HashSet<>(),
                 new HashSet<>(),
@@ -46,6 +46,13 @@ public class FluidTickLevel implements FluidTickingContext {
                 new HashSet<>(),
                 new HashSet<>(),
         };
+    }
+
+    private static int decideThreadCount() {
+        int config = Config.THREAD_COUNT.getAsInt();
+        if (config != 0) return config;
+
+        return Runtime.getRuntime().availableProcessors() - 2;
     }
 
     public void tickLevelSequential(int offset, int length) {
@@ -182,12 +189,5 @@ public class FluidTickLevel implements FluidTickingContext {
 
     public long freezeNanos() {
         return frozenTime;
-    }
-
-    private static int decideThreadCount() {
-        int config = Config.THREAD_COUNT.getAsInt();
-        if (config != 0) return config;
-
-        return Runtime.getRuntime().availableProcessors() - 2;
     }
 }

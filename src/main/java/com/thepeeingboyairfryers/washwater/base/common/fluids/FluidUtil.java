@@ -30,7 +30,7 @@ public class FluidUtil {
         int transaction = Math.min(volume, spaceLeft);
         var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
         var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
-        
+
         fluidChunk.addFluidVolume(
                 pos.getX(), pos.getY(), pos.getZ(),
                 type, (short) Math.min(spaceLeft, volume)

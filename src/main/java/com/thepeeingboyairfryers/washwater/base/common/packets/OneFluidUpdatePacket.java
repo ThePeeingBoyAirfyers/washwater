@@ -8,9 +8,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public record OneFluidUpdatePacket(
-            BlockPos pos,
-            MultiFluidValue value
-    ) implements CustomPacketPayload {
+        BlockPos pos,
+        MultiFluidValue value
+) implements CustomPacketPayload {
 
     public static final CustomPacketPayload.Type<OneFluidUpdatePacket> TYPE =
             new CustomPacketPayload.Type<>(WashWater.resource("one_fluid_update"));

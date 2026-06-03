@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.base.client;
 
-import com.thepeeingboyairfryers.washwater.base.client.debug.DebugFluidRenderer;
 import com.thepeeingboyairfryers.washwater.WashWater;
+import com.thepeeingboyairfryers.washwater.base.client.debug.DebugFluidRenderer;
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import net.minecraft.client.Minecraft;

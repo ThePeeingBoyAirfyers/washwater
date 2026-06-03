@@ -9,10 +9,6 @@ import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
 public class WWStreamCodecs {
-    private WWStreamCodecs() {
-        throw new IllegalStateException("Utility class");
-    }
-
     public static final StreamCodec<ByteBuf, SectionPos> SECTION_POS = ByteBufCodecs.VAR_LONG.map(SectionPos::of, SectionPos::asLong);
     public static final StreamCodec<FriendlyByteBuf, int[]> INT_ARRAY = new StreamCodec<>() {
         @Override
@@ -33,7 +29,6 @@ public class WWStreamCodecs {
             }
         }
     };
-
     public static final StreamCodec<FriendlyByteBuf, short[]> SHORT_ARRAY = new StreamCodec<>() {
         @Override
         public short @NotNull [] decode(FriendlyByteBuf buffer) {
@@ -53,6 +48,10 @@ public class WWStreamCodecs {
             }
         }
     };
+
+    private WWStreamCodecs() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static <B, T1, T2> StreamCodec<B, Pair<T1, T2>> pair(StreamCodec<? super B, T1> c1, StreamCodec<? super B, T2> c2) {
         return StreamCodec.composite(

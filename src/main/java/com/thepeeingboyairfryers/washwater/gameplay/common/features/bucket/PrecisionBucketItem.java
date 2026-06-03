@@ -1,8 +1,8 @@
 package com.thepeeingboyairfryers.washwater.gameplay.common.features.bucket;
 
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
-import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -29,6 +29,33 @@ public class PrecisionBucketItem extends Item {
 
     public PrecisionBucketItem(Item.Properties properties) {
         super(properties);
+    }
+
+    public static boolean precisionBucketPlace(Level level, BlockPos targetPos, ItemStack itemStack, Player player) {
+        int fillLevel = 0;
+        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
+            fillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
+        }
+        if (fillLevel == 0)
+            return false;
+        int newBucketFillLevel = 0;
+        if (level.getBlockState(targetPos).isAir() || !level.getBlockState(targetPos).getFluidState().isEmpty()) {
+            if (FluidUtil.canAddVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel) == fillLevel) {
+                if (!level.isClientSide)
+                    FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel);
+                itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean smartPickup(Level level, BlockPos centrePos, ItemStack itemStack, Player player) {
+        if (!level.isClientSide) {
+            BucketBfs.runBucketBFS(level, centrePos, itemStack, player);
+            return true;
+        }
+        return true;
     }
 
     public InteractionResult useOn(UseOnContext useOnContext) {
@@ -85,33 +112,6 @@ public class PrecisionBucketItem extends Item {
         }
         float fraction = (float) fillLevel / (float) WaterInfo.PRECISION_BUCKET_CAPACITY;
         return (int) (13f * fraction);
-    }
-
-    public static boolean precisionBucketPlace(Level level, BlockPos targetPos, ItemStack itemStack, Player player) {
-        int fillLevel = 0;
-        if (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) != null) {
-            fillLevel = itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL);
-        }
-        if (fillLevel == 0)
-            return false;
-        int newBucketFillLevel = 0;
-            if (level.getBlockState(targetPos).isAir() || !level.getBlockState(targetPos).getFluidState().isEmpty()) {
-                if (FluidUtil.canAddVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel) == fillLevel) {
-                    if (!level.isClientSide)
-                        FluidUtil.addVolume(level, targetPos, WaterInfo.WATER_TYPE, fillLevel);
-                    itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, newBucketFillLevel);
-                    return true;
-                }
-            }
-        return false;
-    }
-
-    public static boolean smartPickup(Level level, BlockPos centrePos, ItemStack itemStack, Player player) {
-        if (!level.isClientSide) {
-            BucketBfs.runBucketBFS(level, centrePos, itemStack, player);
-            return true;
-        }
-        return true;
     }
 
     protected void playEmptySound(@Nullable Player player, LevelAccessor level, BlockPos pos) {

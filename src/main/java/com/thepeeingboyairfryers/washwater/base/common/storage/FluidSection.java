@@ -52,6 +52,8 @@ public interface FluidSection {
 
     @NotNull MultiFluidValue getVolume(int x, int y, int z);
 
+    short getAllVolume(int x, int y, int z);  // Has to be after EMPTY has been defined, dear god help this soul
+
     /**
      * An empty FluidSection that does nothing.
      * This is used to avoid null checks in the code.
@@ -120,10 +122,6 @@ public interface FluidSection {
         }
     };
 
-    short getAllVolume(int x, int y, int z);    // Has to be after EMPTY has been defined, dear god help this soul
-
-    MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
-
     boolean isEmpty();
 
     /**
@@ -132,12 +130,13 @@ public interface FluidSection {
      *
      * @param container The container that this FluidSection belongs to.
      */
-    void setContainer(@NotNull FluidSectionContainer container);
+    void setContainer(@NotNull FluidSectionContainer container);    MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
 
     /**
      * Only use this offthread when the main thread is frozen.
      */
     void acquire();
+
     void release();
 
     /**

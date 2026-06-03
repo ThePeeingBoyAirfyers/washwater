@@ -20,15 +20,15 @@ public class MixinBlockItem {
     private void pushWaterAway(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
-            if (FluidUtil.hasFluid(level, pos)) {
-                if (WaterPushing.checkIfCanDisplaceFluids(level, pos)) {
-                    if (!level.isClientSide) {
-                        WaterPushing.displaceFluids((ServerLevel) level, pos);
-                    }
-                } else {
-                    cir.setReturnValue(InteractionResult.FAIL);
+        if (FluidUtil.hasFluid(level, pos)) {
+            if (WaterPushing.checkIfCanDisplaceFluids(level, pos)) {
+                if (!level.isClientSide) {
+                    WaterPushing.displaceFluids((ServerLevel) level, pos);
                 }
+            } else {
+                cir.setReturnValue(InteractionResult.FAIL);
             }
+        }
     }
 }
 

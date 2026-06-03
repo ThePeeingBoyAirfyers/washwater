@@ -17,7 +17,9 @@ public class WWBlockEntities {
 
     public static void register(net.neoforged.bus.api.IEventBus bus) {
         BLOCK_ENTITY_TYPE.register(bus);
-    }    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CosmicMonoxideSpoutBlockEntity>> COSMIC_MONOXIDE_SPOUT = BLOCK_ENTITY_TYPE.register(
+    }
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CosmicMonoxideSpoutBlockEntity>> COSMIC_MONOXIDE_SPOUT = BLOCK_ENTITY_TYPE.register(
             "cosmic_monoxide_spout",
             () -> BlockEntityType.Builder.of(
                     CosmicMonoxideSpoutBlockEntity::new,

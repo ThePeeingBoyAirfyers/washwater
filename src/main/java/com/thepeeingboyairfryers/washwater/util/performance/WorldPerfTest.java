@@ -37,14 +37,12 @@ import java.util.Collections;
 import java.util.Optional;
 
 public class WorldPerfTest {
-    private WorldPerfTest() {
-        throw new AssertionError();
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldPerfTest.class);
     private static final int SIMULATION_DISTANCE = 16;
     private static long startTime;
-
+    private WorldPerfTest() {
+        throw new AssertionError();
+    }
 
     public static void register(IEventBus modEventBus) {
         if (System.getProperty("ww.bench") == null && System.getProperty("ww.test") == null) return;
@@ -126,7 +124,7 @@ public class WorldPerfTest {
                         WorldDataConfiguration.DEFAULT
                 ),
                 new WorldOptions(
-                0L,
+                        0L,
                         false,
                         false
                 ), regs -> {

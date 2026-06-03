@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import static com.thepeeingboyairfryers.washwater.base.common.WaterInfo.VOLUME_PER_LEVEL;
 
 public class FluidManager {
-    public static final StreamCodec<ByteBuf, FluidType> FLUID_STREAM_CODEC = ByteBufCodecs.SHORT.map(FluidManager::getFluidType, FluidManager::getFluidId);
     private static FluidsIndexationAttachment fluidsIndexation;
+    public static final StreamCodec<ByteBuf, FluidType> FLUID_STREAM_CODEC = ByteBufCodecs.SHORT.map(FluidManager::getFluidType, FluidManager::getFluidId);
 
     private FluidManager() {
         throw new IllegalStateException();

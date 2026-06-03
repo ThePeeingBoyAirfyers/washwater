@@ -7,6 +7,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 public class DummyLock implements Lock {
+    public static final DummyLock INSTANCE = new DummyLock();
+
     @Override
     public void lock() {
 
@@ -36,6 +38,4 @@ public class DummyLock implements Lock {
     public @NotNull Condition newCondition() {
         throw new UnsupportedOperationException();
     }
-
-    public static final DummyLock INSTANCE = new DummyLock();
 }

@@ -1,6 +1,6 @@
 package com.thepeeingboyairfryers.washwater.base.common.flow;
 
-import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
+import com.thepeeingboyairfryers.washwater.Config;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.util.PseudoRandom;
 import net.minecraft.core.BlockPos;
@@ -14,10 +14,11 @@ import java.util.List;
 
 public class WaterPushing {
 
-    private WaterPushing() { }
+    private WaterPushing() {
+    }
 
     public static boolean tryPushWater(ServerLevel level, BlockPos origin, Direction direction) {
-        int maxDistance = WaterInfo.MAX_PUSHING_DISTANCE;
+        int maxDistance = Config.MAX_PUSHING_DISTANCE.getAsInt();
         BlockPos newPos = origin.relative(direction);
         int currentDistance = 0;
         FluidType type = level.getBlockState(newPos).getFluidState().getType().getFluidType();
@@ -32,8 +33,8 @@ public class WaterPushing {
         return volumeToDisplace == 0;
     }
 
-    public static boolean checkIfCanPushWater(ServerLevel level, BlockPos origin,  Direction direction) {
-        int maxDistance = WaterInfo.MAX_PUSHING_DISTANCE;
+    public static boolean checkIfCanPushWater(ServerLevel level, BlockPos origin, Direction direction) {
+        int maxDistance = Config.MAX_PUSHING_DISTANCE.getAsInt();
         BlockPos newPos = origin.relative(direction);
         FluidType originType = level.getBlockState(newPos).getFluidState().getType().getFluidType();
         int currentDistance = 0;
@@ -68,7 +69,6 @@ public class WaterPushing {
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
         List<Direction> viableHorDirections = createAndFillViableHorDirectionList(level, pos);
-
 
         if (viableHorDirections.isEmpty()) {
             return (FluidUtil.addVolume(level, pos, type, availableVolume) == availableVolume);

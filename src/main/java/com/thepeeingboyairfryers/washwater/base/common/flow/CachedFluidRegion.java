@@ -70,7 +70,10 @@ public abstract class CachedFluidRegion implements FluidRegion {
     }
 
     protected abstract void toBeTicked(int x, int y, int z);
+
     protected abstract void toBeUnticked(int x, int y, int z);
+
     protected abstract LevelChunkSection getBlockSection(int x, int y, int z);
+
     protected abstract FluidSection getFluidSection(int x, int y, int z);
 }

@@ -1,5 +1,7 @@
 {
   "variants": {
-    "": { "model": "washwater:block/cosmic_monoxide_spout" }
+    "": {
+      "model": "washwater:block/cosmic_monoxide_spout"
+    }
   }
 }

@@ -4,8 +4,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.collections.WWNetworking;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
+import com.thepeeingboyairfryers.washwater.collections.WWNetworking;
 import com.thepeeingboyairfryers.washwater.ducks.IChunkFluidSection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
@@ -100,6 +100,7 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
 
     public class SectionUpdater implements Consumer<FluidSection> {
         private final int i;
+
         private SectionUpdater(int ii) {
             this.i = ii;
         }
