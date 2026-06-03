@@ -37,8 +37,13 @@ public class WWNetworking {
             var r = e.registrar("1").executesOn(HandlerThread.MAIN);
 
             r.playToClient(OneFluidUpdatePacket.TYPE, OneFluidUpdatePacket.STREAM_CODEC, (p, ctx) -> {
-                var chunk = Minecraft.getInstance().level.getChunkAt(p.pos());
-                FluidSectionManager.getAttachmentFor(chunk).setVolume(p.pos().getX(), p.pos().getY(), p.pos().getZ(), p.value());
+                var level = Minecraft.getInstance().level;
+                assert level != null;
+
+                var chunk = level.getChunkAt(p.pos());
+
+                FluidSectionManager.getAttachmentFor(chunk)
+                        .setVolume(p.pos().getX(), p.pos().getY(), p.pos().getZ(), p.value());
             });
 
             r.playToClient(DumbFluidUpdatePacket.TYPE, DumbFluidUpdatePacket.STREAM_CODEC, WWNetworking::handleSectionUpdate);
@@ -48,7 +53,7 @@ public class WWNetworking {
 
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post e) -> {
             if (e.getLevel().isClientSide()) return;
-            var level = e.getLevel();
+            var level = (ServerLevel) e.getLevel();
             if (!shouldSendPackets(level)) return;
 
             var dirties = DIRTY_SECTIONS.get(level);
@@ -80,8 +85,11 @@ public class WWNetworking {
     }
 
     private static void handleSectionUpdate(SectionUpdatePacket packet, IPayloadContext ctx) {
+        var level = Minecraft.getInstance().level;
+        assert level != null;
+
         var pos = packet.getPos();
-        var chunk = Minecraft.getInstance().level.getChunk(pos.x(), pos.z());
+        var chunk = level.getChunk(pos.x(), pos.z());
         var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(pos.y());
         packet.handle(section);
     }

@@ -1,7 +1,6 @@
 package com.thepeeingboyairfryers.washwater.base.client;
 
 import com.thepeeingboyairfryers.washwater.WashWater;
-import com.thepeeingboyairfryers.washwater.base.client.debug.DebugFluidRenderer;
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import net.minecraft.client.Minecraft;
@@ -19,15 +18,10 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import static com.thepeeingboyairfryers.washwater.collections.WWItems.PRECISION_BUCKET;
 
 @Mod(value = WashWater.MOD_ID, dist = Dist.CLIENT)
-@EventBusSubscriber(modid = WashWater.MOD_ID, value = Dist.CLIENT)
 public class WashWaterClient {
     public WashWaterClient(ModContainer container) {
-        // Allows NeoForge to create a config screen for this mod's configs.
-        // The config screen is accessed by going to the Mods screen > clicking on your mod > clicking on config.
-        // Do not forget to add translations for your config options to the en_us.json file.
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-        DebugFluidRenderer.register(container.getEventBus());
-        init();
+        registerItemProperties();
     }
 
     public static void registerItemProperties() {
@@ -36,21 +30,9 @@ public class WashWaterClient {
                 itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, 0);
                 return 0f;
             }
+
+            //noinspection DataFlowIssue
             return (itemStack.get(WWDataComponentTypes.BUCKET_FILL_LEVEL) / (float) WaterInfo.VOLUME_PER_BLOCK);
         });
-    }
-
-
-    // This method is called during the client setup phase.
-    @SubscribeEvent
-    static void onClientSetup(FMLClientSetupEvent event) {
-        // Some client setup code
-        WashWater.LOGGER.info("HELLO FROM CLIENT SETUP");
-        WashWater.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-        registerItemProperties();
-    }
-
-    public void init() {
-        WashWater.LOGGER.info("HELLO FROM CLIENT INITIALIZATION");
     }
 }
