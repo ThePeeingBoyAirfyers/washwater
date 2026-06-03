@@ -35,4 +35,4 @@ jobs:
       - name: Build with Gradle
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build check sonar --info
+        run: ./gradlew build check --info
