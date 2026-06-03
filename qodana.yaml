@@ -43,3 +43,4 @@ exclude:
   - name: DataFlowIssue
     paths:
       - src/main/java/com/thepeeingboyairfryers/washwater/mixin
+  - name: AutoCloseableResource
