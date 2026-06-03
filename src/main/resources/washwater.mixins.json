@@ -4,11 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "accessors.BlockStateBase",
-    "accessors.ChunkBuilderAccessor",
     "accessors.ChunkMapAccessor",
-    "accessors.SodiumWorldRendererAccessor",
     "accessors.StateHolderAccessor",
-    "client.MixinChunkBuilderMeshingTask",
     "common.MixinBlockItem",
     "common.MixinBucketItem",
     "common.MixinLevelChunkSection",
@@ -23,6 +20,9 @@
     "common.fake_blockstates.MixinServerCommonPacketListenerImpl"
   ],
   "client": [
+    "accessors.ChunkBuilderAccessor",
+    "accessors.SodiumWorldRendererAccessor",
+    "client.MixinChunkBuilderMeshingTask",
     "client.MixinFluidRendererFactory",
     "client.MixinLevelSlice"
   ],
