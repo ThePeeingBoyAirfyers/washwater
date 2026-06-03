@@ -1,6 +1,6 @@
 package com.thepeeingboyairfryers.washwater.tests;
 
-import com.thepeeingboyairfryers.washwater.common.WashWater;
+import com.thepeeingboyairfryers.washwater.WashWater;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;

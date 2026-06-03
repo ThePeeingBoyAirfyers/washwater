@@ -1,9 +1,9 @@
 package com.thepeeingboyairfryers.washwater.mixin.client;
 
-import com.thepeeingboyairfryers.washwater.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.common.storage.FluidSection;
-import com.thepeeingboyairfryers.washwater.common.storage.FluidSectionManager;
-import com.thepeeingboyairfryers.washwater.duck.ILevelSliceFluids;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
+import com.thepeeingboyairfryers.washwater.ducks.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
 import net.caffeinemc.mods.sodium.client.world.cloned.ChunkRenderContext;
 import net.minecraft.client.multiplayer.ClientLevel;

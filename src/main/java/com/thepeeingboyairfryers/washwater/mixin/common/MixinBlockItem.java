@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.mixin.common;
 
-import com.thepeeingboyairfryers.washwater.common.flow.WaterPushing;
-import com.thepeeingboyairfryers.washwater.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.base.common.flow.WaterPushing;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
