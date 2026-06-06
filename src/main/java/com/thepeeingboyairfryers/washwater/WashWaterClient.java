@@ -1,15 +1,12 @@
-package com.thepeeingboyairfryers.washwater.base.client;
+package com.thepeeingboyairfryers.washwater;
 
-import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
@@ -19,9 +16,9 @@ import static com.thepeeingboyairfryers.washwater.collections.WWItems.PRECISION_
 
 @Mod(value = WashWater.MOD_ID, dist = Dist.CLIENT)
 public class WashWaterClient {
-    public WashWaterClient(ModContainer container) {
+    public WashWaterClient(IEventBus modEventBus, ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-        registerItemProperties();
+        modEventBus.addListener((FMLClientSetupEvent e) -> registerItemProperties());;
     }
 
     public static void registerItemProperties() {

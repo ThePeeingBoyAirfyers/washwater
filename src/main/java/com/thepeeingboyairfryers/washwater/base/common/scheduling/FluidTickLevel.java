@@ -16,6 +16,8 @@ import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +35,7 @@ public class FluidTickLevel implements FluidTickingContext {
     private final Set<LongSet> nextTickToBeTicked = ConcurrentHashMap.newKeySet();
     private int misTicks = 0;
     private long frozenTime = 0;
+    private Logger logger;
 
     public FluidTickLevel(ServerLevel iLevel) {
         this.level = iLevel;
@@ -46,6 +49,8 @@ public class FluidTickLevel implements FluidTickingContext {
                 new HashSet<>(),
                 new HashSet<>(),
         };
+
+        logger = LoggerFactory.getLogger("FluidTick+" + iLevel.dimension().location());
     }
 
     private static int decideThreadCount() {
@@ -144,7 +149,11 @@ public class FluidTickLevel implements FluidTickingContext {
             return;
         }
 
-        FluidFlow.tick(region, new BlockPos(x, y, z));
+        try {
+            FluidFlow.tick(region, new BlockPos(x, y, z));
+        } catch (Exception e) {
+            logger.error("Error ticking fluid at {} {} {} with {}", x, y, z, value, e);
+        }
     }
 
     @Override
