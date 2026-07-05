@@ -158,7 +158,7 @@ public interface FluidSection {
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
-                    fluids[y << 4 << 4 | z << 4 | x] = getVolume(x, y, z);
+                    fluids[localPos2Short(x, y, z)] = getVolume(x, y, z);
                 }
             }
         }

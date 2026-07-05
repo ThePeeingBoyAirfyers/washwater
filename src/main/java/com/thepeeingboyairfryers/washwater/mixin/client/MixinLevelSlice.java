@@ -90,7 +90,7 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
             int relBlockZ = z - this.originBlockZ;
             return this.ww€fluids
                     [getLocalSectionIndex(relBlockX >> 4, relBlockY >> 4, relBlockZ >> 4)]
-                    [getLocalBlockIndex(relBlockX & 15, relBlockY & 15, relBlockZ & 15)];
+                    [FluidSection.localPos2Short(relBlockX & 15, relBlockY & 15, relBlockZ & 15)];
         }
     }
 }
