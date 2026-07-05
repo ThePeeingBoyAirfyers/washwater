@@ -1,23 +1,16 @@
 package com.thepeeingboyairfryers.washwater.base.common.flow;
 
-import com.mojang.logging.LogUtils;
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.util.PseudoRandom;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.fluids.FluidType;
-import org.slf4j.Logger;
 
 public class FluidFlow {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static FluidType type;
+    private FluidType type;
 
-    private FluidFlow() {
-        throw new IllegalStateException();
-    }
-
-    public static void tick(FluidRegion region, BlockPos pos) {
+    public void tick(FluidRegion region, BlockPos pos) {
         var iter = region.getFluids(pos).iterator();
         if (!iter.hasNext()) return;
         type = iter.next().fluidType();
@@ -52,7 +45,7 @@ public class FluidFlow {
 
     }
 
-    public static void equalizeWater(FluidRegion region, BlockPos owner, int volume) {
+    public void equalizeWater(FluidRegion region, BlockPos owner, int volume) {
         if (volume < WaterInfo.SURFACE_TENSION_LIMIT) return;
         int newVolume = volume;
 
@@ -74,7 +67,7 @@ public class FluidFlow {
         if (newVolume != volume) region.setVolume(owner, fluid(newVolume));
     }
 
-    public static void equalizeWaterDownwards(FluidRegion region, BlockPos owner, int volume) {
+    public void equalizeWaterDownwards(FluidRegion region, BlockPos owner, int volume) {
         if (volume < WaterInfo.SURFACE_TENSION_LIMIT) return;
         int newVolume = volume;
 
@@ -98,7 +91,7 @@ public class FluidFlow {
         if (newVolume != volume) region.setVolume(owner, fluid(newVolume));
     }
 
-    private static MultiFluidValue fluid(int i) {
+    private MultiFluidValue fluid(int i) {
         return MultiFluidValue.single(type, (short) i);
     }
 

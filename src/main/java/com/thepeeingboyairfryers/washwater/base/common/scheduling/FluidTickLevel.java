@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 public class FluidTickLevel implements FluidTickingContext {
     private static final int REFRESH_RATE = 100;
     private static final Executor EXECUTOR = Executors.newFixedThreadPool(decideThreadCount());
+    private final ThreadLocal<FluidFlow> fluidFlow = new ThreadLocal<>();
     private final ServerLevel level;
     private final Long2ObjectMap<FluidTickSection> tickSections = new Long2ObjectAVLTreeMap<>();
     private final Set<FluidTickSection>[] dirtySections;
@@ -149,8 +150,12 @@ public class FluidTickLevel implements FluidTickingContext {
             return;
         }
 
+        if (fluidFlow.get() == null) {
+            fluidFlow.set(new FluidFlow());
+        }
+
         try {
-            FluidFlow.tick(region, new BlockPos(x, y, z));
+            fluidFlow.get().tick(region, new BlockPos(x, y, z));
         } catch (Exception e) {
             logger.error("Error ticking fluid at {} {} {} with {}", x, y, z, value, e);
         }

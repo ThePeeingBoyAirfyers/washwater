@@ -85,6 +85,13 @@ public class DumbFluidSection extends UpgradeableFluidSection {
     @Override
     protected void copy(FluidSection section) {
         section.fill(array);
+
+        nonEmpty = 0;
+        for (MultiFluidValue value : array) {
+            if (!value.isEmpty()) {
+                nonEmpty++;
+            }
+        }
     }
 
     private int getNonEmpty() {
