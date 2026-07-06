@@ -69,9 +69,14 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         return section.getAllVolume(x & 15, y & 15, z & 15);
     }
 
+    public MultiFluidValue getFluids(int x, int y, int z) {
+        FluidSection section = sections.get(chunk.getSectionIndex(y));
+        return section.getFluids(x & 15, y & 15, z & 15);
+    }
+
     public void addFluidVolume(int x, int y, int z, FluidType type, short volume) {
         FluidSection section = sections.get(chunk.getSectionIndex(y));
-        var values = section.getVolume(x & 15, y & 15, z & 15);
+        var values = section.getFluids(x & 15, y & 15, z & 15);
         short total = 0;
         for (MultiFluidValue.Entry e : values) {
             total += e.volume();

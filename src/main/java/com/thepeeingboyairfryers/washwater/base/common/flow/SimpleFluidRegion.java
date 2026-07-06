@@ -32,7 +32,7 @@ public class SimpleFluidRegion implements FluidRegion {
 
     @Override
     public @NotNull MultiFluidValue getFluids(int x, int y, int z) {
-        return getFluidSection(x, y, z).getVolume(x & 15, y & 15, z & 15);
+        return getFluidSection(x, y, z).getFluids(x & 15, y & 15, z & 15);
     }
 
     @Override

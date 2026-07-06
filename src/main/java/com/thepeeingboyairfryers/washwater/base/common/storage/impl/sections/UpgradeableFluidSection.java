@@ -64,12 +64,12 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     }
 
     @Override
-    public @NotNull MultiFluidValue getVolume(int x, int y, int z) {
+    public @NotNull MultiFluidValue getFluids(int x, int y, int z) {
         if (otherSection == null) {
             return volume(x, y, z);
         }
 
-        return otherSection.getVolume(x, y, z);
+        return otherSection.getFluids(x, y, z);
     }
 
     protected abstract @NotNull MultiFluidValue volume(int x, int y, int z);
@@ -134,7 +134,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
-                    volume(x, y, z, section.getVolume(x, y, z));
+                    volume(x, y, z, section.getFluids(x, y, z));
                 }
             }
         }

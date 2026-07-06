@@ -7,6 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.bus.api.IEventBus;
@@ -49,14 +50,15 @@ public class FluidManager {
         return fluidsIndexation.getRelatedFluids(fluidType).stream().findAny().orElseThrow().defaultFluidState();
     }
 
-    public static FluidState getFluidState(MultiFluidValue result) {
-        short vol = result.getTotalVolume(); //TODO multifluids
+    public static FluidState getFluidState(MultiFluidValue result) { //TODO multifluids
+        if (result.isEmpty()) return Fluids.EMPTY.defaultFluidState();
 
-        if (vol == 0) {
-            return Fluids.EMPTY.defaultFluidState();
-        }
-
-        return Fluids.FLOWING_WATER.getFlowing(((vol / VOLUME_PER_LEVEL) + 1), false);
+        var entry = result.iterator().next();
+        var fluid = fluidsIndexation.getRelatedFluids(entry.fluidType()).stream().findAny().orElseThrow();
+        if (fluid instanceof FlowingFluid f)
+            return f.getFlowing((entry.volume() / VOLUME_PER_LEVEL + 1), false);
+        else
+            return fluid.defaultFluidState();
     }
 
     public static BlockState getFluidBlockState(MultiFluidValue result) {

@@ -23,7 +23,7 @@ public abstract class CachedFluidRegion implements FluidRegion {
         cachedX = x;
         cachedY = y;
         cachedZ = z;
-        cachedFluid = getFluidSection(x >> 4, y >> 4, z >> 4).getVolume(x & 15, y & 15, z & 15);
+        cachedFluid = getFluidSection(x >> 4, y >> 4, z >> 4).getFluids(x & 15, y & 15, z & 15);
         return cachedFluid;
     }
 

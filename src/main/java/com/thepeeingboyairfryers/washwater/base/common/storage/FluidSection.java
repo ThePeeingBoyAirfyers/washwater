@@ -51,7 +51,7 @@ public interface FluidSection {
 
     short getVolumeOf(int x, int y, int z, FluidType type);
 
-    @NotNull MultiFluidValue getVolume(int x, int y, int z);
+    @NotNull MultiFluidValue getFluids(int x, int y, int z);
 
     short getAllVolume(int x, int y, int z);  // Has to be after EMPTY has been defined, dear god help this soul
 
@@ -72,7 +72,7 @@ public interface FluidSection {
         }
 
         @Override
-        public @NotNull MultiFluidValue getVolume(int x, int y, int z) {
+        public @NotNull MultiFluidValue getFluids(int x, int y, int z) {
             return MultiFluidValue.EMPTY;
         }
 
@@ -159,7 +159,7 @@ public interface FluidSection {
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
-                    fluids[localPos2Short(x, y, z)] = getVolume(x, y, z);
+                    fluids[localPos2Short(x, y, z)] = getFluids(x, y, z);
                 }
             }
         }

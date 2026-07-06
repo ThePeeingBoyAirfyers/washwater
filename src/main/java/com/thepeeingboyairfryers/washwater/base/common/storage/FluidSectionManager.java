@@ -54,7 +54,7 @@ public class FluidSectionManager {
     }
 
     public static BlockState getBlockStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, BlockState og) {
-        MultiFluidValue result = fluidSection.getVolume(x, y, z);
+        MultiFluidValue result = fluidSection.getFluids(x, y, z);
 
         if (result.isEmpty()) return og;
         if (og.isAir() && result.getTotalVolume() > 100)
@@ -63,7 +63,7 @@ public class FluidSectionManager {
     }
 
     public static FluidState getFluidStateFromFluidSection(FluidSection fluidSection, int x, int y, int z, FluidState og) {
-        MultiFluidValue result = fluidSection.getVolume(x, y, z);
+        MultiFluidValue result = fluidSection.getFluids(x, y, z);
 
         if (result.isEmpty()) return og;
         if (og.isEmpty() && result.getTotalVolume() > 100)

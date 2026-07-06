@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
+import org.jetbrains.annotations.NotNull;
 
 public class FluidUtil {
     public static final FluidType WATER_TYPE = NeoForgeMod.WATER_TYPE.value();
@@ -125,4 +126,16 @@ public class FluidUtil {
         return !level.getBlockState(pos).isAir() && !hasFluid(level, pos);
     }
 
+    public static MultiFluidValue getFluids(@NotNull ServerLevel level, @NotNull BlockPos pos) {
+        return getFluids(
+                level.getChunk(pos.getZ() >> 4, pos.getZ() >> 4),
+                pos.getX(),
+                pos.getY(),
+                pos.getZ()
+        );
+    }
+
+    public static MultiFluidValue getFluids(@NotNull LevelChunk chunk, int x, int y, int z) {
+        return FluidSectionManager.getAttachmentFor(chunk).getFluids(x, y, z);
+    }
 }
