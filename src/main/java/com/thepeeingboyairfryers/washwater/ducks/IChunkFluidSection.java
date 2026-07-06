@@ -17,5 +17,5 @@ public interface IChunkFluidSection extends FluidSectionContainer {
 
     void ww€setFluidSection(@Nullable FluidSection fSection);
 
-    void ww€configureFluidSectionUpdater(@NotNull FluidChunkAttachment.SectionUpdater updater);
+    void ww€configureFluidSectionUpdater(@NotNull FluidChunkAttachment.SectionUpdater updater, boolean isWorldGen);
 }

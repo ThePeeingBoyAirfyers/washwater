@@ -51,7 +51,7 @@ public class SingleFluidValue implements MultiFluidValue {
             return new SingleFluidValue(type, value);
         }
 
-        throw new UnsupportedOperationException(); //TODO multifluids
+        return this; //TODO multifluids
     }
 
     public short getVolume() {

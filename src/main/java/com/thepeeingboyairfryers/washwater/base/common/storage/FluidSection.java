@@ -123,6 +123,8 @@ public interface FluidSection {
         }
     };
 
+    MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
+
     boolean isEmpty();
 
     /**
@@ -131,7 +133,7 @@ public interface FluidSection {
      *
      * @param container The container that this FluidSection belongs to.
      */
-    void setContainer(@NotNull FluidSectionContainer container);    MapCodec<FluidSection> EMPTY_CODEC = MapCodec.unit(EMPTY);
+    void setContainer(@NotNull FluidSectionContainer container);
 
     /**
      * Only use this offthread when the main thread is frozen.

@@ -26,6 +26,13 @@ public class WaterSourceAirBlock extends Block {
     }
 
     protected void randomTick(@NotNull BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos, @NotNull RandomSource random) {
+        var fluids = FluidUtil.getFluids(level, pos);
+
+        for (var entry : fluids) { //TODO temp check, cus of one type per block
+            if (entry.fluidType() != NeoForgeMod.WATER_TYPE.value())
+                return;
+        }
+
         FluidUtil.addVolume(level, pos, NeoForgeMod.WATER_TYPE.value(), Config.WATER_SOURCE_GAIN.getAsInt());
     }
 

@@ -24,6 +24,8 @@ public class MixinLevelChunkSection implements IChunkFluidSection {
     private FluidSection ww€fluidSection;
     @Unique
     private FluidChunkAttachment.SectionUpdater ww€updateSection;
+    @Unique
+    private boolean isWorldGen;
 
     @Unique
     public FluidSection ww€getFluidSection() {
@@ -47,15 +49,16 @@ public class MixinLevelChunkSection implements IChunkFluidSection {
 
     @Unique
     @Override
-    public void ww€configureFluidSectionUpdater(@NotNull FluidChunkAttachment.SectionUpdater updater) {
+    public void ww€configureFluidSectionUpdater(@NotNull FluidChunkAttachment.SectionUpdater updater, boolean iIsWorldGen) {
         ww€updateSection = updater;
+        isWorldGen = iIsWorldGen;
     }
 
 
     @WrapMethod(method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;")
     public BlockState ww€setBlockState(int x, int y, int z, BlockState state, boolean useLocks, Operation<BlockState> original) {
         if (ww€fluidSection != null)
-            return original.call(x, y, z, FluidSectionManager.writeStateToFluidSection(ww€fluidSection, x, y, z, state), useLocks);
+            return original.call(x, y, z, FluidSectionManager.writeStateToFluidSection(ww€fluidSection, x, y, z, state, isWorldGen), useLocks);
 
         if (state instanceof IFakeRegistryObject<?> f)
             state = (BlockState) f.ww€getOG();

@@ -27,7 +27,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class FluidTickLevel implements FluidTickingContext {
-    private static final int REFRESH_RATE = 100;
+    private static final int REFRESH_RATE = 1000;
     private static final Executor EXECUTOR = Executors.newFixedThreadPool(decideThreadCount());
     private final ThreadLocal<FluidFlow> fluidFlow = new ThreadLocal<>();
     private final ServerLevel level;
@@ -66,7 +66,7 @@ public class FluidTickLevel implements FluidTickingContext {
             var old = dirtySections[p + offset];
             dirtySections[p + offset] = new HashSet<>();
             for (var section : old) {
-                if (section.getAge() + REFRESH_RATE < FluidTicker.getCurrentTick())
+                if (section.needsRefetch() || section.getAge() + REFRESH_RATE < FluidTicker.getCurrentTick())
                     setupTicker(section);
 
                 section.tick(this);
@@ -85,14 +85,14 @@ public class FluidTickLevel implements FluidTickingContext {
 
             for (var section : toBeTicked) {
                 createNeighbors(section.getX(), section.getY(), section.getZ());
+
+                if (section.needsRefetch() || section.getAge() + REFRESH_RATE < FluidTicker.getCurrentTick())
+                    setupTicker(section);
             }
 
             var iter = toBeTicked.iterator();
             for (int i = 0; i < futures.length; i++) {
                 var section = iter.next();
-                if (section.getAge() + REFRESH_RATE < FluidTicker.getCurrentTick())
-                    setupTicker(section);
-
                 futures[i] = CompletableFuture.runAsync(() -> section.tick(this), EXECUTOR);
             }
 

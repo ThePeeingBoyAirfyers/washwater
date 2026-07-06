@@ -10,7 +10,9 @@ import com.thepeeingboyairfryers.washwater.ducks.IChunkFluidSection;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ProtoChunk;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +28,7 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
     ).apply(i, FluidChunkAttachment::new));
 
     private List<FluidSection> sections = null;
-    private LevelChunk chunk;
+    private ChunkAccess chunk;
 
     public FluidChunkAttachment() {
     }
@@ -35,7 +37,7 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         this.sections = new ArrayList<>(iSections);
     }
 
-    public void configure(LevelChunk iChunk) {
+    public void configure(ChunkAccess iChunk) {
         if (chunk == iChunk) return;
         this.chunk = iChunk;
 
@@ -49,7 +51,7 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         for (int i = 0; i < chunk.getSectionsCount(); i++) {
             FluidSection section = sections.get(i);
             IChunkFluidSection container = ((IChunkFluidSection) chunk.getSection(i));
-            container.ww€configureFluidSectionUpdater(new SectionUpdater(i));
+            container.ww€configureFluidSectionUpdater(new SectionUpdater(i), chunk instanceof ProtoChunk);
             container.ww€setFluidSection(section);
         }
     }
@@ -118,18 +120,22 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         }
 
         public void markDirty() {
+            chunk.setUnsaved(true);
+
+            Level level = chunk.getLevel();
+            if (level == null) return;
+
             int x = chunk.getPos().x;
             int y = chunk.getMinSection() + i;
             int z = chunk.getPos().z;
 
-            if (chunk.getLevel().isClientSide) {
+            if (level.isClientSide) {
                 if (MainThreads.isRenderThread())
                     Minecraft.getInstance().levelRenderer.setSectionDirty(x, y, z);
                 return;
             }
 
-            chunk.setUnsaved(true);
-            WWNetworking.queueUpdate((ServerLevel) chunk.getLevel(), x, y, z);
+            WWNetworking.queueUpdate((ServerLevel) level, x, y, z);
         }
     }
 }

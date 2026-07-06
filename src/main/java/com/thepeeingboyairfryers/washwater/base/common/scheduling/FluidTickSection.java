@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 
 public class FluidTickSection extends CachedFluidRegion {
     private final int x;
@@ -18,6 +19,7 @@ public class FluidTickSection extends CachedFluidRegion {
     private final SwapPair<ShortSet> liveTicks = new SwapPair<>(new ShortArraySet(), new ShortArraySet());
     private final FluidSection[] fluidSections = new FluidSection[8];
     private final LevelChunkSection[] blockSections = new LevelChunkSection[8];
+    private boolean needsRefresh = false;
     private TickTracker tickTracker = null;
     private FluidTickingContext currentCtx = null;
     private int age;
@@ -88,12 +90,25 @@ public class FluidTickSection extends CachedFluidRegion {
     public void fetchSections(Level level) {
         assert MainThreads.isServerThread();
 
+        // Reset
         random = level.random.nextInt();
-        tickTracker = null; // Reset
+        tickTracker = null;
+        for (int i = 0; i < 8; i++) {
+            fluidSections[i] = null;
+            blockSections[i] = null;
+        }
 
+        needsRefresh = false;
+
+        // Populate
         for (int xO = 0; xO < 2; xO++) {
             for (int zO = 0; zO < 2; zO++) {
-                var chunk = level.getChunk(x + xO, z + zO);
+                var chunk = level.getChunk(x + xO, z + zO, ChunkStatus.FULL, true);
+                if (chunk == null) {
+                    needsRefresh = true;
+                    continue;
+                }
+
                 var attachment = FluidSectionManager.getAttachmentFor(chunk);
                 for (int yO = 0; yO < 2; yO++) {
                     int i = xO * 4 + yO * 2 + zO;
@@ -130,14 +145,22 @@ public class FluidTickSection extends CachedFluidRegion {
 
     @Override
     protected LevelChunkSection getBlockSection(int xS, int yS, int zS) {
-        return blockSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
+        LevelChunkSection section = blockSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
+        if (section == null) {
+            needsRefresh = true;
+            throw new IllegalStateException("Fetching a null section? x: " + xS + " y: " + yS + " z: " + zS);
+        }
+
+        return section;
     }
 
     @Override
     protected FluidSection getFluidSection(int xS, int yS, int zS) {
         FluidSection section = fluidSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
-        if (section == null)
+        if (section == null) {
+            needsRefresh = true;
             throw new IllegalStateException("Fetching a null section? x: " + xS + " y: " + yS + " z: " + zS);
+        }
 
         return section;
     }
@@ -167,5 +190,9 @@ public class FluidTickSection extends CachedFluidRegion {
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
+    }
+
+    public boolean needsRefetch() {
+        return needsRefresh;
     }
 }
