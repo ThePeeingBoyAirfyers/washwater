@@ -1,7 +1,9 @@
-package com.thepeeingboyairfryers.washwater.base.common.storage;
+package com.thepeeingboyairfryers.washwater.base.common.storage.impl.sections;
 
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -14,10 +16,10 @@ public class SelfReplacingEmptySection extends UpgradeableFluidSection {
     protected void volume(int x, int y, int z, @NotNull MultiFluidValue fluids) {
         if (fluids.size() == 1) {
             FluidType type = fluids.iterator().next().fluidType();
-            upgrade(new SingleFluidSection(type));
+            upgrade(FluidSectionUpgradeInfo.single(type));
             setVolume(x, y, z, fluids);
         } else if (fluids.size() > 1) {
-            upgrade(new DumbFluidSection());
+            upgrade(FluidSectionUpgradeInfo.multiple(fluids.size()));
             setVolume(x, y, z, fluids);
         }
     }

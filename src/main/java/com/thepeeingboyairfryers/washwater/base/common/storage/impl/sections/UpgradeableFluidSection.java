@@ -1,7 +1,11 @@
-package com.thepeeingboyairfryers.washwater.base.common.storage;
+package com.thepeeingboyairfryers.washwater.base.common.storage.impl.sections;
 
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionContainer;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -15,8 +19,8 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     private boolean isAcquired = false; // Yes this is not very safe
     private boolean acqDirty = false;
 
-    protected void upgrade(@NotNull FluidSection newSection) {
-        otherSection = newSection;
+    protected void upgrade(@NotNull FluidSectionUpgradeInfo info) {
+        otherSection = FluidSectionManager.getFactory(container).upgrade(this, info);
         if (isAcquired) otherSection.acquire();
         container.update(otherSection);
     }

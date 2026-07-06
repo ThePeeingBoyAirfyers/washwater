@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.base.common.storage;
+package com.thepeeingboyairfryers.washwater.base.common.storage.impl.sections;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -6,6 +6,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFuidSectionPacket;
 import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFuidUpdatePacket;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
 import com.thepeeingboyairfryers.washwater.util.WWCodecs;
 import it.unimi.dsi.fastutil.shorts.ShortRBTreeSet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
@@ -43,7 +45,7 @@ public class SingleFluidSection extends UpgradeableFluidSection {
         if (fluids.size() <= 1) {
             short v = fluids.forFluid(fluidType);
             if (v == 0 && !fluids.isEmpty()) {
-                upgrade();
+                upgrade(FluidSectionUpgradeInfo.multiple(2));
                 setVolume(x, y, z, fluids);
                 return;
             }
@@ -61,7 +63,7 @@ public class SingleFluidSection extends UpgradeableFluidSection {
             volumes[FluidSection.localPos2Short(x, y, z)] = v;
             markDirty();
         } else if (fluids.size() > 1) {
-            upgrade();
+            upgrade(FluidSectionUpgradeInfo.multiple(fluids.size()));
             setVolume(x, y, z, fluids);
         }
     }
@@ -96,12 +98,6 @@ public class SingleFluidSection extends UpgradeableFluidSection {
     @Override
     protected @NotNull MapCodec<? extends FluidSection> myCodec() {
         return CODEC;
-    }
-
-    private void upgrade() {
-        DumbFluidSection section = new DumbFluidSection();
-        section.copyFrom(this);
-        upgrade(section);
     }
 
     public FluidType getFluidType() {

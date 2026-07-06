@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.base.common.storage;
+package com.thepeeingboyairfryers.washwater.base.common.storage.impl.sections;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.packets.DumbFluidUpdatePacket;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import it.unimi.dsi.fastutil.shorts.ShortRBTreeSet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.core.SectionPos;
