@@ -1,6 +1,7 @@
-package com.thepeeingboyairfryers.washwater.base.common.scheduling;
+package com.thepeeingboyairfryers.washwater.base.common.scheduling.impl;
 
-import com.thepeeingboyairfryers.washwater.base.common.scheduling.section.FluidTickSection;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickLevel;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickSection;
 
 import java.util.HashSet;
 import java.util.Set;

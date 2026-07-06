@@ -1,7 +1,8 @@
-package com.thepeeingboyairfryers.washwater.base.common.scheduling;
+package com.thepeeingboyairfryers.washwater.base.common.scheduling.impl;
 
-import com.thepeeingboyairfryers.washwater.base.common.scheduling.section.FluidTickSection;
-import com.thepeeingboyairfryers.washwater.base.common.scheduling.section.TickTracker;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickLevel;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickSection;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.TickTracker;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 

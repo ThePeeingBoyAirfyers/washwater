@@ -14,11 +14,12 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import static com.thepeeingboyairfryers.washwater.collections.WWItems.PRECISION_BUCKET;
 
+@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 @Mod(value = WashWater.MOD_ID, dist = Dist.CLIENT)
 public class WashWaterClient {
     public WashWaterClient(IEventBus modEventBus, ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-        modEventBus.addListener((FMLClientSetupEvent e) -> registerItemProperties());;
+        modEventBus.addListener((FMLClientSetupEvent e) -> registerItemProperties());
     }
 
     public static void registerItemProperties() {

@@ -1,5 +1,6 @@
-package com.thepeeingboyairfryers.washwater.base.common.scheduling;
+package com.thepeeingboyairfryers.washwater.base.common.scheduling.impl;
 
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickLevel;
 import it.unimi.dsi.fastutil.longs.LongRBTreeSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
