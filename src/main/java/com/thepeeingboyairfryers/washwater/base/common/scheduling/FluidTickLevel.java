@@ -16,6 +16,7 @@ import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,6 +173,11 @@ public class FluidTickLevel implements FluidTickingContext {
         }
 
         return prevTickTracker;
+    }
+
+    @Override
+    public void updateBlock(int x, int y, int z, BlockState oldState, BlockState newState) {
+        level.sendBlockUpdated(new BlockPos(x, y, z), oldState, newState, 3);
     }
 
     public void toBeTicked(int x, int y, int z) {

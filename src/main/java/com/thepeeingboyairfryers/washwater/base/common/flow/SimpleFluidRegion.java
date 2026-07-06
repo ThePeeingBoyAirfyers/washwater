@@ -71,6 +71,11 @@ public class SimpleFluidRegion implements FluidRegion {
         }
     }
 
+    @Override
+    public void setState(int x, int y, int z, BlockState state) {
+        getSection(x, y, z).setBlockState(x & 15, y & 15, z & 15, state, false);
+    }
+
     private FluidSection getFluidSection(int x, int y, int z) {
         return FluidSectionManager.getIfAbsent(level, fluidSections, x >> 4, y >> 4, z >> 4);
     }

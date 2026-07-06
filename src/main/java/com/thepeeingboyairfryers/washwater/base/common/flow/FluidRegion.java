@@ -2,7 +2,7 @@ package com.thepeeingboyairfryers.washwater.base.common.flow;
 
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,14 +32,6 @@ public interface FluidRegion {
 
     boolean isAir(int x, int y, int z);
 
-    default boolean isWater(BlockPos pos) {
-        return isWater(pos.getX(), pos.getY(), pos.getZ());
-    }
-
-    default boolean isWater(int x, int y, int z) {
-        return getFluidVolume(x, y, z, NeoForgeMod.WATER_TYPE.value()) > 0;
-    }
-
     default boolean isSolid(BlockPos pos) {
         return isSolid(pos.getX(), pos.getY(), pos.getZ());
     }
@@ -51,4 +43,7 @@ public interface FluidRegion {
     }
 
     void setVolume(int x, int y, int z, MultiFluidValue fluids);
+
+    @Deprecated
+    void setState(int x, int y, int z, BlockState state);
 }

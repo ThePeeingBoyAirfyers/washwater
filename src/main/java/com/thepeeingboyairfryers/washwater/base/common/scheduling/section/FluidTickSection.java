@@ -8,6 +8,7 @@ import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 
 public class FluidTickSection extends CachedFluidRegion {
@@ -18,6 +19,7 @@ public class FluidTickSection extends CachedFluidRegion {
     private final FluidSection[] fluidSections = new FluidSection[8];
     private final LevelChunkSection[] blockSections = new LevelChunkSection[8];
     private TickTracker tickTracker = null;
+    private FluidTickingContext currentCtx = null;
     private int age;
     private int random;
 
@@ -42,6 +44,7 @@ public class FluidTickSection extends CachedFluidRegion {
             blockSections[j].acquire();
         }
 
+        currentCtx = ctx;
         tickTracker = ctx.makeTickTracker(tickTracker, x, y, z, liveTicks.getOther());
 
         try {
@@ -63,6 +66,7 @@ public class FluidTickSection extends CachedFluidRegion {
         liveTicks.getOther().clear();
 
         tickTracker.apply();
+        currentCtx = null;
     }
 
     public void addLiveTick(int xW, int yW, int zW) {
@@ -136,6 +140,15 @@ public class FluidTickSection extends CachedFluidRegion {
             throw new IllegalStateException("Fetching a null section? x: " + xS + " y: " + yS + " z: " + zS);
 
         return section;
+    }
+
+    @Override
+    public void setState(int xB, int yB, int zB, BlockState state) {
+        var section = getBlockSection(xB >> 4, yB >> 4, zB >> 4);
+        BlockState prev = section.getBlockState(xB & 15, yB & 15, zB & 15);
+        section.setBlockState(xB & 15, yB & 15, zB & 15, state, false);
+
+        currentCtx.updateBlock(xB, yB, zB, prev, state);
     }
 
     public int getAge() {
