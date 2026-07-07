@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater;
 
+import com.thepeeingboyairfryers.washwater.base.client.LilyPadBakedModel;
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -20,6 +21,7 @@ public class WashWaterClient {
     public WashWaterClient(IEventBus modEventBus, ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modEventBus.addListener((FMLClientSetupEvent e) -> registerItemProperties());
+        modEventBus.addListener(LilyPadBakedModel::modifyBakedModelsEvent);
     }
 
     public static void registerItemProperties() {
