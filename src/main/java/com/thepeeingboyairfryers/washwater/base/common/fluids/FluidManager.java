@@ -2,6 +2,7 @@ package com.thepeeingboyairfryers.washwater.base.common.fluids;
 
 import com.thepeeingboyairfryers.washwater.base.common.storage.attachment.FluidsIndexationAttachment;
 import com.thepeeingboyairfryers.washwater.base.common.storage.attachment.WWAttachments;
+import com.thepeeingboyairfryers.washwater.util.WWFluidState;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -50,15 +51,20 @@ public class FluidManager {
         return fluidsIndexation.getRelatedFluids(fluidType).stream().findAny().orElseThrow().defaultFluidState();
     }
 
-    public static FluidState getFluidState(MultiFluidValue result) { //TODO multifluids
-        if (result.isEmpty()) return Fluids.EMPTY.defaultFluidState();
+    public static FluidState getFluidState(MultiFluidValue fluidValue) { //TODO multifluids
+        if (fluidValue.isEmpty()) return Fluids.EMPTY.defaultFluidState();
 
-        var entry = result.iterator().next();
-        var fluid = fluidsIndexation.getRelatedFluids(entry.fluidType()).stream().findAny().orElseThrow();
-        if (fluid instanceof FlowingFluid f)
-            return f.getFlowing((entry.volume() / VOLUME_PER_LEVEL + 1), false);
-        else
-            return fluid.defaultFluidState();
+        var entry = fluidValue.iterator().next();
+        var fluidType = fluidsIndexation.getRelatedFluids(entry.fluidType()).stream().findAny().orElseThrow();
+        FluidState base = fluidType.defaultFluidState();
+        if (fluidType instanceof FlowingFluid f) {
+            if (entry.volume() > 900)
+                base = f.getSource(false);
+            else
+                base = f.getFlowing((entry.volume() / VOLUME_PER_LEVEL + 1), false);
+        }
+
+        return new WWFluidState(fluidValue, base);
     }
 
     public static BlockState getFluidBlockState(MultiFluidValue result) {

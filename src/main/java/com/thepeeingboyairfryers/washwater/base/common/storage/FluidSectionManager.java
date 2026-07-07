@@ -11,7 +11,6 @@ import com.thepeeingboyairfryers.washwater.base.common.storage.impl.sections.Sin
 import com.thepeeingboyairfryers.washwater.collections.WWBlocks;
 import com.thepeeingboyairfryers.washwater.ducks.IFluidState;
 import com.thepeeingboyairfryers.washwater.util.WWBlockState;
-import com.thepeeingboyairfryers.washwater.util.WWFluidState;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.Level;
@@ -75,7 +74,7 @@ public class FluidSectionManager {
         if (result.isEmpty()) return og;
         if (og.isEmpty() && result.getTotalVolume() > 100)
             og = FluidManager.getFluidState(result);
-        return new WWFluidState(result, og);
+        return og;
     }
 
     public static FluidSection getIfAbsent(Level level, Long2ObjectMap<FluidSection> sections, int x, int y, int z) {

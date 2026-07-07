@@ -1,6 +1,7 @@
 package com.thepeeingboyairfryers.washwater.util;
 
 import com.mojang.serialization.MapCodec;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.ducks.IFakeRegistryObject;
 import com.thepeeingboyairfryers.washwater.mixin.accessors.BlockStateBase;
@@ -31,7 +32,7 @@ public class WWBlockState extends BlockState implements IFakeRegistryObject<Bloc
 
     @Override
     public @NotNull FluidState getFluidState() {
-        return new WWFluidState(fluid, og.getFluidState());
+        return FluidManager.getFluidState(fluid);
     }
 
     @Override
