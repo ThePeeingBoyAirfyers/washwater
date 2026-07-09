@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
-import com.thepeeingboyairfryers.washwater.collections.WWNetworking;
+import com.thepeeingboyairfryers.washwater.base.common.WWNetworking;
 import com.thepeeingboyairfryers.washwater.ducks.IChunkFluidSection;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
 import net.minecraft.client.Minecraft;

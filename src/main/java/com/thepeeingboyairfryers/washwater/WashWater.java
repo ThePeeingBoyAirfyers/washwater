@@ -11,7 +11,7 @@ import com.thepeeingboyairfryers.washwater.collections.WWBlockEntities;
 import com.thepeeingboyairfryers.washwater.collections.WWBlocks;
 import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.collections.WWItems;
-import com.thepeeingboyairfryers.washwater.collections.WWNetworking;
+import com.thepeeingboyairfryers.washwater.base.common.WWNetworking;
 import com.thepeeingboyairfryers.washwater.tests.BucketTest;
 import com.thepeeingboyairfryers.washwater.util.performance.WorldPerfTest;
 import me.lucko.spark.api.Spark;

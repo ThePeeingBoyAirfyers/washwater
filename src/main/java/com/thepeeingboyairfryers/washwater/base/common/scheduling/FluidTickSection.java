@@ -20,6 +20,7 @@ public class FluidTickSection extends CachedFluidRegion {
     private final FluidSection[] fluidSections = new FluidSection[8];
     private final LevelChunkSection[] blockSections = new LevelChunkSection[8];
     private boolean needsRefresh = false;
+    private byte loadedChunks = 0;
     private TickTracker tickTracker = null;
     private FluidTickingContext currentCtx = null;
     private int age;
@@ -99,11 +100,12 @@ public class FluidTickSection extends CachedFluidRegion {
         }
 
         needsRefresh = false;
+        loadedChunks = 0;
 
         // Populate
         for (int xO = 0; xO < 2; xO++) {
             for (int zO = 0; zO < 2; zO++) {
-                var chunk = level.getChunk(x + xO, z + zO, ChunkStatus.FULL, true);
+                var chunk = level.getChunk(x + xO, z + zO, ChunkStatus.FULL, false);
                 if (chunk == null) {
                     needsRefresh = true;
                     continue;
@@ -113,12 +115,19 @@ public class FluidTickSection extends CachedFluidRegion {
                 for (int yO = 0; yO < 2; yO++) {
                     int i = xO * 4 + yO * 2 + zO;
                     int yS = yO + y;
+                    loadedChunks |= (byte) (1 << i);
+
                     if (yS < chunk.getMinSection()) continue;
                     fluidSections[i] = attachment.getSectionWithY(yS);
                     blockSections[i] = chunk.getSection(chunk.getSectionIndexFromSectionY(yS));
                 }
             }
         }
+    }
+
+    private boolean isChunkUnloaded(int xS, int yS, int zS) {
+        int i = (xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z);
+        return ((1 << i) & loadedChunks) == 0;
     }
 
     public int getX() {
@@ -145,24 +154,22 @@ public class FluidTickSection extends CachedFluidRegion {
 
     @Override
     protected LevelChunkSection getBlockSection(int xS, int yS, int zS) {
-        LevelChunkSection section = blockSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
-        if (section == null) {
+        if (isChunkUnloaded(xS, yS, zS)) {
             needsRefresh = true;
             throw new IllegalStateException("Fetching a null section? x: " + xS + " y: " + yS + " z: " + zS);
         }
 
-        return section;
+        return blockSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
     }
 
     @Override
     protected FluidSection getFluidSection(int xS, int yS, int zS) {
-        FluidSection section = fluidSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
-        if (section == null) {
+        if (isChunkUnloaded(xS, yS, zS)) {
             needsRefresh = true;
             throw new IllegalStateException("Fetching a null section? x: " + xS + " y: " + yS + " z: " + zS);
         }
 
-        return section;
+        return fluidSections[(xS - this.x) * 4 + (yS - this.y) * 2 + (zS - this.z)];
     }
 
     @Override
@@ -194,5 +201,9 @@ public class FluidTickSection extends CachedFluidRegion {
 
     public boolean needsRefetch() {
         return needsRefresh;
+    }
+
+    public boolean canTick() {
+        return loadedChunks == -1;
     }
 }

@@ -18,6 +18,7 @@ public class WWStats {
 
     public static final Timer FLUID_TICKING = REGISTRY.timer("fluid_ticking");
     public static final Meter FLUID_MISSES = REGISTRY.meter("fluid_misses");
+    public static final Meter PACKET_MISSES = REGISTRY.meter("packet_misses");
 
     public static Component printReport() {
         var result = Component.literal("WWStats:\n");

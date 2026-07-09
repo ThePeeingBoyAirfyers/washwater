@@ -85,16 +85,21 @@ public class FluidTickLevel implements FluidTickingContext {
 
                 amountOfDirtySections += toBeTicked.size();
                 dirtySections[p + offset] = new HashSet<>();
-                CompletableFuture<Void>[] futures = new CompletableFuture[toBeTicked.size()];
 
-                for (var section : toBeTicked) {
+                var iter = toBeTicked.iterator();
+                while (iter.hasNext()) {
+                    var section = iter.next();
                     createNeighbors(section.getX(), section.getY(), section.getZ());
 
                     if (section.needsRefetch() || section.getAge() + REFRESH_RATE < FluidTicker.getCurrentTick())
                         setupTicker(section);
+
+                    if (!section.canTick())
+                        iter.remove();
                 }
 
-                var iter = toBeTicked.iterator();
+                CompletableFuture<Void>[] futures = new CompletableFuture[toBeTicked.size()];
+                iter = toBeTicked.iterator();
                 for (int i = 0; i < futures.length; i++) {
                     var section = iter.next();
                     futures[i] = CompletableFuture.runAsync(() -> section.tick(this), EXECUTOR);

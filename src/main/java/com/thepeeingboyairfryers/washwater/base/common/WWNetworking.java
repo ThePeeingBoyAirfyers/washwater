@@ -1,6 +1,7 @@
-package com.thepeeingboyairfryers.washwater.collections;
+package com.thepeeingboyairfryers.washwater.base.common;
 
 import com.thepeeingboyairfryers.washwater.Config;
+import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.common.packets.DumbFluidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.packets.OneFluidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.packets.SectionUpdatePacket;
@@ -13,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.ChunkWatchEvent;
@@ -56,18 +58,25 @@ public class WWNetworking {
             var level = (ServerLevel) e.getLevel();
             if (!shouldSendPackets(level)) return;
 
-            var dirties = DIRTY_SECTIONS.get(level);
-            if (dirties == null) return;
-            for (var lPos : dirties) {
-                var sectionPos = SectionPos.of(lPos);
-                var chunkPos = sectionPos.chunk();
-                var chunk = level.getChunk(chunkPos.x, chunkPos.z);
-                var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
+            synchronized (DIRTY_SECTIONS) {
+                var dirties = DIRTY_SECTIONS.get(level);
+                if (dirties == null) return;
+                for (var lPos : dirties) {
+                    var sectionPos = SectionPos.of(lPos);
+                    var chunkPos = sectionPos.chunk();
+                    var chunk = level.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false);
+                    if (chunk == null) {
+                        WashWater.LOGGER.warn("Unloaded chunk trying to send dirty data");
+                        continue;
+                    }
 
+                    var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
+                    var update = s.buildUpdatePacket(sectionPos, false);
+                    if (update != null)
+                        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, chunkPos, update);
+                }
 
-                var update = s.buildUpdatePacket(sectionPos, false);
-                if (update != null)
-                    PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, chunkPos, update);
+                dirties.clear();
             }
         });
 
@@ -89,7 +98,13 @@ public class WWNetworking {
         assert level != null;
 
         var pos = packet.getPos();
-        var chunk = level.getChunk(pos.x(), pos.z());
+        var chunk = level.getChunk(pos.x(), pos.z(), ChunkStatus.FULL, false);
+
+        if (chunk == null) {
+            WWStats.PACKET_MISSES.mark();
+            return;
+        }
+
         var section = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(pos.y());
         packet.handle(section);
     }
