@@ -56,11 +56,9 @@ public abstract class InSectionTickTracker implements TickTracker {
     protected int getX() {
         return x;
     }
-
     protected int getY() {
         return y;
     }
-
     protected int getZ() {
         return z;
     }

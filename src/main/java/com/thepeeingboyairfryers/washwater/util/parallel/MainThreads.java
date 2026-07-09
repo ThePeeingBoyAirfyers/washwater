@@ -19,7 +19,7 @@ public class MainThreads {
         return isRenderThread() || isServerThread();
     }
 
-    public static boolean isServerThread() {
+    public static boolean isServerThread() { //TODO when opening another world it creates a new thread...
         if (serverThread == -1) {
             if (Thread.currentThread().getName().equals("Server thread")) {
                 serverThread = Thread.currentThread().threadId();

@@ -6,7 +6,6 @@ import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionContainer;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
-import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -169,6 +168,6 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     }
 
     private boolean checkAccess() {
-        return (MainThreads.isMainThread() != isAcquired);
+        return true; //todo (MainThreads.isMainThread() != isAcquired);
     }
 }

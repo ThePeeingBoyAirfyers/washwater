@@ -1,7 +1,9 @@
 package com.thepeeingboyairfryers.washwater.base.common.scheduling;
 
+import com.codahale.metrics.Timer;
 import com.thepeeingboyairfryers.washwater.Config;
 import com.thepeeingboyairfryers.washwater.WashWater;
+import com.thepeeingboyairfryers.washwater.base.common.WWStats;
 import com.thepeeingboyairfryers.washwater.base.common.flow.FluidFlow;
 import com.thepeeingboyairfryers.washwater.base.common.flow.FluidRegion;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
@@ -34,8 +36,6 @@ public class FluidTickLevel implements FluidTickingContext {
     private final Long2ObjectMap<FluidTickSection> tickSections = new Long2ObjectAVLTreeMap<>();
     private final Set<FluidTickSection>[] dirtySections;
     private final Set<LongSet> nextTickToBeTicked = ConcurrentHashMap.newKeySet();
-    private int misTicks = 0;
-    private long frozenTime = 0;
     private Logger logger;
 
     public FluidTickLevel(ServerLevel iLevel) {
@@ -75,39 +75,42 @@ public class FluidTickLevel implements FluidTickingContext {
     }
 
     public void tickLevelParallel(int offset, int length) {
-        frozenTime = 0;
-        for (int p = 0; p < length; p++) {
-            var toBeTicked = dirtySections[p + offset];
-            if (toBeTicked.isEmpty()) continue;
+        int amountOfDirtySections = 0;
 
-            dirtySections[p + offset] = new HashSet<>();
-            CompletableFuture<Void>[] futures = new CompletableFuture[toBeTicked.size()];
+        try (Timer.Context context = WWStats.FLUID_TICKING.time()) {
+            for (int p = 0; p < length; p++) {
 
-            for (var section : toBeTicked) {
-                createNeighbors(section.getX(), section.getY(), section.getZ());
+                var toBeTicked = dirtySections[p + offset];
+                if (toBeTicked.isEmpty()) continue;
 
-                if (section.needsRefetch() || section.getAge() + REFRESH_RATE < FluidTicker.getCurrentTick())
-                    setupTicker(section);
+                amountOfDirtySections += toBeTicked.size();
+                dirtySections[p + offset] = new HashSet<>();
+                CompletableFuture<Void>[] futures = new CompletableFuture[toBeTicked.size()];
+
+                for (var section : toBeTicked) {
+                    createNeighbors(section.getX(), section.getY(), section.getZ());
+
+                    if (section.needsRefetch() || section.getAge() + REFRESH_RATE < FluidTicker.getCurrentTick())
+                        setupTicker(section);
+                }
+
+                var iter = toBeTicked.iterator();
+                for (int i = 0; i < futures.length; i++) {
+                    var section = iter.next();
+                    futures[i] = CompletableFuture.runAsync(() -> section.tick(this), EXECUTOR);
+                }
+
+                //TODO independently measure?
+                CompletableFuture.allOf(futures).join();
             }
-
-            var iter = toBeTicked.iterator();
-            for (int i = 0; i < futures.length; i++) {
-                var section = iter.next();
-                futures[i] = CompletableFuture.runAsync(() -> section.tick(this), EXECUTOR);
-            }
-
-            long start = System.nanoTime();
-            CompletableFuture.allOf(futures).join();
-            frozenTime += (System.nanoTime() - start);
+        } catch (Exception e) {
+            WashWater.LOGGER.error("Error while ticking level parallel", e);
         }
+
+        WWStats.TICKED_SECTIONS.update(amountOfDirtySections);
     }
 
     public void applyNextTicks() {
-        if (misTicks > 0) {
-            WashWater.LOGGER.warn("Empty fluids were ticked {} times", misTicks);
-            misTicks = 0;
-        }
-
         for (LongSet toBeTicked : nextTickToBeTicked) {
             for (long p : toBeTicked) {
                 toBeTicked(BlockPos.getX(p), BlockPos.getY(p), BlockPos.getZ(p));
@@ -146,7 +149,7 @@ public class FluidTickLevel implements FluidTickingContext {
     @Override
     public void tickFluid(FluidRegion region, int x, int y, int z, MultiFluidValue value, int random) {
         if (value.isEmpty()) {
-            misTicks++;
+            WWStats.FLUID_MISSES.mark();
             return;
         }
 
@@ -206,7 +209,7 @@ public class FluidTickLevel implements FluidTickingContext {
         return tickSections.get(SectionPos.asLong(xS, yS, zS));
     }
 
-    public long freezeNanos() {
-        return frozenTime;
+    public ServerLevel getLevel() {
+        return level;
     }
 }

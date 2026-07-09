@@ -1,6 +1,8 @@
 package com.thepeeingboyairfryers.washwater.util.performance;
 
+import com.codahale.metrics.Slf4jReporter;
 import com.thepeeingboyairfryers.washwater.Config;
+import com.thepeeingboyairfryers.washwater.base.common.WWStats;
 import com.thepeeingboyairfryers.washwater.collections.WWBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -39,7 +41,13 @@ import java.util.Optional;
 public class WorldPerfTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldPerfTest.class);
     private static final int SIMULATION_DISTANCE = 16;
-    private static long startTime;
+    private static final Slf4jReporter REPORTER = Slf4jReporter.forRegistry(WWStats.REGISTRY)
+            .outputTo(LOGGER)
+            .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)
+            .build();
+
+    private static int counter = 0;
+
     private WorldPerfTest() {
         throw new AssertionError();
     }
@@ -48,7 +56,6 @@ public class WorldPerfTest {
         if (System.getProperty("ww.bench") == null && System.getProperty("ww.test") == null) return;
         if (System.getProperty("ww.bench") != null) {
             NeoForge.EVENT_BUS.addListener(WorldPerfTest::tickPost);
-            NeoForge.EVENT_BUS.addListener(WorldPerfTest::tickPre);
         }
 
         if (System.getProperty("ww.test") != null) {
@@ -60,13 +67,11 @@ public class WorldPerfTest {
         }
     }
 
-    private static void tickPre(ServerTickEvent.Pre event) {
-        startTime = System.nanoTime();
-    }
-
     private static void tickPost(ServerTickEvent.Post event) {
-        long delta = System.nanoTime() - startTime;
-        LOGGER.info("{}ms{}", delta / 1000000, delta % 1000000);
+        if (counter++ >= 200) {
+            counter = 0;
+            REPORTER.report();
+        }
     }
 
     private static void screenOpening(ScreenEvent.Opening event) {

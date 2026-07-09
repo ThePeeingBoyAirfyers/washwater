@@ -64,9 +64,6 @@ public class FluidTicker {
                 tLevel.tickLevelParallel(4, 4);
             else tLevel.tickLevelSequential(4, 4);
         }
-
-        long delta = tLevel.freezeNanos();
-        //WashWater.LOGGER.debug("{} freeze takes {}ms{}", level.getDescription().getString(), delta / 1000000, delta % 1000000);
     }
 
     public static int getCurrentTick() {
