@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.base.common.scheduling;
 
-import com.codahale.metrics.Timer;
 import com.thepeeingboyairfryers.washwater.Config;
 import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.common.WWStats;
@@ -10,6 +9,7 @@ import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.InSectionTickTracker;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.PassthroughTickTracker;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
+import com.thepeeingboyairfryers.washwater.util.performance.PerTickTimer;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -77,7 +77,7 @@ public class FluidTickLevel implements FluidTickingContext {
     public void tickLevelParallel(int offset, int length) {
         int amountOfDirtySections = 0;
 
-        try (Timer.Context context = WWStats.FLUID_TICKING.time()) {
+        try (PerTickTimer.Context context = WWStats.FLUID_TICKING.push()) {
             for (int p = 0; p < length; p++) {
 
                 var toBeTicked = dirtySections[p + offset];
@@ -105,8 +105,9 @@ public class FluidTickLevel implements FluidTickingContext {
                     futures[i] = CompletableFuture.runAsync(() -> section.tick(this), EXECUTOR);
                 }
 
-                //TODO independently measure?
-                CompletableFuture.allOf(futures).join();
+                try (PerTickTimer.Context c = context.push("Pool")) {
+                    CompletableFuture.allOf(futures).join();
+                }
             }
         } catch (Exception e) {
             WashWater.LOGGER.error("Error while ticking level parallel", e);

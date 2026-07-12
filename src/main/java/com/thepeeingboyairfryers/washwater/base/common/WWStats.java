@@ -4,7 +4,8 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SlidingTimeWindowArrayReservoir;
-import com.codahale.metrics.Timer;
+import com.thepeeingboyairfryers.washwater.util.performance.PerTickTimer;
+import com.thepeeingboyairfryers.washwater.util.performance.StatsReporter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
@@ -16,9 +17,11 @@ public class WWStats {
             new SlidingTimeWindowArrayReservoir(5, TimeUnit.MINUTES))
     );
 
-    public static final Timer FLUID_TICKING = REGISTRY.timer("fluid_ticking");
+
     public static final Meter FLUID_MISSES = REGISTRY.meter("fluid_misses");
     public static final Meter PACKET_MISSES = REGISTRY.meter("packet_misses");
+    private static final StatsReporter REPORTER = new StatsReporter();
+    public static final PerTickTimer FLUID_TICKING = REPORTER.addMeasurements(new PerTickTimer("Fluid Ticking", 60 * 20 * 15));
 
     public static Component printReport() {
         var result = Component.literal("WWStats:\n");
@@ -32,15 +35,7 @@ public class WWStats {
         result.append(Component.literal(TICKED_SECTIONS.getSnapshot().getMean() + "\n")
                 .withStyle(ChatFormatting.DARK_GREEN));
 
-        result.append("Time used for fluidsim:\n");
-        result.append(Component.literal("    Mean  :" + FLUID_TICKING.getSnapshot().getMean() + "\n")
-                .withStyle(ChatFormatting.GREEN));
-        result.append(Component.literal("    95%   :" + FLUID_TICKING.getSnapshot().get95thPercentile() + "\n")
-                .withStyle(ChatFormatting.RED));
-        result.append(Component.literal("    99%   :" + FLUID_TICKING.getSnapshot().get99thPercentile() + "\n")
-                .withStyle(ChatFormatting.DARK_RED));
-        result.append(Component.literal("    99.9% :" + FLUID_TICKING.getSnapshot().get99thPercentile() + "\n")
-                .withStyle(ChatFormatting.DARK_PURPLE));
+        result.append(REPORTER.report());
 
 
         return result;
