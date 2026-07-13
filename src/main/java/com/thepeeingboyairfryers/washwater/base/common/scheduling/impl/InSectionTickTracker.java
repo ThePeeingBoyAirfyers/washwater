@@ -2,16 +2,15 @@ package com.thepeeingboyairfryers.washwater.base.common.scheduling.impl;
 
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickLevel;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickSection;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.LocalPosSet;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.TickTracker;
-import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
-import it.unimi.dsi.fastutil.shorts.ShortSet;
 
 public abstract class InSectionTickTracker implements TickTracker {
     private final int x;
     private final int y;
     private final int z;
     private final FluidTickLevel level;
-    private ShortSet inSectionTicks;
+    private LocalPosSet inSectionTicks;
 
     public InSectionTickTracker(int iX, int iY, int iZ, FluidTickLevel iLevel) {
         this.x = iX;
@@ -21,7 +20,7 @@ public abstract class InSectionTickTracker implements TickTracker {
     }
 
 
-    public void setSectionTickList(ShortSet set) {
+    public void setSectionTickList(LocalPosSet set) {
         inSectionTicks = set;
     }
 
@@ -31,7 +30,7 @@ public abstract class InSectionTickTracker implements TickTracker {
         int yS = FluidTickSection.getSectionCoord(yW);
         int zS = FluidTickSection.getSectionCoord(zW);
         if (xS == x && yS == y && zS == z) {
-            inSectionTicks.add(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
+            inSectionTicks.add(xW - 8, yW - 8, zW - 8);
         } else handleOutsideAddition(xS, yS, zS, xW, yW, zW);
     }
 
@@ -43,7 +42,7 @@ public abstract class InSectionTickTracker implements TickTracker {
         int yS = FluidTickSection.getSectionCoord(yW);
         int zS = FluidTickSection.getSectionCoord(zW);
         if (xS == x && yS == y && zS == z) {
-            inSectionTicks.remove(FluidSection.localPos2Short(xW - 8, yW - 8, zW - 8));
+            inSectionTicks.remove(xW - 8, yW - 8, zW - 8);
         } else handleOutsideRemoval(xS, yS, zS, xW, yW, zW);
     }
 

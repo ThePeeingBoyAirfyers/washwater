@@ -29,14 +29,14 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class FluidTickLevel implements FluidTickingContext {
-    private static final int REFRESH_RATE = 1000;
+    private static final int REFRESH_RATE = 20 * 60;
     private static final Executor EXECUTOR = Executors.newFixedThreadPool(decideThreadCount());
     private final ThreadLocal<FluidFlow> fluidFlow = new ThreadLocal<>();
     private final ServerLevel level;
     private final Long2ObjectMap<FluidTickSection> tickSections = new Long2ObjectAVLTreeMap<>();
     private final Set<FluidTickSection>[] dirtySections;
     private final Set<LongSet> nextTickToBeTicked = ConcurrentHashMap.newKeySet();
-    private Logger logger;
+    private final Logger logger;
 
     public FluidTickLevel(ServerLevel iLevel) {
         this.level = iLevel;
@@ -171,7 +171,7 @@ public class FluidTickLevel implements FluidTickingContext {
     }
 
     @Override
-    public TickTracker makeTickTracker(TickTracker prevTickTracker, int sX, int sY, int sZ, ShortSet nextTickInSection) {
+    public TickTracker makeTickTracker(TickTracker prevTickTracker, int sX, int sY, int sZ, LocalPosSet nextTickInSection) {
         if (prevTickTracker == null)
             //prevTickTracker = new SimpleTickTracker(sX, sY, sZ, this);
             prevTickTracker = new PassthroughTickTracker(sX, sY, sZ, this);
