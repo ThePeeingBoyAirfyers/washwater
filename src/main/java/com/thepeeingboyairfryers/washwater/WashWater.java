@@ -3,12 +3,15 @@ package com.thepeeingboyairfryers.washwater;
 import com.mojang.logging.LogUtils;
 import com.thepeeingboyairfryers.washwater.base.common.WWNetworking;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidManager;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickSpread;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTicker;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.base.common.storage.attachment.WWAttachments;
 import com.thepeeingboyairfryers.washwater.collections.WWBlockEntities;
 import com.thepeeingboyairfryers.washwater.collections.WWBlocks;
 import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
+import com.thepeeingboyairfryers.washwater.collections.WWImplementations;
 import com.thepeeingboyairfryers.washwater.collections.WWItems;
 import com.thepeeingboyairfryers.washwater.gameplay.common.WWCommand;
 import com.thepeeingboyairfryers.washwater.tests.BucketTest;
@@ -23,6 +26,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
 import org.slf4j.Logger;
 
 
@@ -41,11 +45,16 @@ public class WashWater {
         WWBlockEntities.register(modEventBus);
         WWAttachments.register(modEventBus);
         WWNetworking.register(modEventBus);
+        WWImplementations.register(modEventBus);
         WorldPerfTest.register(modEventBus);
 
         FluidManager.register(modEventBus);
         FluidSectionManager.register(modEventBus);
         FluidTicker.register(modEventBus);
+        modEventBus.addListener((NewRegistryEvent e) -> {
+            e.register(FluidTickStrategy.REGISTRY.registry());
+            e.register(FluidTickSpread.REGISTRY.registry());
+        });
 
         modEventBus.addListener(this::registerTests);
         modEventBus.addListener(this::loadComplete);

@@ -7,9 +7,11 @@ import net.minecraft.core.BlockPos;
 
 public class SimpleTickTracker extends InSectionTickTracker {
     private final LongSet outSectionTicks = new LongRBTreeSet();
+    private final FluidTickLevel level;
 
-    public SimpleTickTracker(int iX, int iY, int iZ, FluidTickLevel iLevel) {
-        super(iX, iY, iZ, iLevel);
+    public SimpleTickTracker(int iX, int iY, int iZ, TickSectionStrategy strategy, FluidTickLevel iLevel) {
+        super(iX, iY, iZ, strategy);
+        this.level = iLevel;
     }
 
     @Override
@@ -25,6 +27,6 @@ public class SimpleTickTracker extends InSectionTickTracker {
     @Override
     public void apply() {
         super.apply();
-        getLevel().addTickSet(outSectionTicks);
+        level.addTickSet(outSectionTicks);
     }
 }

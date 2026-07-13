@@ -23,7 +23,7 @@ public class PerTickTimer extends PerTickMeasurements {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             pushMeasurement(System.nanoTime() - startTime, name);
         }
     }

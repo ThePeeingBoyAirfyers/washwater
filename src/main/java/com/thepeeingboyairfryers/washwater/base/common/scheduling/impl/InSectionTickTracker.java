@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.base.common.scheduling.impl;
 
-import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickLevel;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickSection;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.LocalPosSet;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.TickTracker;
@@ -9,16 +8,15 @@ public abstract class InSectionTickTracker implements TickTracker {
     private final int x;
     private final int y;
     private final int z;
-    private final FluidTickLevel level;
+    private final TickSectionStrategy strategy;
     private LocalPosSet inSectionTicks;
 
-    public InSectionTickTracker(int iX, int iY, int iZ, FluidTickLevel iLevel) {
+    public InSectionTickTracker(int iX, int iY, int iZ, TickSectionStrategy iStrategy) {
         this.x = iX;
         this.y = iY;
         this.z = iZ;
-        this.level = iLevel;
+        this.strategy = iStrategy;
     }
-
 
     public void setSectionTickList(LocalPosSet set) {
         inSectionTicks = set;
@@ -48,8 +46,8 @@ public abstract class InSectionTickTracker implements TickTracker {
 
     protected abstract void handleOutsideRemoval(int xS, int yS, int zS, int xW, int yW, int zW);
 
-    protected FluidTickLevel getLevel() {
-        return level;
+    protected TickSectionStrategy getStrategy() {
+        return strategy;
     }
 
     protected int getX() {
@@ -65,6 +63,6 @@ public abstract class InSectionTickTracker implements TickTracker {
     @Override
     public void apply() {
         if (!inSectionTicks.isEmpty())
-            level.markSectionDirty(level.getTickSection(x, y, z));
+            strategy.markSectionDirty(strategy.getTickSection(x, y, z));
     }
 }

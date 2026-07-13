@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.base.common.scheduling;
 
-import com.thepeeingboyairfryers.washwater.Config;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
 import net.minecraft.core.BlockPos;
@@ -14,7 +13,7 @@ import java.util.Map;
 
 public class FluidTicker {
     private static final Map<ServerLevel, FluidTickLevel> TICK_LEVELS = new HashMap<>();
-    private static int currentTick = 0;
+    private static long currentTick = 0;
 
     private FluidTicker() {
         throw new IllegalStateException();
@@ -45,20 +44,11 @@ public class FluidTicker {
         if (e.getLevel().isClientSide) return;
         var level = (ServerLevel) e.getLevel();
         var tLevel = TICK_LEVELS.computeIfAbsent(level, FluidTickLevel::new);
-
-        if (e.getLevel().getDayTime() % 2 == 0) {
-            tLevel.applyNextTicks();
-            if (Config.PARALLEL.getAsBoolean())
-                tLevel.tickLevelParallel(0, 4);
-            else tLevel.tickLevelSequential(0, 4);
-        } else {
-            if (Config.PARALLEL.getAsBoolean())
-                tLevel.tickLevelParallel(4, 4);
-            else tLevel.tickLevelSequential(4, 4);
-        }
+        currentTick = level.getDayTime();
+        tLevel.tick();
     }
 
     public static int getCurrentTick() {
-        return currentTick;
+        return (int) currentTick;
     }
 }
