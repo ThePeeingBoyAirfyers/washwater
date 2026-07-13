@@ -1,7 +1,6 @@
 package com.thepeeingboyairfryers.washwater.base.common;
 
 import com.thepeeingboyairfryers.washwater.Config;
-import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.common.packets.DumbFluidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.packets.OneFluidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.packets.SectionUpdatePacket;
@@ -66,7 +65,7 @@ public class WWNetworking {
                     var chunkPos = sectionPos.chunk();
                     var chunk = level.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false);
                     if (chunk == null) {
-                        WashWater.LOGGER.warn("Unloaded chunk trying to send dirty data");
+                        //TODO verify that the only case this happens is when something gets unloaded while it was dirty
                         continue;
                     }
 

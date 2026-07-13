@@ -5,7 +5,7 @@ import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.storage.attachment.FluidChunkAttachment;
 import com.thepeeingboyairfryers.washwater.base.common.storage.attachment.WWAttachments;
-import com.thepeeingboyairfryers.washwater.base.common.storage.impl.DefaultFluidSectionFactory;
+import com.thepeeingboyairfryers.washwater.base.common.storage.impl.DumbFluidSectionFactory;
 import com.thepeeingboyairfryers.washwater.base.common.storage.impl.sections.DumbFluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.impl.sections.SingleFluidSection;
 import com.thepeeingboyairfryers.washwater.collections.WWBlocks;
@@ -26,7 +26,7 @@ public class FluidSectionManager {
     private FluidSectionManager() {
         throw new IllegalStateException();
     }
-    private static final FluidSectionFactory FACTORY = new DefaultFluidSectionFactory();
+    private static final FluidSectionFactory FACTORY = new DumbFluidSectionFactory();
 
     public static void register(IEventBus bus) {
         bus.addListener((NewRegistryEvent e) -> e.register(FluidSection.DISPATCH_REGISTRY));

@@ -113,7 +113,7 @@ public class FluidTickLevel implements FluidTickingContext {
             WashWater.LOGGER.error("Error while ticking level parallel", e);
         }
 
-        WWStats.TICKED_SECTIONS.update(amountOfDirtySections);
+        WWStats.TICKED_SECTIONS.pushMeasurement(amountOfDirtySections);
     }
 
     public void applyNextTicks() {

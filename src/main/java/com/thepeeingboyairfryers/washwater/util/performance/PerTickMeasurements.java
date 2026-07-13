@@ -34,6 +34,10 @@ public class PerTickMeasurements {
         times.values().forEach(Measurement::onTick);
     }
 
+    public void pushMeasurement(long time) {
+        pushMeasurement(time, "");
+    }
+
     public void pushMeasurement(long time, String name) {
         times.computeIfAbsent(name, n -> new Measurement(maxMeasurements, n.isEmpty() ? rootName : n, formatter)).push(time);
     }
@@ -52,7 +56,7 @@ public class PerTickMeasurements {
         private final String name;
         private final Long2ObjectFunction<String> formatter;
         private int idx;
-        private int measurementsLength = 0;
+        private int measurementsLength;
 
         private Measurement(int measurementSize, String iName, Long2ObjectFunction<String> iFormatter) {
             this.measurements = new long[measurementSize];
@@ -61,7 +65,9 @@ public class PerTickMeasurements {
         }
 
         private void push(long measurement) {
-            inTick.add(measurement);
+            synchronized (inTick) {
+                inTick.add(measurement);
+            }
         }
 
         public LongStream readLast(int amount) {
@@ -76,7 +82,7 @@ public class PerTickMeasurements {
                 indices = IntStream.range(nIdx, idx);
             }
 
-            return indices.mapToLong(i -> measurements[i]);
+            return indices.mapToLong(i -> measurements[i]).filter(l -> l != Long.MAX_VALUE);
         }
 
         public long getPercentageWise(double percentage, int overTimeInTicks) {
@@ -84,6 +90,7 @@ public class PerTickMeasurements {
             long[] result = new long[(int) (lookLength * (1.0 - percentage)) + 1];
             var iter = readLast(lookLength).iterator();
 
+            // TODO lookLength is wrong amount, when there are empty readings
             int lowestIndex = 0;
             while (iter.hasNext()) {
                 long l = iter.nextLong();
@@ -110,24 +117,26 @@ public class PerTickMeasurements {
         }
 
         private void onTick() {
-            if (inTick.isEmpty()) {
-                throw new AssertionError();
+            synchronized (inTick) {
+                long avg;
+                if (inTick.isEmpty()) {
+                    // We havent measured anything real yet so no need to start doing that
+                    if (measurementsLength == 0) return;
+                    avg = Long.MIN_VALUE;
+                } else if (inTick.size() == 1) {
+                    avg = inTick.getFirst();
+                } else {
+                    avg = (long) inTick.longStream().average().orElseThrow();
+                }
+
+                inTick.clear();
+
+                if (measurementsLength < measurements.length)
+                    measurementsLength++;
+
+                measurements[idx] = avg;
+                idx = (idx + 1) % measurements.length;
             }
-
-            long avg;
-            if (inTick.size() == 1) {
-                avg = inTick.getFirst();
-            } else {
-                avg = (long) inTick.longStream().average().orElseThrow();
-            }
-
-            inTick.clear();
-
-            if (measurementsLength < measurements.length)
-                measurementsLength++;
-
-            measurements[idx] = avg;
-            idx = (idx + 1) % measurements.length;
         }
     }
 }

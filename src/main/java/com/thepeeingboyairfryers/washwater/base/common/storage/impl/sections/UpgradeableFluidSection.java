@@ -122,6 +122,8 @@ public abstract class UpgradeableFluidSection implements FluidSection {
 
     @Override
     public void copyFrom(FluidSection section) {
+        if (section.isEmpty()) return;
+
         if (otherSection == null) {
             assert checkAccess();
             copy(section);

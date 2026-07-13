@@ -1,6 +1,5 @@
 package com.thepeeingboyairfryers.washwater.util.performance;
 
-import com.codahale.metrics.Slf4jReporter;
 import com.thepeeingboyairfryers.washwater.Config;
 import com.thepeeingboyairfryers.washwater.base.common.WWStats;
 import com.thepeeingboyairfryers.washwater.collections.WWBlocks;
@@ -41,11 +40,6 @@ import java.util.Optional;
 public class WorldPerfTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldPerfTest.class);
     private static final int SIMULATION_DISTANCE = 16;
-    private static final Slf4jReporter REPORTER = Slf4jReporter.forRegistry(WWStats.REGISTRY)
-            .outputTo(LOGGER)
-            .withLoggingLevel(Slf4jReporter.LoggingLevel.INFO)
-            .build();
-
     private static int counter = 0;
 
     private WorldPerfTest() {
@@ -70,7 +64,7 @@ public class WorldPerfTest {
     private static void tickPost(ServerTickEvent.Post event) {
         if (counter++ >= 200) {
             counter = 0;
-            REPORTER.report();
+            event.getServer().sendSystemMessage(WWStats.printReport());
         }
     }
 
