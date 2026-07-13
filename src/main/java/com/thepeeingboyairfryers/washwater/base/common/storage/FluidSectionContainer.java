@@ -1,7 +1,7 @@
 package com.thepeeingboyairfryers.washwater.base.common.storage;
 
 public interface FluidSectionContainer {
-    void update(FluidSection section);
+    FluidSection upgrade(FluidSection section, FluidSectionUpgradeInfo info);
 
     void markDirty();
 }

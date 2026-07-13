@@ -5,7 +5,7 @@ import com.thepeeingboyairfryers.washwater.base.common.packets.DumbFluidUpdatePa
 import com.thepeeingboyairfryers.washwater.base.common.packets.OneFluidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.packets.SectionUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFuidSectionPacket;
-import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFuidUpdatePacket;
+import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFluidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import it.unimi.dsi.fastutil.longs.LongRBTreeSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -48,7 +48,7 @@ public class WWNetworking {
             });
 
             r.playToClient(DumbFluidUpdatePacket.TYPE, DumbFluidUpdatePacket.STREAM_CODEC, WWNetworking::handleSectionUpdate);
-            r.playToClient(SingleFuidUpdatePacket.TYPE, SingleFuidUpdatePacket.STREAM_CODEC, WWNetworking::handleSectionUpdate);
+            r.playToClient(SingleFluidUpdatePacket.TYPE, SingleFluidUpdatePacket.STREAM_CODEC, WWNetworking::handleSectionUpdate);
             r.playToClient(SingleFuidSectionPacket.TYPE, SingleFuidSectionPacket.STREAM_CODEC, WWNetworking::handleSectionUpdate);
         });
 

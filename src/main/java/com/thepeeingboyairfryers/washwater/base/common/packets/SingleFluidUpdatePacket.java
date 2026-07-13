@@ -11,24 +11,24 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
-public class SingleFuidUpdatePacket extends SectionUpdatePacket {
-    public static final CustomPacketPayload.Type<SingleFuidUpdatePacket> TYPE = newType("single_fluid_update");
-    public static final StreamCodec<FriendlyByteBuf, SingleFuidUpdatePacket> STREAM_CODEC =
+public class SingleFluidUpdatePacket extends SectionUpdatePacket {
+    public static final CustomPacketPayload.Type<SingleFluidUpdatePacket> TYPE = newType("single_fluid_update");
+    public static final StreamCodec<FriendlyByteBuf, SingleFluidUpdatePacket> STREAM_CODEC =
             StreamCodec.composite(
                     WWStreamCodecs.SECTION_POS,
-                    SingleFuidUpdatePacket::getPos,
+                    SingleFluidUpdatePacket::getPos,
                     FluidManager.FLUID_STREAM_CODEC,
-                    SingleFuidUpdatePacket::getFluidType,
+                    SingleFluidUpdatePacket::getFluidType,
                     WWStreamCodecs.INT_ARRAY,
-                    SingleFuidUpdatePacket::getPositionValues,
-                    SingleFuidUpdatePacket::new
+                    SingleFluidUpdatePacket::getPositionValues,
+                    SingleFluidUpdatePacket::new
             );
 
     private final SectionPos pos;
     private final FluidType fluidType;
     private final int[] positionValues;
 
-    public SingleFuidUpdatePacket(SectionPos iPos, FluidType iFluidType, int[] iPositionValues) {
+    public SingleFluidUpdatePacket(SectionPos iPos, FluidType iFluidType, int[] iPositionValues) {
         this.pos = iPos;
         this.fluidType = iFluidType;
         this.positionValues = iPositionValues;

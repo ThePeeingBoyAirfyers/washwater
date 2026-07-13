@@ -3,10 +3,11 @@ package com.thepeeingboyairfryers.washwater;
 import com.mojang.logging.LogUtils;
 import com.thepeeingboyairfryers.washwater.base.common.WWNetworking;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidManager;
-import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickSpread;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickForeman;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTicker;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.storage.attachment.WWAttachments;
 import com.thepeeingboyairfryers.washwater.collections.WWBlockEntities;
 import com.thepeeingboyairfryers.washwater.collections.WWBlocks;
@@ -52,14 +53,16 @@ public class WashWater {
         FluidSectionManager.register(modEventBus);
         FluidTicker.register(modEventBus);
         modEventBus.addListener((NewRegistryEvent e) -> {
+            e.register(FluidSectionUpgradeStrategy.REGISTRY.registry());
             e.register(FluidTickStrategy.REGISTRY.registry());
-            e.register(FluidTickSpread.REGISTRY.registry());
+            e.register(FluidTickForeman.REGISTRY.registry());
         });
 
         modEventBus.addListener(this::registerTests);
         modEventBus.addListener(this::loadComplete);
 
-        NeoForge.EVENT_BUS.addListener(WWCommand::registerCommand);
+        NeoForge.EVENT_BUS.addListener(WWCommand::registerServerCommand);
+        NeoForge.EVENT_BUS.addListener(WWCommand::registerClientCommand);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }

@@ -1,13 +1,14 @@
 package com.thepeeingboyairfryers.washwater.util.registry;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.util.registry.impl.LevelConfigurationRegistryImpl;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,14 +22,14 @@ public interface LevelConfigurationRegistry<T extends LevelConfigurationInterfac
     ResourceArgument<LevelConfigurationInterface.Entry<T>> argumentType(CommandBuildContext context);
     ResourceKey<Registry<LevelConfigurationInterface.Entry<T>>> registryKey();
 
-    T get(ServerLevel level);
+    T get(Level level);
 
-    static <T extends LevelConfigurationInterface<T>> LevelConfigurationRegistry<T> create(ResourceLocation name) {
-        return new LevelConfigurationRegistryImpl<>(name, null);
+    static <T extends LevelConfigurationInterface<T>> LevelConfigurationRegistry<T> create(ResourceLocation name, LevelConfigurationSide side) {
+        return new LevelConfigurationRegistryImpl<>(name, side, null);
     }
 
-    static <T extends LevelConfigurationInterface<T>> LevelConfigurationRegistry<T> create(ResourceLocation name, Supplier<T> defaultValue) {
-        return new LevelConfigurationRegistryImpl<>(name, defaultValue);
+    static <T extends LevelConfigurationInterface<T>> LevelConfigurationRegistry<T> create(ResourceLocation name, LevelConfigurationSide side,Supplier<T> defaultValue) {
+        return new LevelConfigurationRegistryImpl<>(name, side, defaultValue);
     }
 
     static LevelConfigurationRegistry<?> get(ResourceLocation location) {
@@ -41,5 +42,9 @@ public interface LevelConfigurationRegistry<T extends LevelConfigurationInterfac
 
     @Nullable T defaultValue();
 
-    void set(ServerLevel level, T i);
+    void set(Level level, T i);
+
+    LevelConfigurationSide side();
+
+    <I extends T> LevelConfigurationInterface.Entry<T> createEntry(Class<I> clazz, MapCodec<I> codec, ConfigurationCommand<I> command);
 }

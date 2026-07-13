@@ -37,7 +37,7 @@ public class FluidTickLevel implements FluidTickingContext {
     }
 
     public void tick() {
-        int workAmount = FluidTickSpread.REGISTRY.get(level).calculateWork(level, prevProgress, getStrategy());
+        int workAmount = FluidTickForeman.REGISTRY.get(level).calculateWork(level, prevProgress, getStrategy());
         try (PerTickTimer.Context context = WWStats.FLUID_TICKING.push()) {
             prevProgress = getStrategy().tick(context, level, this, prevProgress, workAmount);
         } catch (Exception e) {
