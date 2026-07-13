@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.serialization.Encoder;
 import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.common.WWStats;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.ManualForeman;
 import com.thepeeingboyairfryers.washwater.util.registry.LevelConfigurationInterface;
 import com.thepeeingboyairfryers.washwater.util.registry.LevelConfigurationRegistry;
 import com.thepeeingboyairfryers.washwater.util.registry.LevelConfigurationSide;
@@ -29,7 +30,8 @@ public class WWCommand {
     public static void registerServerCommand(RegisterCommandsEvent event) {
         event.getDispatcher().register(literal("ww")
                 .then(stats())
-                .then(configure(event.getBuildContext(), false)));
+                .then(configure(event.getBuildContext(), false))
+                .then(step()));
     }
 
     public static void registerClientCommand(RegisterClientCommandsEvent event) {
@@ -41,6 +43,13 @@ public class WWCommand {
         return literal("stats").executes((ctx -> {
             ctx.getSource().sendSuccess(WWStats::printReport, true);
             return 0;
+        }));
+    }
+
+    private static ArgumentBuilder<CommandSourceStack, ?> step() {
+        return literal("step").executes((ctx -> {
+            ManualForeman.INSTANCE.step();
+            return 1;
         }));
     }
 

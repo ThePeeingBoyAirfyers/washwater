@@ -5,6 +5,7 @@ import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickForeman;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.FixedWorkForeman;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.ManualForeman;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.ParallelTickStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.SequentialSectionTickStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeStrategy;
@@ -26,6 +27,7 @@ public class WWImplementations {
 
     public static void register(IEventBus bus) {
         register(FluidTickForeman.REGISTRY, FixedWorkForeman.class, "fixed_work", FixedWorkForeman.CODEC, FixedWorkForeman.COMMAND);
+        register(FluidTickForeman.REGISTRY, ManualForeman.class, "manual", ManualForeman.CODEC, ManualForeman.COMMAND);
 
         register(FluidTickStrategy.REGISTRY, ParallelTickStrategy.class, "parallel", ParallelTickStrategy.CODEC, ParallelTickStrategy.COMMAND);
         register(FluidTickStrategy.REGISTRY, SequentialSectionTickStrategy.class, "section_sequential", SequentialSectionTickStrategy.CODEC, SequentialSectionTickStrategy.COMMAND);
