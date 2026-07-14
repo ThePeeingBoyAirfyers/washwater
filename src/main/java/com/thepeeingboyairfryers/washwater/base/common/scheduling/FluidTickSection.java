@@ -1,12 +1,11 @@
 package com.thepeeingboyairfryers.washwater.base.common.scheduling;
 
 import com.thepeeingboyairfryers.washwater.base.common.flow.CachedFluidRegion;
-import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.LocalPosShortSet;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.LocalBitPosSet;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.util.SwapPair;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
-import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -16,7 +15,7 @@ public class FluidTickSection extends CachedFluidRegion {
     private final int x;
     private final int y;
     private final int z;
-    private final SwapPair<LocalPosSet> liveTicks = new SwapPair<>(new LocalPosShortSet(new ShortArraySet()), new LocalPosShortSet(new ShortArraySet()));
+    private final SwapPair<LocalPosSet> liveTicks = new SwapPair<>(new LocalBitPosSet(), new LocalBitPosSet());
     private final FluidSection[] fluidSections = new FluidSection[8];
     private final LevelChunkSection[] blockSections = new LevelChunkSection[8];
     private boolean needsRefresh = false;

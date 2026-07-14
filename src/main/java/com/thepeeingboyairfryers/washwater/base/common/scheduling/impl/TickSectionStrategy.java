@@ -61,7 +61,7 @@ public abstract class TickSectionStrategy implements FluidTickStrategy {
             doWork(timerCtx, phase, toBeTicked, ctx);
         }
 
-        WWStats.TICKED_SECTIONS.pushMeasurement(amountOfDirtySections, level.dimension().location().toString());
+        WWStats.TICKED_SECTIONS.pushMeasurement(amountOfDirtySections, level.dimension().location() + " TickSections");
 
         return (prevProgress + workAmount) % 8;
     }
