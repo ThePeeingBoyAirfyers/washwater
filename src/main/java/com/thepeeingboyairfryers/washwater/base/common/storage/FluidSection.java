@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
-import com.thepeeingboyairfryers.washwater.base.common.storage.impl.sections.SelfReplacingEmptySection;
+import com.thepeeingboyairfryers.washwater.base.common.storage.impl.EnumUpgradeInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
@@ -88,8 +88,7 @@ public interface FluidSection {
 
         @Override
         public void setContainer(@NotNull FluidSectionContainer container) {
-            var section = new SelfReplacingEmptySection();
-            container.update(section);
+            container.upgrade(null, EnumUpgradeInfo.EMPTY);
         }
 
         @Override

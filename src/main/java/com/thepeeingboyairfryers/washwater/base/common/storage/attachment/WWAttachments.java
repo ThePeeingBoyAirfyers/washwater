@@ -2,6 +2,7 @@ package com.thepeeingboyairfryers.washwater.base.common.storage.attachment;
 
 import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidManager;
+import com.thepeeingboyairfryers.washwater.util.registry.impl.ConfigurationsStorage;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -49,6 +50,13 @@ public class WWAttachments {
                             })
                             .build()
             );
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<ConfigurationsStorage>> CONFIGURATIONS = ATTACHMENTS.register(
+            "configurations",
+            () -> AttachmentType.builder(ConfigurationsStorage::new)
+                    .serialize(ConfigurationsStorage.CODEC)
+                    .build()
+    );
 
     private WWAttachments() {
         throw new IllegalStateException();

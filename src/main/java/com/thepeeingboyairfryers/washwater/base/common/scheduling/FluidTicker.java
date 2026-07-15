@@ -1,7 +1,5 @@
 package com.thepeeingboyairfryers.washwater.base.common.scheduling;
 
-import com.thepeeingboyairfryers.washwater.Config;
-import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
 import net.minecraft.core.BlockPos;
@@ -15,7 +13,7 @@ import java.util.Map;
 
 public class FluidTicker {
     private static final Map<ServerLevel, FluidTickLevel> TICK_LEVELS = new HashMap<>();
-    private static int currentTick = 0;
+    private static long currentTick = 0;
 
     private FluidTicker() {
         throw new IllegalStateException();
@@ -42,31 +40,15 @@ public class FluidTicker {
         TICK_LEVELS.computeIfAbsent(level, FluidTickLevel::new).toBeTicked(pos.getX(), pos.getY(), pos.getZ());
     }
 
-
-    public static boolean shouldTick(ServerLevel level) {
-        return currentTick % FluidManager.lowestTick(level) == 0;
-    }
-
     public static void tick(LevelTickEvent.Post e) {
         if (e.getLevel().isClientSide) return;
         var level = (ServerLevel) e.getLevel();
-        currentTick++;
-
         var tLevel = TICK_LEVELS.computeIfAbsent(level, FluidTickLevel::new);
-
-        if (shouldTick(level)) {
-            tLevel.applyNextTicks();
-            if (Config.PARALLEL.getAsBoolean())
-                tLevel.tickLevelParallel(0, 4);
-            else tLevel.tickLevelSequential(4, 4);
-        } else {
-            if (Config.PARALLEL.getAsBoolean())
-                tLevel.tickLevelParallel(4, 4);
-            else tLevel.tickLevelSequential(4, 4);
-        }
+        currentTick = level.getDayTime();
+        tLevel.tick();
     }
 
     public static int getCurrentTick() {
-        return currentTick;
+        return (int) currentTick;
     }
 }

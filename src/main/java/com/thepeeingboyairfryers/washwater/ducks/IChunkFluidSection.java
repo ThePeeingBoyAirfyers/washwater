@@ -8,11 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 public interface IChunkFluidSection extends FluidSectionContainer {
 
-    @Override
-    default void update(FluidSection section) {
-        ww€setFluidSection(section);
-    }
-
     @Nullable FluidSection ww€getFluidSection();
 
     void ww€setFluidSection(@Nullable FluidSection fSection);

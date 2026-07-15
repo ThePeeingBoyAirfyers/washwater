@@ -2,10 +2,13 @@ package com.thepeeingboyairfryers.washwater.base.common.storage.attachment;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.thepeeingboyairfryers.washwater.base.common.WWNetworking;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
-import com.thepeeingboyairfryers.washwater.base.common.WWNetworking;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeStrategy;
+import com.thepeeingboyairfryers.washwater.base.common.storage.impl.DefaultFluidSectionUpgradeStrategy;
 import com.thepeeingboyairfryers.washwater.ducks.IChunkFluidSection;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
 import net.minecraft.client.Minecraft;
@@ -19,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class FluidChunkAttachment implements Iterable<FluidSection> {
     public static final MapCodec<FluidChunkAttachment> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
@@ -106,15 +108,26 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         return sections.iterator();
     }
 
-    public class SectionUpdater implements Consumer<FluidSection> {
+    public class SectionUpdater {
         private final int i;
 
         private SectionUpdater(int ii) {
             this.i = ii;
         }
 
-        @Override
-        public void accept(FluidSection fluidSection) {
+        public FluidSection upgrade(FluidSection fluidSection, FluidSectionUpgradeInfo info) {
+            Level level = chunk.getLevel();
+            FluidSection result;
+            if (level == null) // Happens on worldgen
+                result = DefaultFluidSectionUpgradeStrategy.INSTANCE.upgrade(fluidSection, info);
+            else
+                result = FluidSectionUpgradeStrategy.REGISTRY.get(chunk.getLevel()).upgrade(fluidSection, info);
+
+            set(result);
+            return result;
+        }
+
+        public void set(FluidSection fluidSection) {
             sections.set(i, fluidSection);
             markDirty();
         }

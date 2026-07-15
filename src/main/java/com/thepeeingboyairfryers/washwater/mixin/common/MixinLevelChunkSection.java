@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
 import com.thepeeingboyairfryers.washwater.base.common.storage.attachment.FluidChunkAttachment;
 import com.thepeeingboyairfryers.washwater.ducks.IChunkFluidSection;
 import com.thepeeingboyairfryers.washwater.ducks.IFakeRegistryObject;
@@ -37,8 +38,15 @@ public class MixinLevelChunkSection implements IChunkFluidSection {
     public void ww€setFluidSection(FluidSection fSection) {
         if (ww€fluidSection == fSection) return;
         this.ww€fluidSection = fSection;
-        ww€updateSection.accept(fSection);
+        ww€updateSection.set(fSection);
         ww€fluidSection.setContainer(this);
+    }
+
+    @Override
+    public FluidSection upgrade(FluidSection section, FluidSectionUpgradeInfo info) {
+        ww€fluidSection = ww€updateSection.upgrade(section, info);
+        ww€fluidSection.setContainer(this);
+        return ww€fluidSection;
     }
 
     @Override

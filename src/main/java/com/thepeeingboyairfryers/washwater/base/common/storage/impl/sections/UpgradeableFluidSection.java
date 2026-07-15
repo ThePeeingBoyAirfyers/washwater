@@ -4,8 +4,8 @@ import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionContainer;
-import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
+import com.thepeeingboyairfryers.washwater.base.common.storage.impl.DefaultFluidSectionUpgradeStrategy;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -19,9 +19,11 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     private boolean acqDirty = false;
 
     protected void upgrade(@NotNull FluidSectionUpgradeInfo info) {
-        otherSection = FluidSectionManager.getFactory(container).upgrade(this, info);
+        if (container == null)
+            otherSection = DefaultFluidSectionUpgradeStrategy.INSTANCE.upgrade(this, info);
+        else
+            otherSection = container.upgrade(this, info);
         if (isAcquired) otherSection.acquire();
-        container.update(otherSection);
     }
 
     @Override
@@ -95,7 +97,7 @@ public abstract class UpgradeableFluidSection implements FluidSection {
     }
 
     protected void markDirty() {
-        if (!isAcquired)
+        if (!isAcquired && container != null)
             container.markDirty();
         else acqDirty = true;
     }
@@ -122,6 +124,8 @@ public abstract class UpgradeableFluidSection implements FluidSection {
 
     @Override
     public void copyFrom(FluidSection section) {
+        if (section.isEmpty()) return;
+
         if (otherSection == null) {
             assert checkAccess();
             copy(section);

@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFuidSectionPacket;
-import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFuidUpdatePacket;
+import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFluidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
 import com.thepeeingboyairfryers.washwater.util.WWCodecs;
@@ -91,7 +91,7 @@ public class SingleFluidSection extends UpgradeableFluidSection {
             }
 
             dirty.clear();
-            return new SingleFuidUpdatePacket(pos, fluidType, updates);
+            return new SingleFluidUpdatePacket(pos, fluidType, updates);
         }
     }
 
