@@ -126,7 +126,7 @@ public class FluidUtil {
         return !level.getBlockState(pos).isAir() && !hasFluid(level, pos);
     }
 
-    public static MultiFluidValue getFluids(@NotNull ServerLevel level, @NotNull BlockPos pos) {
+    public static MultiFluidValue getFluids(@NotNull Level level, @NotNull BlockPos pos) {
         return getFluids(
                 level.getChunk(pos.getZ() >> 4, pos.getZ() >> 4),
                 pos.getX(),
