@@ -199,11 +199,19 @@ publishing {
     publications {
         register('mavenJava', MavenPublication) {
             from components.java
+            groupId = "com.ewoudje"
+            artifactId = "ww-core"
+            version = mod_version
         }
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            name = "ewoudje"
+            url = uri("https://maven.ewoudje.com/releases")
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
         }
     }
 }

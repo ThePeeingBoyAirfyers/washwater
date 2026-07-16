@@ -48,6 +48,7 @@ public class FluidTickSection extends CachedFluidRegion {
 
         currentCtx = ctx;
         tickTracker = ctx.makeTickTracker(tickTracker, x, y, z, liveTicks.getOther());
+        resetCache();
 
         try {
             liveTicks.getCurrent().forEach((xL, yL, zL) -> {
