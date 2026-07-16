@@ -76,4 +76,8 @@ public abstract class CachedFluidRegion implements FluidRegion {
     protected abstract LevelChunkSection getBlockSection(int x, int y, int z);
 
     protected abstract FluidSection getFluidSection(int x, int y, int z);
+
+    protected void resetCache() {
+        cachedX = Integer.MIN_VALUE;
+    }
 }

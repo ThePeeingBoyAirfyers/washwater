@@ -137,8 +137,9 @@ public class WorldPerfTest {
                     var list = flatSettings.getLayersInfo();
                     list.add(new FlatLayerInfo(1, Blocks.BEDROCK));
                     list.add(new FlatLayerInfo(2, Blocks.STONE));
-                    list.add(new FlatLayerInfo(2, Blocks.WATER));
+
                     if (!test) {
+                        list.add(new FlatLayerInfo(2, Blocks.WATER));
                         list.add(new FlatLayerInfo(32, Blocks.AIR));
                         list.add(new FlatLayerInfo(16, WWBlocks.WATER_SOURCE_AIR_BLOCK.get()));
                     }
