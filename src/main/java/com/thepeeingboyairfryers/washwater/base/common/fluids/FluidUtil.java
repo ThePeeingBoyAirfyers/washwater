@@ -23,12 +23,15 @@ public class FluidUtil {
     public static int addVolume(Level level, BlockPos pos, FluidType type, int volume) {
 
         if (canAddVolume(level, pos, type, volume) == 0) {
+            System.out.println("returned 0");
             return 0;
         }
 
         short oldVolume = getAllVolume(level, pos);
+        System.out.println("oldvolume " + oldVolume);
         short spaceLeft = (short) (VOLUME_OF_BLOCK - oldVolume);
         int transaction = Math.min(volume, spaceLeft);
+        System.out.println("transaction: " + transaction);
         var chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
         var fluidChunk = FluidSectionManager.getAttachmentFor(chunk);
 

@@ -69,9 +69,12 @@ public class WaterPushing {
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
         List<Direction> viableHorDirections = createAndFillViableHorDirectionList(level, pos);
+        System.out.println("displace start initial: " + availableVolume);
 
         if (viableHorDirections.isEmpty()) {
-            return (FluidUtil.addVolume(level, pos, type, availableVolume) == availableVolume);
+            System.out.println("displace vertical");
+            System.out.println((FluidUtil.addVolume(level, pos.above(), type, availableVolume) == availableVolume));
+            //return true;
         } else {
             if (availableVolume > 0) {
                 int i = 0;
@@ -93,10 +96,11 @@ public class WaterPushing {
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
         List<Direction> viableHorDirections = createAndFillViableHorDirectionList(level, pos);
-
+        System.out.println("can displace start");
 
         if (viableHorDirections.isEmpty()) {
-            return (FluidUtil.canAddVolume(level, pos, type, availableVolume) == availableVolume);
+            System.out.println("can displace vertical returned: " + (FluidUtil.canAddVolume(level, pos.above(), type, availableVolume) == availableVolume));
+            return (FluidUtil.canAddVolume(level, pos.above(), type, availableVolume) == availableVolume);
         } else {
             if (availableVolume > 0) {
                 int i = 0;
