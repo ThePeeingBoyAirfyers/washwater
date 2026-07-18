@@ -25,6 +25,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -46,7 +47,7 @@ public class WashWater {
         WWBlockEntities.register(modEventBus);
         WWAttachments.register(modEventBus);
         WWNetworking.register(modEventBus);
-        WWImplementations.register(modEventBus);
+        WWImplementations.register(modEventBus, FMLEnvironment.dist.isClient());
         WorldPerfTest.register(modEventBus);
 
         FluidManager.register(modEventBus);

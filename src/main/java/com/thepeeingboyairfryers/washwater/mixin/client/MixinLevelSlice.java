@@ -1,8 +1,10 @@
 package com.thepeeingboyairfryers.washwater.mixin.client;
 
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.WWFluidRendererFactory;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
+import com.thepeeingboyairfryers.washwater.ducks.ILevelSliceConfiguration;
 import com.thepeeingboyairfryers.washwater.ducks.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
 import net.caffeinemc.mods.sodium.client.world.cloned.ChunkRenderContext;
@@ -22,7 +24,7 @@ import java.util.Arrays;
 
 
 @Mixin(LevelSlice.class)
-public abstract class MixinLevelSlice implements ILevelSliceFluids {
+public abstract class MixinLevelSlice implements ILevelSliceFluids, ILevelSliceConfiguration {
 
     @Shadow
     @Final
@@ -44,6 +46,8 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
     @Shadow
     private int originBlockZ;
 
+    @Unique private WWFluidRendererFactory ww€factory;
+
     @Shadow
     public static int getLocalSectionIndex(int sectionX, int sectionY, int sectionZ) {
         throw new AssertionError();
@@ -59,10 +63,14 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
         for (var fluids : ww€fluids) {
             Arrays.fill(fluids, MultiFluidValue.EMPTY);
         }
+
+        ww€factory = WWFluidRendererFactory.REGISTRY.get(iLevel);
     }
 
     @Inject(method = "copySectionData", at = @At("HEAD"))
     void ww€copyFluidSection(ChunkRenderContext context, int sectionIndex, CallbackInfo ci) {
+        ww€factory = WWFluidRendererFactory.REGISTRY.get(this.level);
+
         int x = sectionIndex % SECTION_ARRAY_LENGTH;
         int sd = (sectionIndex - x) / SECTION_ARRAY_LENGTH;
         int z = sd % SECTION_ARRAY_LENGTH;
@@ -92,5 +100,10 @@ public abstract class MixinLevelSlice implements ILevelSliceFluids {
                     [getLocalSectionIndex(relBlockX >> 4, relBlockY >> 4, relBlockZ >> 4)]
                     [FluidSection.localPos2Short(relBlockX & 15, relBlockY & 15, relBlockZ & 15)];
         }
+    }
+
+    @Override
+    public WWFluidRendererFactory ww€getFactory() {
+        return ww€factory;
     }
 }

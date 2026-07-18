@@ -1,6 +1,6 @@
 package com.thepeeingboyairfryers.washwater.mixin.client;
 
-import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.WashFluidRendererFactory;
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.SodiumWashFluidRendererFactory;
 import net.caffeinemc.mods.sodium.client.services.FluidRendererFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,6 +14,6 @@ public interface MixinFluidRendererFactory {
      */
     @Redirect(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/services/Services;load(Ljava/lang/Class;)Ljava/lang/Object;"))
     private static Object instantiate(Class<?> clazz) {
-        return new WashFluidRendererFactory();
+        return new SodiumWashFluidRendererFactory();
     }
 }

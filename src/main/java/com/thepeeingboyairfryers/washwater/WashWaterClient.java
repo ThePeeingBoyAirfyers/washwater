@@ -1,6 +1,7 @@
 package com.thepeeingboyairfryers.washwater;
 
 import com.thepeeingboyairfryers.washwater.base.client.LilyPadBakedModel;
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.WWFluidRendererFactory;
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -12,6 +13,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import static com.thepeeingboyairfryers.washwater.collections.WWItems.PRECISION_BUCKET;
 
@@ -22,6 +24,10 @@ public class WashWaterClient {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modEventBus.addListener((FMLClientSetupEvent e) -> registerItemProperties());
         modEventBus.addListener(LilyPadBakedModel::modifyBakedModelsEvent);
+
+        modEventBus.addListener((NewRegistryEvent e) -> {
+            e.register(WWFluidRendererFactory.REGISTRY.registry());
+        });
     }
 
     public static void registerItemProperties() {

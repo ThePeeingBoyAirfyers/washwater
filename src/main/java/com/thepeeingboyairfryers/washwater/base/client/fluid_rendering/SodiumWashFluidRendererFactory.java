@@ -12,13 +12,13 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 
-public class WashFluidRendererFactory implements FluidRendererFactory {
+public class SodiumWashFluidRendererFactory implements FluidRendererFactory {
     @Override
     public FluidRenderer createPlatformFluidRenderer(
             ColorProviderRegistry colorProviderRegistry,
             LightPipelineProvider lightPipelineProvider
     ) {
-        return new WashFluidRenderer(colorProviderRegistry, lightPipelineProvider);
+        return new SodiumWashFluidRenderer(colorProviderRegistry, lightPipelineProvider);
     }
 
     @Override
