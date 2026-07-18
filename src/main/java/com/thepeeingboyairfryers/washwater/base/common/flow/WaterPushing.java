@@ -22,7 +22,11 @@ public class WaterPushing {
         int maxDistance = Config.MAX_PUSHING_DISTANCE.getAsInt();
         BlockPos newPos = origin.relative(direction);
         int currentDistance = 0;
-        FluidType type = level.getBlockState(newPos).getFluidState().getType().getFluidType();
+        FluidType type = null;
+        for (MultiFluidValue.Entry fluid : FluidUtil.getFluids(level, newPos)) {
+            if (type != null) throw new IllegalStateException();
+            type = fluid.fluidType();
+        }
         int volumeToDisplace = FluidUtil.getVolume(level, newPos, type);
 
         while (volumeToDisplace > 0 && currentDistance < maxDistance) {
@@ -37,7 +41,11 @@ public class WaterPushing {
     public static boolean checkIfCanPushWater(ServerLevel level, BlockPos origin, Direction direction) {
         int maxDistance = Config.MAX_PUSHING_DISTANCE.getAsInt();
         BlockPos newPos = origin.relative(direction);
-        FluidType originType = level.getBlockState(newPos).getFluidState().getType().getFluidType();
+        FluidType originType = null;
+        for (MultiFluidValue.Entry fluid : FluidUtil.getFluids(level, newPos)) {
+            if (originType != null) throw new IllegalStateException();
+            originType = fluid.fluidType();
+        }
         int currentDistance = 0;
         int volumeToDisplace = FluidUtil.getVolume(level, newPos, originType);
 
