@@ -2,6 +2,7 @@ package com.thepeeingboyairfryers.washwater.base.common.flow;
 
 import com.thepeeingboyairfryers.washwater.Config;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.util.PseudoRandom;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -65,16 +66,17 @@ public class WaterPushing {
     }
 
     public static boolean displaceFluids(ServerLevel level, BlockPos pos) {
-        FluidType type = level.getFluidState(pos).getFluidType();
+        FluidType type = null;
+        for (MultiFluidValue.Entry fluid : FluidUtil.getFluids(level, pos)) {
+            if (type != null) throw new IllegalStateException();
+            type = fluid.fluidType();
+        }
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
         List<Direction> viableHorDirections = createAndFillViableHorDirectionList(level, pos);
-        System.out.println("displace start initial: " + availableVolume);
 
         if (viableHorDirections.isEmpty()) {
-            System.out.println("displace vertical");
-            System.out.println((FluidUtil.addVolume(level, pos.above(), type, availableVolume) == availableVolume));
-            //return true;
+            return ((FluidUtil.addVolume(level, pos.above(), type, availableVolume) == availableVolume));
         } else {
             if (availableVolume > 0) {
                 int i = 0;
@@ -96,10 +98,8 @@ public class WaterPushing {
         int availableVolume = FluidUtil.getVolume(level, pos, type);
         int initialVolume = availableVolume;
         List<Direction> viableHorDirections = createAndFillViableHorDirectionList(level, pos);
-        System.out.println("can displace start");
 
         if (viableHorDirections.isEmpty()) {
-            System.out.println("can displace vertical returned: " + (FluidUtil.canAddVolume(level, pos.above(), type, availableVolume) == availableVolume));
             return (FluidUtil.canAddVolume(level, pos.above(), type, availableVolume) == availableVolume);
         } else {
             if (availableVolume > 0) {
