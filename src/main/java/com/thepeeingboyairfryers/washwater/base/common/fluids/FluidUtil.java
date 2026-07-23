@@ -128,7 +128,7 @@ public class FluidUtil {
 
     public static MultiFluidValue getFluids(@NotNull ServerLevel level, @NotNull BlockPos pos) {
         return getFluids(
-                level.getChunk(pos.getZ() >> 4, pos.getZ() >> 4),
+                level.getChunk(pos.getX() >> 4, pos.getZ() >> 4),
                 pos.getX(),
                 pos.getY(),
                 pos.getZ()
