@@ -2,6 +2,7 @@ package com.thepeeingboyairfryers.washwater.base.common.scheduling;
 
 import com.thepeeingboyairfryers.washwater.base.common.flow.CachedFluidRegion;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.LocalBitPosSet;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.UpdateBlockTask;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.util.SwapPair;
@@ -178,7 +179,7 @@ public class FluidTickSection extends CachedFluidRegion {
         BlockState prev = section.getBlockState(xB & 15, yB & 15, zB & 15);
         section.setBlockState(xB & 15, yB & 15, zB & 15, state, false);
 
-        currentCtx.updateBlock(xB, yB, zB, prev, state);
+        currentCtx.queueTask(new UpdateBlockTask(xB, yB, zB, prev, state));
     }
 
     public int getAge() {
