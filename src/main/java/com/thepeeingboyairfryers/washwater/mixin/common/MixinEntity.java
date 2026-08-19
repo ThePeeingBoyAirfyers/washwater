@@ -51,17 +51,14 @@ public abstract class MixinEntity {
                     target = "Lnet/minecraft/world/entity/Entity;lavaHurt()V")
     )
     private void lavaHurt(Entity entityInstance) {
-        if (!fireImmune()) {
-            return;
-        }
+        if (fireImmune()) return;
         FluidState lavaState = entityInstance.level().getFluidState(entityInstance.getOnPos().above());
 
         float lavaRatio = lavaState.getAmount() / 8f;
         if (lavaRatio < 0.5f) {
             lavaRatio = Math.max(lavaRatio, 0.25f);
         }
-        else
-            lavaRatio = 1f;
+        else lavaRatio = 1f;
 
         igniteForSeconds(15.0F * lavaRatio);
         if (hurt(damageSources().lava(), 4.0F * lavaRatio)) {
