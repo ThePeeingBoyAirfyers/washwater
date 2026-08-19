@@ -33,7 +33,6 @@ public class MixinPointedDripstoneBlock {
             }
 
             BlockPos rootFluidPos = rootFluidPosOptional.get().above();
-            System.out.println("rootfluidpos: " + rootFluidPos);
             MultiFluidValue fluidAboveStalactite = FluidUtil.getFluids(level, rootFluidPos);
             if (fluidAboveStalactite.isEmpty()) {
                 return;
@@ -48,16 +47,12 @@ public class MixinPointedDripstoneBlock {
 
             //FluidType.DripstoneDripInfo dripInfo = fluid.getFluidType().getDripInfo();
             if (fluidVolume >= WaterInfo.DROPLET_SIZE) {
-
                 if (randChance < 0.9F) {
-
                     BlockPos blockpos = findTip(state, level, pos, 11, false).below();
                     if (FluidUtil.canAddVolume(level, blockpos, type, WaterInfo.DROPLET_SIZE) == WaterInfo.DROPLET_SIZE) {
-                        System.out.println("could add");
                         //remove consumed fluid from above
                         FluidUtil.setVolume(level, rootFluidPos, MultiFluidValue.single(type, (short) (fluidVolume - WaterInfo.DROPLET_SIZE)));
                         //place water droplet below
-                        System.out.println("blockpos is: " + blockpos);
                         FluidUtil.addVolume(level, blockpos, type, WaterInfo.DROPLET_SIZE);
                     }
                 }
