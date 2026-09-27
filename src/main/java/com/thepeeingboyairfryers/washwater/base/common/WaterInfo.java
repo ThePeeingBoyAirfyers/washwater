@@ -17,7 +17,6 @@ public class WaterInfo {
     public static final short CUT_OFF_VALUE = (short) (VOLUME_PER_LEVEL * 7);
     public static final short SURFACE_TENSION_LIMIT = 20;
     public static final int FLOW_DIVIDER = 8;
-    @Deprecated public static final int MIN_Y = -64;
     public static final int PRECISION_BUCKET_RADIUS = 2;
 
     private static final BlockPos.MutableBlockPos SOLID_POS = new BlockPos.MutableBlockPos();

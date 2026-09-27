@@ -62,6 +62,5 @@ public interface FluidRegion extends BlockGetter {
 
     BlockState getBlockState(int x, int y, int z);
 
-    @Deprecated
     void setState(int x, int y, int z, BlockState state);
 }
