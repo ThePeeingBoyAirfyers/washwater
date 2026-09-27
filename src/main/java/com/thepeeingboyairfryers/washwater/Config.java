@@ -30,6 +30,8 @@ public class Config {
             .comment("How far should water be able to be pushed (by pistons etc.)")
             .defineInRange("maxPushingDistance", 8, 0, Integer.MAX_VALUE);
 
+    public static final ModConfigSpec.BooleanValue EXPERIMENTAL_PARTIAL_BLOCKS = BUILDER
+            .define("experimentalPartialBlocks", false);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 

@@ -1,12 +1,16 @@
 package com.thepeeingboyairfryers.washwater.base.common.flow;
 
+import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
+import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidManager;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
-public interface FluidRegion {
+public interface FluidRegion extends BlockGetter {
 
     default int getFluidVolume(BlockPos pos, FluidType type) {
         return getFluidVolume(pos.getX(), pos.getY(), pos.getZ(), type);
@@ -36,13 +40,27 @@ public interface FluidRegion {
         return isSolid(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    boolean isSolid(int x, int y, int z);
+    default boolean isSolid(int x, int y, int z) {
+        return WaterInfo.isSolid(this, getBlockState(x, y, z), x, y, z);
+    }
 
     default void setVolume(BlockPos pos, MultiFluidValue fluids) {
         setVolume(pos.getX(), pos.getY(), pos.getZ(), fluids);
     }
 
     void setVolume(int x, int y, int z, MultiFluidValue fluids);
+
+    @Override
+    default @NotNull FluidState getFluidState(@NotNull BlockPos blockPos) {
+        return FluidManager.getFluidState(getFluids(blockPos));
+    }
+
+    @Override
+    default @NotNull BlockState getBlockState(BlockPos blockPos) {
+        return getBlockState(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+    }
+
+    BlockState getBlockState(int x, int y, int z);
 
     @Deprecated
     void setState(int x, int y, int z, BlockState state);

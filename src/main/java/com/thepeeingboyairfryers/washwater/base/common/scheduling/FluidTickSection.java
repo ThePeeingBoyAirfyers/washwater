@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.base.common.scheduling;
 
+import com.thepeeingboyairfryers.washwater.base.common.LevelMeta;
 import com.thepeeingboyairfryers.washwater.base.common.flow.CachedFluidRegion;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.LocalBitPosSet;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.UpdateBlockTask;
@@ -7,15 +8,16 @@ import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.util.SwapPair;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+import org.jetbrains.annotations.Nullable;
 
 public class FluidTickSection extends CachedFluidRegion {
-    private final int x;
-    private final int y;
-    private final int z;
+    private final int x, y, z;
     private final SwapPair<LocalPosSet> liveTicks = new SwapPair<>(new LocalBitPosSet(), new LocalBitPosSet());
     private final FluidSection[] fluidSections = new FluidSection[8];
     private final LevelChunkSection[] blockSections = new LevelChunkSection[8];
@@ -26,7 +28,8 @@ public class FluidTickSection extends CachedFluidRegion {
     private int age;
     private int random;
 
-    public FluidTickSection(int iX, int iY, int iZ) {
+    public FluidTickSection(LevelMeta meta, int iX, int iY, int iZ) {
+        super(meta);
         this.x = iX;
         this.y = iY;
         this.z = iZ;
@@ -206,5 +209,20 @@ public class FluidTickSection extends CachedFluidRegion {
 
     public boolean canTick() {
         return loadedChunks == -1;
+    }
+
+    @Override
+    public @Nullable BlockEntity getBlockEntity(BlockPos blockPos) {
+        return null;
+    }
+
+    @Override
+    public int getHeight() {
+        return 0;
+    }
+
+    @Override
+    public int getMinBuildHeight() {
+        return 0;
     }
 }
