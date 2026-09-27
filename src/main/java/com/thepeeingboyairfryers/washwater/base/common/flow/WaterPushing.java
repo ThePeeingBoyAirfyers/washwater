@@ -116,7 +116,6 @@ public class WaterPushing {
                     int cut = initialVolume / viableHorDirections.size();
                     if (i == 0)
                         cut += availableVolume % viableHorDirections.size();
-
                     int remainder = (cut - FluidUtil.canAddVolume(level, pos.relative(dir).mutable(), type, cut));
                     availableVolume = availableVolume - cut + remainder;
                     i++;

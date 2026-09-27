@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.mixin.common;
 
+import com.thepeeingboyairfryers.washwater.base.common.flow.WaterDisplacement;
 import com.thepeeingboyairfryers.washwater.base.common.flow.WaterPushing;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import net.minecraft.core.BlockPos;
@@ -20,10 +21,19 @@ public class MixinBlockItem {
     private void pushWaterAway(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
+        System.out.println("try place");
         if (FluidUtil.hasFluid(level, pos)) {
-            if (WaterPushing.checkIfCanDisplaceFluids(level, pos)) {
+/*            if (WaterPushing.checkIfCanDisplaceFluids(level, pos)) {
                 if (!level.isClientSide) {
                     WaterPushing.displaceFluids((ServerLevel) level, pos);
+                }
+            } else {
+                cir.setReturnValue(InteractionResult.FAIL);
+            }*/
+            System.out.println("try place 1");
+            if (WaterDisplacement.checkIfCanDisplaceFluids(level, pos)) {
+                if (!level.isClientSide) {
+                    WaterDisplacement.displaceFluids((ServerLevel) level, pos);
                 }
             } else {
                 cir.setReturnValue(InteractionResult.FAIL);
