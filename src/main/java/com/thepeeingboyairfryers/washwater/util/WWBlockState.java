@@ -11,6 +11,9 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * This is in general a bad idea, I'm gonna keep it around for now but blockstates are meant to be 'constants' and memory location comparable.
+ */
 public class WWBlockState extends BlockState implements IFakeRegistryObject<BlockState> {
     private final MultiFluidValue fluid;
     private final BlockState og;

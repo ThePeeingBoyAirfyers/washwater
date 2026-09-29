@@ -6,25 +6,25 @@
     "accessors.BlockStateBase",
     "accessors.ChunkMapAccessor",
     "accessors.StateHolderAccessor",
-    "common.MixinBlockItem",
-    "common.MixinBucketItem",
-    "common.MixinLevelChunkSection",
-    "common.MixinNeighborUpdater",
-    "common.MixinPistonBaseBlock",
-    "common.MixinProtoChunk",
-    "common.MixinServerLevel",
-    "common.fake_blockstates.MixinCrudeIncrementalIntIdentityHashBiMap",
-    "common.fake_blockstates.MixinFluidState",
-    "common.fake_blockstates.MixinIdMapper",
-    "common.fake_blockstates.MixinMappedRegistry",
-    "common.fake_blockstates.MixinServerCommonPacketListenerImpl"
+    "base.common.MixinBlockItem",
+    "content.common.MixinBucketItem",
+    "base.common.MixinLevelChunkSection",
+    "base.common.MixinNeighborUpdater",
+    "content.common.MixinPistonBaseBlock",
+    "base.common.MixinProtoChunk",
+    "base.common.MixinServerLevel",
+    "base.common.fake_blockstates.MixinCrudeIncrementalIntIdentityHashBiMap",
+    "base.common.fake_blockstates.MixinFluidState",
+    "base.common.fake_blockstates.MixinIdMapper",
+    "base.common.fake_blockstates.MixinMappedRegistry",
+    "base.common.fake_blockstates.MixinServerCommonPacketListenerImpl"
   ],
   "client": [
     "accessors.ChunkBuilderAccessor",
     "accessors.SodiumWorldRendererAccessor",
-    "client.MixinChunkBuilderMeshingTask",
-    "client.MixinFluidRendererFactory",
-    "client.MixinLevelSlice"
+    "base.client.MixinChunkBuilderMeshingTask",
+    "base.client.MixinFluidRendererFactory",
+    "base.client.MixinLevelSlice"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.mixin.common.fake_blockstates;
+package com.thepeeingboyairfryers.washwater.mixin.base.common.fake_blockstates;
 
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.ducks.IFluidState;

@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.mixin.client;
+package com.thepeeingboyairfryers.washwater.mixin.base.client;
 
 import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.SodiumWashFluidRendererFactory;
 import net.caffeinemc.mods.sodium.client.services.FluidRendererFactory;
