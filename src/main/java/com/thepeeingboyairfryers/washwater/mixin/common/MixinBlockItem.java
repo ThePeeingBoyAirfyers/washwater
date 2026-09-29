@@ -21,7 +21,6 @@ public class MixinBlockItem {
     private void pushWaterAway(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
-        System.out.println("try place");
         if (FluidUtil.hasFluid(level, pos)) {
 /*            if (WaterPushing.checkIfCanDisplaceFluids(level, pos)) {
                 if (!level.isClientSide) {
@@ -30,9 +29,9 @@ public class MixinBlockItem {
             } else {
                 cir.setReturnValue(InteractionResult.FAIL);
             }*/
-            System.out.println("try place 1");
             if (WaterDisplacement.checkIfCanDisplaceFluids(level, pos)) {
                 if (!level.isClientSide) {
+                    System.out.println("called real displace");
                     WaterDisplacement.displaceFluids((ServerLevel) level, pos);
                 }
             } else {
