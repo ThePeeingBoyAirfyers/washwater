@@ -70,23 +70,34 @@ public class WaterDisplacement {
             Iterator<Direction> dirIterator = viableDirections.iterator();
             System.out.println("viable dirs: " + viableDirections);
             System.out.println("remainder: " + remainder);
+            int cut = remainder / viableDirections.size();
+            int cutUp = cut + initialVolume % viableDirections.size();
             while (dirIterator.hasNext()) {
-                System.out.println("hasnext");
                 Direction dir = dirIterator.next();
-                int cut = remainder / viableDirections.size();
-                if (dir == Direction.UP)
-                    cut += initialVolume % viableDirections.size();
+                if (dir == Direction.UP) {
+                    cut = cutUp;
+                }
+                else {
+                    cut -= initialVolume % viableDirections.size();
+                }
+                System.out.println("new dir: " + dir);
+                System.out.println("cut: " + cut);
                 int cutRemainder = cut;
                 for (int i = 1; i <= maxDisplacementRange && cutRemainder > 0; i++) {
-                    if (FluidUtil.isSolid(level, pos.relative(dir, i)))
+                    if (FluidUtil.isSolid(level, pos.relative(dir, i))) {
+                        System.out.println("broke");
                         break;
+                    }
                     cutRemainder = (cutRemainder - FluidUtil.addVolume(level, pos.relative(dir, i).mutable(), type, cutRemainder));
+                    System.out.println("new cutremainder: " + cutRemainder);
                 }
                 if (cutRemainder > 0) {
+                    System.out.println("removed dir");
                     dirIterator.remove();
                 }
                 int cutTransaction = cut - cutRemainder;
                 remainder -= cutTransaction;
+                System.out.println("remainder: " + remainder);
             }
         }
         return remainder == 0;
@@ -127,25 +138,35 @@ public class WaterDisplacement {
             Iterator<Direction> dirIterator = viableDirections.iterator();
             System.out.println("viable dirs: " + viableDirections);
             System.out.println("remainder: " + remainder);
+            int cut = remainder / viableDirections.size();
+            int cutUp = cut + initialVolume % viableDirections.size();
             while (dirIterator.hasNext()) {
-                System.out.println("hasnext");
                 Direction dir = dirIterator.next();
-                int cut = remainder / viableDirections.size();
-                if (dir == Direction.UP)
-                    cut += initialVolume % viableDirections.size();
+                if (dir == Direction.UP) {
+                    cut = cutUp;
+                }
+                else {
+                    cut -= initialVolume % viableDirections.size();
+                }
+                System.out.println("new dir: " + dir);
+                System.out.println("cut: " + cut);
                 int cutRemainder = cut;
                 for (int i = 1; i <= maxDisplacementRange && cutRemainder > 0; i++) {
-                    if (FluidUtil.isSolid(level, pos.relative(dir, i)))
+                    if (FluidUtil.isSolid(level, pos.relative(dir, i))) {
+                        System.out.println("broke");
                         break;
+                    }
                     cutRemainder = (cutRemainder - FluidUtil.canAddVolume(level, pos.relative(dir, i).mutable(), type, cutRemainder));
+                    System.out.println("new cutremainder: " + cutRemainder);
                 }
                 if (cutRemainder > 0) {
+                    System.out.println("removed dir");
                     dirIterator.remove();
                 }
                 int cutTransaction = cut - cutRemainder;
                 remainder -= cutTransaction;
+                System.out.println("remainder: " + remainder);
             }
-
         }
         return remainder == 0;
     }
