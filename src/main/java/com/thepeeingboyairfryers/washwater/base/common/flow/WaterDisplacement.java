@@ -64,22 +64,42 @@ public class WaterDisplacement {
         }
         int initialVolume = fluid.volume();
         List<Direction> viableDirections = createAndFillViableDirectionList(level, pos);
+        Direction biasDir = null;
+
         int remainder = initialVolume;
 
         while (remainder > 0 && !viableDirections.isEmpty()) {
+            while (biasDir == null) {
+                Direction[] array =  PseudoRandom.getRandom3DDirectionArray();
+
+                for (int i = 0; i < 6; i++) {
+                    Direction dire = array[i];
+                    if (viableDirections.contains(dire)) {
+                        biasDir = dire;
+                        break;
+                    }
+                }
+
+            }
+
             Iterator<Direction> dirIterator = viableDirections.iterator();
             System.out.println("viable dirs: " + viableDirections);
             System.out.println("remainder: " + remainder);
-            int cut = remainder / viableDirections.size();
-            int cutUp = cut + initialVolume % viableDirections.size();
+            int theoreticalCut = remainder / viableDirections.size();
+            int theoreticalCutUp = theoreticalCut + initialVolume % viableDirections.size();
             while (dirIterator.hasNext()) {
                 Direction dir = dirIterator.next();
-                if (dir == Direction.UP) {
-                    cut = cutUp;
+                int cut = 0;
+                cut = theoreticalCut;
+                //BIAS LOGIC
+                if (dir == biasDir) {
+                    System.out.println("uppeddddd");
+                    cut = theoreticalCutUp;
+                    biasDir = null;
                 }
-                else {
+/*                else {
                     cut -= initialVolume % viableDirections.size();
-                }
+                }*/
                 System.out.println("new dir: " + dir);
                 System.out.println("cut: " + cut);
                 int cutRemainder = cut;
@@ -132,22 +152,42 @@ public class WaterDisplacement {
         }
         int initialVolume = fluid.volume();
         List<Direction> viableDirections = createAndFillViableDirectionList(level, pos);
+        Direction biasDir = null;
+
         int remainder = initialVolume;
 
         while (remainder > 0 && !viableDirections.isEmpty()) {
+            while (biasDir == null) {
+                Direction[] array =  PseudoRandom.getRandom3DDirectionArray();
+
+                for (int i = 0; i < 6; i++) {
+                    Direction dire = array[i];
+                    if (viableDirections.contains(dire)) {
+                        biasDir = dire;
+                        break;
+                    }
+                }
+
+            }
+
             Iterator<Direction> dirIterator = viableDirections.iterator();
             System.out.println("viable dirs: " + viableDirections);
             System.out.println("remainder: " + remainder);
-            int cut = remainder / viableDirections.size();
-            int cutUp = cut + initialVolume % viableDirections.size();
+            int theoreticalCut = remainder / viableDirections.size();
+            int theoreticalCutUp = theoreticalCut + initialVolume % viableDirections.size();
             while (dirIterator.hasNext()) {
                 Direction dir = dirIterator.next();
-                if (dir == Direction.UP) {
-                    cut = cutUp;
+                int cut = 0;
+                cut = theoreticalCut;
+                //BIAS LOGIC
+                if (dir == biasDir) {
+                    System.out.println("uppeddddd");
+                    cut = theoreticalCutUp;
+                    biasDir = null;
                 }
-                else {
+/*                else {
                     cut -= initialVolume % viableDirections.size();
-                }
+                }*/
                 System.out.println("new dir: " + dir);
                 System.out.println("cut: " + cut);
                 int cutRemainder = cut;
