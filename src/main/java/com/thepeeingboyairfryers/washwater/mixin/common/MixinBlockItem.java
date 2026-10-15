@@ -29,14 +29,14 @@ public class MixinBlockItem {
             } else {
                 cir.setReturnValue(InteractionResult.FAIL);
             }*/
-            if (WaterDisplacement.checkIfCanDisplaceFluids(level, pos)) {
+/*            if (WaterDisplacement.checkIfCanDisplaceFluids(level, pos)) {
                 if (!level.isClientSide) {
                     System.out.println("called real displace");
                     WaterDisplacement.displaceFluids((ServerLevel) level, pos);
                 }
             } else {
                 cir.setReturnValue(InteractionResult.FAIL);
-            }
+            }*/
         }
     }
 }
