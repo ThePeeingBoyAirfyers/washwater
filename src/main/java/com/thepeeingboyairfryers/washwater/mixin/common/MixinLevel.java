@@ -30,7 +30,6 @@ public class MixinLevel {
         if (FluidUtil.hasFluid((Level) (Object) this, pos)) {
             if (WaterDisplacement.checkIfCanDisplaceFluids((Level) (Object) this, pos)) {
                 if (!this.isClientSide) {
-                    System.out.println("called real displace");
                     WaterDisplacement.displaceFluids((Level) (Object) this, pos);
                 }
             } else {
