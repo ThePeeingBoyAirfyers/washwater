@@ -11,6 +11,7 @@
     "common.MixinBlockItem",
     "common.MixinBucketItem",
     "common.MixinEntity",
+    "common.MixinLevel",
     "common.MixinLevelChunkSection",
     "common.MixinNeighborUpdater",
     "common.MixinPistonBaseBlock",

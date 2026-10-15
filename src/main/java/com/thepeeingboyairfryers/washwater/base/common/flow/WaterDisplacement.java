@@ -79,12 +79,8 @@ public class WaterDisplacement {
                         break;
                     }
                 }
-
             }
-
             Iterator<Direction> dirIterator = viableDirections.iterator();
-            System.out.println("viable dirs: " + viableDirections);
-            System.out.println("remainder: " + remainder);
             int theoreticalCut = remainder / viableDirections.size();
             int theoreticalCutUp = theoreticalCut + initialVolume % viableDirections.size();
             while (dirIterator.hasNext()) {
@@ -93,31 +89,22 @@ public class WaterDisplacement {
                 cut = theoreticalCut;
                 //BIAS LOGIC
                 if (dir == biasDir) {
-                    System.out.println("uppeddddd");
                     cut = theoreticalCutUp;
                     biasDir = null;
                 }
-/*                else {
-                    cut -= initialVolume % viableDirections.size();
-                }*/
-                System.out.println("new dir: " + dir);
-                System.out.println("cut: " + cut);
+
                 int cutRemainder = cut;
                 for (int i = 1; i <= maxDisplacementRange && cutRemainder > 0; i++) {
                     if (FluidUtil.isSolid(level, pos.relative(dir, i))) {
-                        System.out.println("broke");
                         break;
                     }
                     cutRemainder = (cutRemainder - FluidUtil.addVolume(level, pos.relative(dir, i).mutable(), type, cutRemainder));
-                    System.out.println("new cutremainder: " + cutRemainder);
                 }
                 if (cutRemainder > 0) {
-                    System.out.println("removed dir");
                     dirIterator.remove();
                 }
                 int cutTransaction = cut - cutRemainder;
                 remainder -= cutTransaction;
-                System.out.println("remainder: " + remainder);
             }
         }
         return remainder == 0;
@@ -144,6 +131,7 @@ public class WaterDisplacement {
 
     public static boolean checkIfCanDisplaceFluids(Level level, BlockPos pos) {
         FluidType type = null;
+        System.out.println("amagdalus " + level == null);
         MultiFluidValue.Entry fluid = null;
         for (MultiFluidValue.Entry fluidEntry : FluidUtil.getFluids(level, pos)) {
             if (type != null) throw new IllegalStateException();
@@ -157,9 +145,9 @@ public class WaterDisplacement {
         int remainder = initialVolume;
 
         while (remainder > 0 && !viableDirections.isEmpty()) {
+
             while (biasDir == null) {
                 Direction[] array =  PseudoRandom.getRandom3DDirectionArray();
-
                 for (int i = 0; i < 6; i++) {
                     Direction dire = array[i];
                     if (viableDirections.contains(dire)) {
@@ -167,45 +155,30 @@ public class WaterDisplacement {
                         break;
                     }
                 }
-
             }
 
             Iterator<Direction> dirIterator = viableDirections.iterator();
-            System.out.println("viable dirs: " + viableDirections);
-            System.out.println("remainder: " + remainder);
             int theoreticalCut = remainder / viableDirections.size();
-            int theoreticalCutUp = theoreticalCut + initialVolume % viableDirections.size();
             while (dirIterator.hasNext()) {
                 Direction dir = dirIterator.next();
-                int cut = 0;
-                cut = theoreticalCut;
+                int cut = theoreticalCut;
                 //BIAS LOGIC
                 if (dir == biasDir) {
-                    System.out.println("uppeddddd");
-                    cut = theoreticalCutUp;
+                    cut += initialVolume % viableDirections.size();
                     biasDir = null;
                 }
-/*                else {
-                    cut -= initialVolume % viableDirections.size();
-                }*/
-                System.out.println("new dir: " + dir);
-                System.out.println("cut: " + cut);
                 int cutRemainder = cut;
                 for (int i = 1; i <= maxDisplacementRange && cutRemainder > 0; i++) {
                     if (FluidUtil.isSolid(level, pos.relative(dir, i))) {
-                        System.out.println("broke");
                         break;
                     }
                     cutRemainder = (cutRemainder - FluidUtil.canAddVolume(level, pos.relative(dir, i).mutable(), type, cutRemainder));
-                    System.out.println("new cutremainder: " + cutRemainder);
                 }
                 if (cutRemainder > 0) {
-                    System.out.println("removed dir");
                     dirIterator.remove();
                 }
                 int cutTransaction = cut - cutRemainder;
                 remainder -= cutTransaction;
-                System.out.println("remainder: " + remainder);
             }
         }
         return remainder == 0;

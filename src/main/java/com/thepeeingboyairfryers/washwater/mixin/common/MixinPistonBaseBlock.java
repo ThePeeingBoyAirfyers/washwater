@@ -17,7 +17,7 @@ public class MixinPistonBaseBlock {
 
     @Inject(at = @At("HEAD"), method = "moveBlocks", cancellable = true)
     private void moveBlocks(Level level, BlockPos blockPos, Direction direction, boolean bl, CallbackInfoReturnable<Boolean> cir) {
-        if (!level.isClientSide) {
+/*        if (!level.isClientSide) {
             if (WaterPushing.checkIfCanPushWater((ServerLevel) level, blockPos, direction)) {
                 BlockPos blockPos2 = blockPos.relative(direction);
                 boolean returnValue = WaterPushing.tryPushWater((ServerLevel) level, blockPos, direction);
@@ -28,6 +28,6 @@ public class MixinPistonBaseBlock {
                 cir.setReturnValue(false);
                 cir.cancel();
             }
-        }
+        }*/
     }
 }
