@@ -7,6 +7,7 @@ import com.thepeeingboyairfryers.washwater.base.common.packets.SectionUpdatePack
 import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFuidSectionPacket;
 import com.thepeeingboyairfryers.washwater.base.common.packets.SingleFluidUpdatePacket;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
+import com.thepeeingboyairfryers.washwater.util.poker.FluidSectionPoker;
 import it.unimi.dsi.fastutil.longs.LongRBTreeSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.client.Minecraft;
@@ -72,7 +73,7 @@ public class WWNetworking {
                     var s = FluidSectionManager.getAttachmentFor(chunk).getSectionWithY(sectionPos.y());
                     var update = s.buildUpdatePacket(sectionPos, false);
                     if (update != null)
-                        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, chunkPos, update);
+                        PacketDistributor.sendToPlayersTrackingChunk(level, chunkPos, update);
                 }
 
                 dirties.clear();
@@ -93,6 +94,8 @@ public class WWNetworking {
     }
 
     private static void handleSectionUpdate(SectionUpdatePacket packet, IPayloadContext ctx) {
+        if (FluidSectionPoker.isEnabled()) return;
+
         var level = Minecraft.getInstance().level;
         assert level != null;
 
@@ -114,6 +117,8 @@ public class WWNetworking {
 
     //SectionPos coordinates
     public static void queueUpdate(ServerLevel level, int x, int y, int z) {
+        if (FluidSectionPoker.isEnabled()) return; // Dont do anything if we are doing poker
+
         synchronized (DIRTY_SECTIONS) {
             DIRTY_SECTIONS.computeIfAbsent(level, a -> new LongRBTreeSet()).add(SectionPos.asLong(x, y, z));
         }
