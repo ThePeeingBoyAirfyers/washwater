@@ -22,7 +22,7 @@ public class WaterInfo {
     private static final BlockPos.MutableBlockPos SOLID_POS = new BlockPos.MutableBlockPos();
     public static boolean isSolid(BlockGetter getter, BlockState state, int x, int y, int z) {
         if (!Config.EXPERIMENTAL_PARTIAL_BLOCKS.getAsBoolean())
-            return !state.isAir();
+            return !state.isAir() && state.getFluidState().isEmpty();
 
         // TODO make it work better, disabled by default for now
         VoxelShape shape = state.getCollisionShape(getter, SOLID_POS.set(x, y, z));
