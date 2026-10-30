@@ -11,7 +11,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 public class FluidSectionPoker {
-    private static boolean enabled = true;
+    private static boolean enabled = false;
 
     private FluidSectionPoker() {
         throw new AssertionError();
