@@ -14,7 +14,7 @@ public class WaterInfo {
     public static final int FLOW_DIVIDER = 8;
     public static final int MIN_Y = -64;
     public static final int PRECISION_BUCKET_RADIUS = 2;
-    public static final int DROPLET_SIZE = 10;
+    public static final int DROPLET_SIZE = Config.DROPLET_SIZE.getAsInt();
 
     private WaterInfo() {
         throw new IllegalStateException();
