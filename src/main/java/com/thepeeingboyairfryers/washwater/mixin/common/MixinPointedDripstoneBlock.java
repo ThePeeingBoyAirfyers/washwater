@@ -26,6 +26,9 @@ public class MixinPointedDripstoneBlock {
      */
     @Overwrite
     public static void maybeTransferFluid(BlockState state, ServerLevel level, BlockPos pos, float randChance) {
+
+        if (randChance < 0.9F) return;
+
         if (isStalactiteStartPos(state, level, pos)) {
             Optional<BlockPos> rootFluidPosOptional = getFluidPosAbove(level, pos, state);
             if (rootFluidPosOptional.isEmpty()) {
@@ -33,36 +36,30 @@ public class MixinPointedDripstoneBlock {
             }
 
             BlockPos rootFluidPos = rootFluidPosOptional.get().above();
-            System.out.println("rootfluidpos: " + rootFluidPos);
-            MultiFluidValue fluidAboveStalactite = FluidUtil.getFluids(level, rootFluidPos);
-            if (fluidAboveStalactite.isEmpty()) {
+            MultiFluidValue fluidAboveDripstone = FluidUtil.getFluids(level, rootFluidPos);
+            if (fluidAboveDripstone.isEmpty()) {
                 return;
             }
 
-            Iterator<MultiFluidValue.Entry> fluids = fluidAboveStalactite.iterator();
+            Iterator<MultiFluidValue.Entry> fluids = fluidAboveDripstone.iterator();
             MultiFluidValue.Entry fluid = fluids.next();
             if (fluids.hasNext()) throw new IllegalStateException();;
 
             FluidType type = fluid.fluidType();
             int fluidVolume = fluid.volume();
 
-            //FluidType.DripstoneDripInfo dripInfo = fluid.getFluidType().getDripInfo();
-            if (fluidVolume >= WaterInfo.DROPLET_SIZE) {
+            if (fluidVolume >= WaterInfo.DROPLET_SIZE) return;
 
-                if (randChance < 0.9F) {
 
-                    BlockPos blockpos = findTip(state, level, pos, 11, false).below();
-                    if (FluidUtil.canAddVolume(level, blockpos, type, WaterInfo.DROPLET_SIZE) == WaterInfo.DROPLET_SIZE) {
-                        System.out.println("could add");
-                        //remove consumed fluid from above
-                        FluidUtil.setVolume(level, rootFluidPos, MultiFluidValue.single(type, (short) (fluidVolume - WaterInfo.DROPLET_SIZE)));
-                        //place water droplet below
-                        System.out.println("blockpos is: " + blockpos);
-                        FluidUtil.addVolume(level, blockpos, type, WaterInfo.DROPLET_SIZE);
-                    }
-                }
+            BlockPos blockpos = findTip(state, level, pos, 11, false).below();
+            if (FluidUtil.canAddVolume(level, blockpos, type, WaterInfo.DROPLET_SIZE) == WaterInfo.DROPLET_SIZE) {
+                //remove consumed fluid from above
+                FluidUtil.setVolume(level, rootFluidPos, MultiFluidValue.single(type, (short) (fluidVolume - WaterInfo.DROPLET_SIZE)));
+                //place water droplet below
+                FluidUtil.addVolume(level, blockpos, type, WaterInfo.DROPLET_SIZE);
             }
         }
+
     }
 
     private static Optional<BlockPos> getFluidPosAbove(Level level, BlockPos pos, BlockState state) {
