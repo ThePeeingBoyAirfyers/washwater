@@ -24,11 +24,18 @@ public interface LevelConfigurationRegistry<T extends LevelConfigurationInterfac
 
     T get(Level level);
 
-    static <T extends LevelConfigurationInterface<T>> LevelConfigurationRegistry<T> create(ResourceLocation name, LevelConfigurationSide side) {
+    static <T extends LevelConfigurationInterface<T>> LevelConfigurationRegistry<T> create(
+            ResourceLocation name,
+            LevelConfigurationSide side
+    ) {
         return new LevelConfigurationRegistryImpl<>(name, side, null);
     }
 
-    static <T extends LevelConfigurationInterface<T>> LevelConfigurationRegistry<T> create(ResourceLocation name, LevelConfigurationSide side,Supplier<T> defaultValue) {
+    static <T extends LevelConfigurationInterface<T>> LevelConfigurationRegistry<T> create(
+            ResourceLocation name,
+            LevelConfigurationSide side,
+            Supplier<T> defaultValue
+    ) {
         return new LevelConfigurationRegistryImpl<>(name, side, defaultValue);
     }
 
@@ -46,5 +53,9 @@ public interface LevelConfigurationRegistry<T extends LevelConfigurationInterfac
 
     LevelConfigurationSide side();
 
-    <I extends T> LevelConfigurationInterface.Entry<T> createEntry(Class<I> clazz, MapCodec<I> codec, ConfigurationCommand<I> command);
+    <I extends T> LevelConfigurationInterface.Entry<T> createEntry(
+            Class<I> clazz,
+            MapCodec<I> codec,
+            ConfigurationCommand<I> command
+    );
 }

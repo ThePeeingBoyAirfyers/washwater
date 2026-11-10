@@ -1,7 +1,5 @@
-package com.thepeeingboyairfryers.washwater.base.client.fluid_rendering;
+package com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.impl;
 
-import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidManager;
-import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.ducks.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.api.util.ColorARGB;
 import net.caffeinemc.mods.sodium.client.model.color.ColorProvider;
@@ -13,7 +11,6 @@ import net.caffeinemc.mods.sodium.client.model.quad.ModelQuad;
 import net.caffeinemc.mods.sodium.client.model.quad.properties.ModelQuadFacing;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildBuffers;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.buffers.ChunkModelBuilder;
-import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.FluidRenderer;
 import net.caffeinemc.mods.sodium.client.render.chunk.terrain.material.DefaultMaterials;
 import net.caffeinemc.mods.sodium.client.render.chunk.terrain.material.Material;
 import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.TranslucentGeometryCollector;
@@ -29,62 +26,60 @@ import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.textures.FluidSpriteCache;
 
-
-public class WashFluidRenderer extends FluidRenderer {
-
-    private final WaterSurfaceHandler handler = new WaterSurfaceHandler();
+public class FluidRenderingState {
     private final QuadLightData quadLightData = new QuadLightData();
     private final ModelQuad quad = new ModelQuad();
     private final ChunkVertexEncoder.Vertex[] vertices = ChunkVertexEncoder.Vertex.uninitializedQuad();
     private final BlockPos.MutableBlockPos scratchPos = new BlockPos.MutableBlockPos();
+    private final BlockPos.MutableBlockPos scratchPos2 = new BlockPos.MutableBlockPos();
     private final ColorProviderRegistry colorRegistry;
     private final LightPipelineProvider lightPipelineProvider;
     private final int[] quadColors = new int[4];
+    private Material material;
+    private LevelSlice level;
+    private int x, y, z;
+    private BlockState blockState;
+    private FluidState fluidState;
     private ColorProvider<FluidState> colorProvider;
     private ChunkModelBuilder builder;
     private TranslucentGeometryCollector collector;
+    private TextureAtlasSprite[] sprites;
+    private BlockPos offset;
 
-    public WashFluidRenderer(ColorProviderRegistry iColorRegistry, LightPipelineProvider iLightPipelineProvider) {
+    public FluidRenderingState(ColorProviderRegistry iColorRegistry, LightPipelineProvider iLightPipelineProvider) {
         this.colorRegistry = iColorRegistry;
         this.lightPipelineProvider = iLightPipelineProvider;
     }
 
-    @Override
-    public void render(
-            LevelSlice level,
-            BlockState blockState,
-            FluidState fluidState,
-            BlockPos blockPos,
-            BlockPos offset,
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public void configure(
+            int iX, int iY, int iZ,
+            BlockPos iOffset,
+            LevelSlice iLevel,
+            BlockState iBlockState,
+            FluidState iFluidState,
             TranslucentGeometryCollector iCollector,
             ChunkBuildBuffers buffers
     ) {
-        ILevelSliceFluids fluids = (ILevelSliceFluids) (Object) level;
-        MultiFluidValue value = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        if (value.size() != 1) throw new IllegalArgumentException();
-        MultiFluidValue.Entry entry = value.iterator().next();
-        fluidState = FluidManager.dropinFluidState(entry.fluidType());
+        this.x = iX;
+        this.y = iY;
+        this.z = iZ;
+        this.level = iLevel;
+        this.blockState = iBlockState;
+        this.fluidState = iFluidState;
+        this.offset = iOffset;
 
-        Material material = DefaultMaterials.forFluidState(fluidState);
-        this.builder = buffers.get(material);
-        this.collector = iCollector;
+        material = DefaultMaterials.forFluidState(fluidState);
+        builder = buffers.get(material);
+        collector = iCollector;
         colorProvider = colorRegistry.getColorProvider(fluidState.getType());
         if (colorProvider == null)
             colorProvider = ForgeColorProviders.adapt(IClientFluidTypeExtensions.of(fluidState));
 
-        handler.configure(level, blockPos, blockState, fluidState);
-        TextureAtlasSprite[] sprites = FluidSpriteCache.getFluidSprites(level, blockPos, fluidState);
-
-        quad.setSprite(sprites[0]);
-
-        for (Direction dir : Direction.values()) {
-            if (handler.configureFace(dir, quad)) {
-                writeQuad(material, blockPos, offset, dir, level, fluidState);
-            }
-        }
+        sprites = FluidSpriteCache.getFluidSprites(level, getBlockPos(), fluidState);
     }
 
-    private void writeQuad(Material material, BlockPos realPos, BlockPos offset, Direction facing, LevelSlice level, FluidState fluidState) {
+    public void writeQuad(Direction facing) {
         ChunkVertexEncoder.Vertex[] iVertices = this.vertices;
         TextureAtlasSprite sprite = quad.getSprite();
 
@@ -94,8 +89,8 @@ public class WashFluidRenderer extends FluidRenderer {
 
         quad.setFaceNormal(normal);
 
-        lighter.calculate(quad, realPos, quadLightData, null, facing, false, false);
-        colorProvider.getColors(level, realPos, scratchPos.set(realPos), fluidState, quad, quadColors);
+        lighter.calculate(quad,  scratchPos.set(x, y, z), quadLightData, null, facing, false, false);
+        colorProvider.getColors(level, scratchPos.set(x, y, z), scratchPos2.set(x, y, z), fluidState, quad, quadColors);
 
         for (int i = 0; i < 4; ++i) {
             ChunkVertexEncoder.Vertex out = iVertices[i];
@@ -125,4 +120,67 @@ public class WashFluidRenderer extends FluidRenderer {
         quad.setFlags(0);
     }
 
+    public TextureAtlasSprite[] getSprites() {
+        return sprites;
+    }
+
+    public ColorProviderRegistry getColorRegistry() {
+        return colorRegistry;
+    }
+
+    public int[] getQuadColors() {
+        return quadColors;
+    }
+
+    public LightPipelineProvider getLightPipelineProvider() {
+        return lightPipelineProvider;
+    }
+
+    public ModelQuad getQuad() {
+        return quad;
+    }
+
+    public BlockPos useScratchPos(int iX, int iY, int iZ) {
+        return scratchPos.set(iX, iY, iZ);
+    }
+
+    public BlockPos getBlockPos() {
+        return scratchPos2.set(x, y, z);
+    }
+
+    public QuadLightData getQuadLightData() {
+        return quadLightData;
+    }
+
+    public ChunkVertexEncoder.Vertex[] getVertices() {
+        return vertices;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    public BlockState getBlockState() {
+        return blockState;
+    }
+
+    public FluidState getFluidState() {
+        return fluidState;
+    }
+
+    public LevelSlice getLevel() {
+        return level;
+    }
+
+    public ILevelSliceFluids getFluids() {
+        return (ILevelSliceFluids) (Object) level;
+    }
 }

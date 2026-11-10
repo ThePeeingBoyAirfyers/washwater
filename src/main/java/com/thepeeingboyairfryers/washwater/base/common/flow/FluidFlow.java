@@ -36,7 +36,7 @@ public class FluidFlow {
         //Downwards flow
         if (!region.isSolid(selfPos.getX(), underY, selfPos.getZ()) && underVolume < WaterInfo.VOLUME_PER_BLOCK) {
             //Delete water at world bottom (void)
-            if (underY == WaterInfo.MIN_Y) {
+            if (underY == region.getMinBuildHeight()) {
                 region.setVolume(selfPos, fluid(0));
                 return;
             }

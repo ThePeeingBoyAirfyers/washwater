@@ -2,6 +2,8 @@ package com.thepeeingboyairfryers.washwater.collections;
 
 import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.WashWater;
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.WWFluidRendererFactory;
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.impl.basic.BasicFluidRendererFactory;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickForeman;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.FixedWorkForeman;
@@ -25,7 +27,7 @@ import java.util.List;
 public class WWImplementations {
     private static HashMap<LevelConfigurationRegistry<?>, List<Pair<String, LevelConfigurationInterface.Entry<?>>>> entries = new HashMap<>();
 
-    public static void register(IEventBus bus) {
+    public static void register(IEventBus bus, boolean isClient) {
         register(FluidTickForeman.REGISTRY, FixedWorkForeman.class, "fixed_work", FixedWorkForeman.CODEC, FixedWorkForeman.COMMAND);
         register(FluidTickForeman.REGISTRY, ManualForeman.class, "manual", ManualForeman.CODEC, ManualForeman.COMMAND);
 
@@ -34,6 +36,9 @@ public class WWImplementations {
 
         register(FluidSectionUpgradeStrategy.REGISTRY, DefaultFluidSectionUpgradeStrategy.class, "default", DefaultFluidSectionUpgradeStrategy.INSTANCE.codec(), DefaultFluidSectionUpgradeStrategy.INSTANCE.command());
         register(FluidSectionUpgradeStrategy.REGISTRY, DumbFluidSectionUpgradeStrategy.class, "dumb", DumbFluidSectionUpgradeStrategy.INSTANCE.codec(), DumbFluidSectionUpgradeStrategy.INSTANCE.command());
+
+        if (isClient)
+            register(WWFluidRendererFactory.REGISTRY, BasicFluidRendererFactory.class, "basid", BasicFluidRendererFactory.CODEC, BasicFluidRendererFactory.COMMAND);
 
         bus.addListener((RegisterEvent e) ->
                 entries.forEach((r, l) ->

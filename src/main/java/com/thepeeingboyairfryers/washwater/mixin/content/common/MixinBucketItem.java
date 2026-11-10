@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.mixin.common;
+package com.thepeeingboyairfryers.washwater.mixin.content.common;
 
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
@@ -30,7 +30,7 @@ public abstract class MixinBucketItem {
             )
     )
     private boolean ww€setBlock(Level level, BlockPos pos, BlockState state, int flags) {
-        if (pos.getY() == WaterInfo.MIN_Y)
+        if (pos.getY() == level.getMinBuildHeight())
             return false;
         if (!level.isClientSide) {
             return (FluidUtil.addVolume(level, pos, content.getFluidType(), WaterInfo.VOLUME_PER_BLOCK) == WaterInfo.VOLUME_PER_BLOCK);

@@ -6,11 +6,14 @@ import com.thepeeingboyairfryers.washwater.base.common.WWNetworking;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.FluidUtil;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
+import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionList;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeInfo;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionUpgradeStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.storage.impl.DefaultFluidSectionUpgradeStrategy;
+import com.thepeeingboyairfryers.washwater.base.common.storage.impl.SimpleFluidSectionList;
 import com.thepeeingboyairfryers.washwater.ducks.IChunkFluidSection;
 import com.thepeeingboyairfryers.washwater.util.parallel.MainThreads;
+import com.thepeeingboyairfryers.washwater.util.poker.FluidSectionPoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -19,7 +22,6 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,14 +31,14 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
                     .forGetter(FluidChunkAttachment::getSections)
     ).apply(i, FluidChunkAttachment::new));
 
-    private List<FluidSection> sections = null;
+    private FluidSectionList sections = null;
     private ChunkAccess chunk;
 
     public FluidChunkAttachment() {
     }
 
     private FluidChunkAttachment(List<FluidSection> iSections) {
-        this.sections = new ArrayList<>(iSections);
+        this.sections = new SimpleFluidSectionList(iSections);
     }
 
     public void configure(ChunkAccess iChunk) {
@@ -44,10 +46,9 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
         this.chunk = iChunk;
 
         if (sections == null) {
-            sections = new ArrayList<>(chunk.getSectionsCount());
-            for (int i = 0; i < chunk.getSectionsCount(); i++) {
-                sections.add(FluidSection.EMPTY);
-            }
+            sections = FluidSectionPoker.createList(chunk);
+        } else {
+            sections = FluidSectionPoker.configureList(chunk, sections);
         }
 
         for (int i = 0; i < chunk.getSectionsCount(); i++) {
@@ -100,6 +101,10 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
     }
 
     private List<FluidSection> getSections() {
+        return sections.getListCopy();
+    }
+
+    public FluidSectionList getSectionList() {
         return sections;
     }
 
@@ -146,9 +151,10 @@ public class FluidChunkAttachment implements Iterable<FluidSection> {
                 if (MainThreads.isRenderThread())
                     Minecraft.getInstance().levelRenderer.setSectionDirty(x, y, z);
                 return;
+            } else {
+                FluidSectionPoker.markDirty(level, x, y, z);
+                WWNetworking.queueUpdate((ServerLevel) level, x, y, z);
             }
-
-            WWNetworking.queueUpdate((ServerLevel) level, x, y, z);
         }
     }
 }

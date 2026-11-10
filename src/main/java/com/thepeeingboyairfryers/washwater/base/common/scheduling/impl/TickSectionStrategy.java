@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.base.common.scheduling.impl;
 
+import com.thepeeingboyairfryers.washwater.base.common.LevelMeta;
 import com.thepeeingboyairfryers.washwater.base.common.WWStats;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickSection;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickStrategy;
@@ -72,7 +73,7 @@ public abstract class TickSectionStrategy implements FluidTickStrategy {
         int yS = FluidTickSection.getSectionCoord(y);
         int zS = FluidTickSection.getSectionCoord(z);
 
-        FluidTickSection tSection = tickSections.computeIfAbsent(SectionPos.asLong(xS, yS, zS), l -> setupTicker(level, new FluidTickSection(xS, yS, zS)));
+        FluidTickSection tSection = tickSections.computeIfAbsent(SectionPos.asLong(xS, yS, zS), l -> setupTicker(level, new FluidTickSection(new LevelMeta(level), xS, yS, zS)));
         tSection.addLiveTick(x, y, z);
         markSectionDirty(tSection);
     }
@@ -103,7 +104,7 @@ public abstract class TickSectionStrategy implements FluidTickStrategy {
                     if (yy < level.getMinSection() - 1) continue;
                     var section = tickSections.computeIfAbsent(
                             SectionPos.asLong(xx, yy, zz),
-                            l -> new FluidTickSection(xx, yy, zz));
+                            l -> new FluidTickSection(new LevelMeta(level), xx, yy, zz));
 
                     section.setAge(FluidTicker.getCurrentTick() - refreshRate - 10);
                 }

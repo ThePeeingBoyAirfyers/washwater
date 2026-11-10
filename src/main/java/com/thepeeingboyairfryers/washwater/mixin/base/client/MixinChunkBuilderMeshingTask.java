@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.mixin.client;
+package com.thepeeingboyairfryers.washwater.mixin.base.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;

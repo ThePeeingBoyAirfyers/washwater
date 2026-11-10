@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.mixin.common;
+package com.thepeeingboyairfryers.washwater.mixin.content.common;
 
 import com.thepeeingboyairfryers.washwater.base.common.flow.WaterPushing;
 import net.minecraft.core.BlockPos;
