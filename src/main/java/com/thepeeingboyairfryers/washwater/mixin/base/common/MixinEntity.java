@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.mixin.common;
+package com.thepeeingboyairfryers.washwater.mixin.base.common;
 
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
