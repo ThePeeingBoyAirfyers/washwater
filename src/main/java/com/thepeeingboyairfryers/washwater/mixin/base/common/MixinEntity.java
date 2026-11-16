@@ -1,28 +1,17 @@
-package com.thepeeingboyairfryers.washwater.mixin.common;
+package com.thepeeingboyairfryers.washwater.mixin.base.common;
 
 
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.fluids.FluidType;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import static com.thepeeingboyairfryers.washwater.mixin.accessors.EntityAccessor.*;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity {
