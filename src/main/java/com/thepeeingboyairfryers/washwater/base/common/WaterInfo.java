@@ -18,6 +18,7 @@ public class WaterInfo {
     public static final short SURFACE_TENSION_LIMIT = 20;
     public static final int FLOW_DIVIDER = 8;
     public static final int PRECISION_BUCKET_RADIUS = 2;
+    public static final int DROPLET_SIZE = 10;
 
     private static final BlockPos.MutableBlockPos SOLID_POS = new BlockPos.MutableBlockPos();
     public static boolean isSolid(BlockGetter getter, BlockState state, int x, int y, int z) {

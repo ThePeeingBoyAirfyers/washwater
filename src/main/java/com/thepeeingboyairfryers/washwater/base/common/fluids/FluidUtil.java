@@ -23,6 +23,7 @@ public class FluidUtil {
     public static int addVolume(Level level, BlockPos pos, FluidType type, int volume) {
 
         if (canAddVolume(level, pos, type, volume) == 0) {
+            System.out.println("returned 0 addvol");
             return 0;
         }
 
