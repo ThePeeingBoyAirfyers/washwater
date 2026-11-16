@@ -11,6 +11,7 @@
     "base.common.MixinLevelChunkSection",
     "base.common.MixinNeighborUpdater",
     "content.common.MixinPistonBaseBlock",
+    "base.common.MixinPointedDripstoneBlock",
     "base.common.MixinProtoChunk",
     "base.common.MixinServerLevel",
     "base.common.fake_blockstates.MixinCrudeIncrementalIntIdentityHashBiMap",
