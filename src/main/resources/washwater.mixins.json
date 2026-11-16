@@ -8,6 +8,7 @@
     "accessors.StateHolderAccessor",
     "base.common.MixinBlockItem",
     "content.common.MixinBucketItem",
+    "base.common.MixinEntity",
     "base.common.MixinLevelChunkSection",
     "base.common.MixinNeighborUpdater",
     "content.common.MixinPistonBaseBlock",
