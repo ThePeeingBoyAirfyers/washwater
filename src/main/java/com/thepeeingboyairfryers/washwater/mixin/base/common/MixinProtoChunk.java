@@ -1,4 +1,4 @@
-package com.thepeeingboyairfryers.washwater.mixin.common;
+package com.thepeeingboyairfryers.washwater.mixin.base.common;
 
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import net.minecraft.core.Registry;

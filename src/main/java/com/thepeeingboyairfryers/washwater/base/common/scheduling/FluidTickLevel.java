@@ -13,16 +13,17 @@ import com.thepeeingboyairfryers.washwater.util.performance.PerTickTimer;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FluidTickLevel implements FluidTickingContext {
     private final ThreadLocal<FluidFlow> fluidFlow = new ThreadLocal<>();
     private final Set<LongSet> nextTickToBeTicked = ConcurrentHashMap.newKeySet();
+    private final ConcurrentLinkedQueue<FluidTickingTask.MainThreadTask> mainThreadTasks = new ConcurrentLinkedQueue<>();
     private final ServerLevel level;
     private final Logger logger;
     private int prevProgress = 0;
@@ -42,6 +43,12 @@ public class FluidTickLevel implements FluidTickingContext {
             prevProgress = getStrategy().tick(context, level, this, prevProgress, workAmount);
         } catch (Exception e) {
             WashWater.LOGGER.error("Error while ticking level parallel", e);
+        }
+
+        applyNextTicks();
+
+        while (!mainThreadTasks.isEmpty()) {
+            mainThreadTasks.poll().run(level);
         }
     }
 
@@ -88,8 +95,10 @@ public class FluidTickLevel implements FluidTickingContext {
     }
 
     @Override
-    public void updateBlock(int x, int y, int z, BlockState oldState, BlockState newState) {
-        level.sendBlockUpdated(new BlockPos(x, y, z), oldState, newState, 3);
+    public void queueTask(FluidTickingTask task) {
+        if (task instanceof FluidTickingTask.MainThreadTask mainThreadTask) {
+            mainThreadTasks.add(mainThreadTask);
+        }
     }
 
     public void toBeTicked(int x, int y, int z) {

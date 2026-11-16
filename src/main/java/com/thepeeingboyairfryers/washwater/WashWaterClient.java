@@ -1,6 +1,7 @@
 package com.thepeeingboyairfryers.washwater;
 
 import com.thepeeingboyairfryers.washwater.base.client.LilyPadBakedModel;
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.WWFluidRendererFactory;
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.collections.WWDataComponentTypes;
 import com.thepeeingboyairfryers.washwater.debug.DebugFluidRenderer;
@@ -13,10 +14,10 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import static com.thepeeingboyairfryers.washwater.collections.WWItems.PRECISION_BUCKET;
 
-@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 @Mod(value = WashWater.MOD_ID, dist = Dist.CLIENT)
 public class WashWaterClient {
     public WashWaterClient(IEventBus modEventBus, ModContainer container) {
@@ -24,9 +25,13 @@ public class WashWaterClient {
         modEventBus.addListener((FMLClientSetupEvent e) -> registerItemProperties());
         modEventBus.addListener(LilyPadBakedModel::modifyBakedModelsEvent);
         DebugFluidRenderer.register(container.getEventBus());
+
+        modEventBus.addListener((NewRegistryEvent e) -> {
+            e.register(WWFluidRendererFactory.REGISTRY.registry());
+        });
     }
 
-    public static void registerItemProperties() {
+    private void registerItemProperties() {
         ItemProperties.register(PRECISION_BUCKET.get(), ResourceLocation.parse("bucketlevel"), (itemStack, clientWorld, livingEntity, seed) -> {
             if (!itemStack.has(WWDataComponentTypes.BUCKET_FILL_LEVEL)) {
                 itemStack.set(WWDataComponentTypes.BUCKET_FILL_LEVEL, 0);

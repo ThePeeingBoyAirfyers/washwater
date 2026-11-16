@@ -1,26 +1,19 @@
-package com.thepeeingboyairfryers.washwater.base.client.fluid_rendering;
+package com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.impl.basic;
 
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.impl.FluidRenderingState;
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.ducks.ILevelSliceFluids;
 import net.caffeinemc.mods.sodium.client.model.quad.ModelQuad;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockOcclusionCache;
-import net.caffeinemc.mods.sodium.client.world.LevelSlice;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.Shapes;
 
-public class WaterSurfaceHandler {
+public class FluidFaceHandler {
 
     private final float[] heights = new float[6];
     private final BlockOcclusionCache occlusionCache = new BlockOcclusionCache();
-
-    private LevelSlice level;
-    private BlockPos blockPos;
-    private BlockState blockState;
-    private FluidState fluidState;
+    private final FluidRenderingState state;
 
     private float northWestHeight;
     private float northEastHeight;
@@ -28,15 +21,11 @@ public class WaterSurfaceHandler {
     private float southEastHeight;
     private float selfHeight;
 
-    public void configure(LevelSlice iLevel, BlockPos pos, BlockState state, FluidState iFluidState) {
-        level = iLevel;
-        blockPos = pos;
-        blockState = state;
-        fluidState = iFluidState;
-        fetchHeights((ILevelSliceFluids) (Object) level);
+    public FluidFaceHandler(FluidRenderingState renderingState) {
+        this.state = renderingState;
     }
 
-    public boolean configureFace(Direction dir, ModelQuad quad) {
+    public boolean configureFace(Direction dir) {
         if (this.isFullBlockFluidOccluded(dir))
             return false;
         float yOffset = 0.00000001F;
@@ -79,38 +68,39 @@ public class WaterSurfaceHandler {
                 break;
 
             case DOWN:
-                setVertex(quad, 0, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-                setVertex(quad, 1, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-                setVertex(quad, 2, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-                setVertex(quad, 3, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+                setVertex(state.getQuad(), 0, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+                setVertex(state.getQuad(), 1, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+                setVertex(state.getQuad(), 2, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+                setVertex(state.getQuad(), 3, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
                 return true;
 
             case UP:
-                setVertex(quad, 0, 0.0f, southWestHeight, 1.0f, 0.0f, 0.0f);
-                setVertex(quad, 1, 1.0f, southEastHeight, 1.0f, 1.0f, 0.0f);
-                setVertex(quad, 2, 1.0f, northEastHeight, 0.0f, 1.0f, 1.0f);
-                setVertex(quad, 3, 0.0f, northWestHeight, 0.0f, 0.0f, 1.0f);
+                setVertex(state.getQuad(), 0, 0.0f, southWestHeight, 1.0f, 0.0f, 0.0f);
+                setVertex(state.getQuad(), 1, 1.0f, southEastHeight, 1.0f, 1.0f, 0.0f);
+                setVertex(state.getQuad(), 2, 1.0f, northEastHeight, 0.0f, 1.0f, 1.0f);
+                setVertex(state.getQuad(), 3, 0.0f, northWestHeight, 0.0f, 0.0f, 1.0f);
                 return true;
             default:
                 throw new IllegalArgumentException();
         }
 
         //Horizontal Directions
-        setVertex(quad, 0, x2, c2, z2, 1f, 1f);
-        setVertex(quad, 1, x2, yOffset, z2, 1f, 1f);
-        setVertex(quad, 2, x1, yOffset, z1, 1f, 1f);
-        setVertex(quad, 3, x1, c1, z1, 1f, 1f);
+        setVertex(state.getQuad(), 0, x2, c2, z2, 1f, 1f);
+        setVertex(state.getQuad(), 1, x2, yOffset, z2, 1f, 1f);
+        setVertex(state.getQuad(), 2, x1, yOffset, z1, 1f, 1f);
+        setVertex(state.getQuad(), 3, x1, c1, z1, 1f, 1f);
 
         return true;
     }
 
-    private void fetchHeights(ILevelSliceFluids fluids) {
+    public void fetchHeights() {
+        ILevelSliceFluids fluids = state.getFluids();
         for (Direction dir : Direction.values()) {
-            MultiFluidValue fluid = fluids.ww€getFluidFor(blockPos.getX() + dir.getStepX(), blockPos.getY() + dir.getStepY(), blockPos.getZ() + dir.getStepZ());
+            MultiFluidValue fluid = fluids.ww€getFluidFor(state.getX() + dir.getStepX(), state.getY() + dir.getStepY(), state.getZ() + dir.getStepZ());
             heights[dir.ordinal()] = fluid.getTotalVolume() / (float) WaterInfo.VOLUME_PER_BLOCK;
         }
 
-        MultiFluidValue fluid = fluids.ww€getFluidFor(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        MultiFluidValue fluid = fluids.ww€getFluidFor(state.getX(), state.getY(), state.getZ());
         selfHeight = fluid.getTotalVolume() / (float) WaterInfo.VOLUME_PER_BLOCK;
 
         this.northWestHeight = calculateCornerHeight(fluids, Direction.NORTH, Direction.WEST);
@@ -128,7 +118,7 @@ public class WaterSurfaceHandler {
     }
 
     private boolean isFullBlockFluidOccluded(Direction dir) {
-        if (!this.occlusionCache.shouldDrawFullBlockFluidSide(blockState, level, blockPos, dir, fluidState, Shapes.block()))
+        if (!this.occlusionCache.shouldDrawFullBlockFluidSide(state.getBlockState(), state.getLevel(), state.getBlockPos(), dir, state.getFluidState(), Shapes.block()))
             return true;
         if (dir == Direction.DOWN)
             return heights[dir.ordinal()] >= 0.9999f;
@@ -141,10 +131,10 @@ public class WaterSurfaceHandler {
         int divisor = 1;
         float heightA = heights[dirA.ordinal()];
         float heightB = heights[dirB.ordinal()];
-        MultiFluidValue fluidDiag = fluids.ww€getFluidFor(blockPos.getX() + dirA.getStepX() + dirB.getStepX(), blockPos.getY(), blockPos.getZ() + dirA.getStepZ() + dirB.getStepZ());
-        MultiFluidValue fluidAAbove = fluids.ww€getFluidFor(blockPos.getX() + dirA.getStepX(), blockPos.getY() + 1, blockPos.getZ() + dirA.getStepZ());
-        MultiFluidValue fluidBAbove = fluids.ww€getFluidFor(blockPos.getX() + dirB.getStepX(), blockPos.getY() + 1, blockPos.getZ() + dirB.getStepZ());
-        MultiFluidValue fluidDiagAbove = fluids.ww€getFluidFor(blockPos.getX() + dirA.getStepX() + dirB.getStepX(), blockPos.getY() + 1, blockPos.getZ() + dirA.getStepZ() + dirB.getStepZ());
+        MultiFluidValue fluidDiag = fluids.ww€getFluidFor(state.getX() + dirA.getStepX() + dirB.getStepX(), state.getY(), state.getZ() + dirA.getStepZ() + dirB.getStepZ());
+        MultiFluidValue fluidAAbove = fluids.ww€getFluidFor(state.getX() + dirA.getStepX(), state.getY() + 1, state.getZ() + dirA.getStepZ());
+        MultiFluidValue fluidBAbove = fluids.ww€getFluidFor(state.getX() + dirB.getStepX(), state.getY() + 1, state.getZ() + dirB.getStepZ());
+        MultiFluidValue fluidDiagAbove = fluids.ww€getFluidFor(state.getX() + dirA.getStepX() + dirB.getStepX(), state.getY() + 1, state.getZ() + dirA.getStepZ() + dirB.getStepZ());
         float heightDiag = fluidDiag.getTotalVolume() / (float) WaterInfo.VOLUME_PER_BLOCK;
 
         if ((!fluidAAbove.isEmpty() && heightA >= 0.9999f) || (!fluidBAbove.isEmpty() && heightB >= 0.9999f) || (!fluidDiagAbove.isEmpty() && heightDiag >= 0.9999f))

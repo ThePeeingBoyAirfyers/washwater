@@ -10,10 +10,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SimpleFluidRegion implements FluidRegion {
     private final Long2ObjectMap<FluidSection> fluidSections = new Long2ObjectOpenHashMap<>();
@@ -40,16 +42,9 @@ public class SimpleFluidRegion implements FluidRegion {
         return getFluidSection(x, y, z).getAllVolume(x & 15, y & 15, z & 15);
     }
 
-
     @Override
     public boolean isAir(int x, int y, int z) {
         return getFluidSection(x, y, z).getAllVolume(x & 15, y & 15, z & 15) == 0;
-    }
-
-    @Override
-    public boolean isSolid(int x, int y, int z) {
-        BlockState localBS = getSection(x, y, z).getBlockState(x & 15, y & 15, z & 15);
-        return (!localBS.isAir() && localBS.getFluidState().isEmpty());
     }
 
     @Override
@@ -86,5 +81,26 @@ public class SimpleFluidRegion implements FluidRegion {
 
     public void setTickSet(LongSet current) {
         onUpdate = current;
+    }
+
+
+    @Override
+    public @Nullable BlockEntity getBlockEntity(BlockPos blockPos) {
+        return level.getBlockEntity(blockPos);
+    }
+
+    @Override
+    public BlockState getBlockState(int x, int y, int z) {
+        return getSection(x, y, z).getBlockState(x & 15, y & 15, z & 15);
+    }
+
+    @Override
+    public int getHeight() {
+        return level.getHeight();
+    }
+
+    @Override
+    public int getMinBuildHeight() {
+        return level.getMinBuildHeight();
     }
 }
