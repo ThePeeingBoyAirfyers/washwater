@@ -125,7 +125,7 @@ public class LevelConfigurationRegistryImpl<T extends LevelConfigurationInterfac
     }
 
     @Override
-    public <I extends T> LevelConfigurationInterface.Entry<T> createEntry(Class<I> clazz, MapCodec<I> codec, ConfigurationCommand<I> command) {
+    public <I extends T> LevelConfigurationInterface.Entry<T> createEntry(Class<I> clazz, MapCodec<I> iCodec, ConfigurationCommand<I> command) {
         var entry = new LevelConfigurationInterface.Entry<T>() {
             @Override
             public ConfigurationCommand<? extends T> command() {
@@ -134,7 +134,7 @@ public class LevelConfigurationRegistryImpl<T extends LevelConfigurationInterfac
 
             @Override
             public MapCodec<? extends T> codec() {
-                return codec;
+                return iCodec;
             }
         };
 

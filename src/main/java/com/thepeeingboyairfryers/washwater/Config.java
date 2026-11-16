@@ -34,6 +34,8 @@ public class Config {
             .comment("The volume of water moved in each dripstone water dripping event")
             .defineInRange("dropletSize", 10, 0, Integer.MAX_VALUE);
 
+    public static final ModConfigSpec.BooleanValue EXPERIMENTAL_PARTIAL_BLOCKS = BUILDER
+            .define("experimentalPartialBlocks", false);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 

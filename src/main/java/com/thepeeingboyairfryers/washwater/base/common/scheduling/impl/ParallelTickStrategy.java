@@ -36,6 +36,7 @@ public class ParallelTickStrategy extends TickSectionStrategy {
 
     public ParallelTickStrategy(int iRefreshRate, int threadCount) {
         super(iRefreshRate);
+        if (threadCount <= 0) threadCount = decideThreadCount();
         executor = Executors.newFixedThreadPool(threadCount);
     }
 

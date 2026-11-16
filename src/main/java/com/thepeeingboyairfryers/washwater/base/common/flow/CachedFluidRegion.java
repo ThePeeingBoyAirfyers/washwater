@@ -1,5 +1,6 @@
 package com.thepeeingboyairfryers.washwater.base.common.flow;
 
+import com.thepeeingboyairfryers.washwater.base.common.LevelMeta;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import net.minecraft.core.Direction;
@@ -8,9 +9,13 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class CachedFluidRegion implements FluidRegion {
+public abstract class CachedFluidRegion extends MetaBasedFluidRegion {
     private int cachedX = Integer.MIN_VALUE, cachedY = Integer.MIN_VALUE, cachedZ = Integer.MIN_VALUE;
     private MultiFluidValue cachedFluid;
+
+    public CachedFluidRegion(LevelMeta iLevelMeta) {
+        super(iLevelMeta);
+    }
 
     @Override
     public int getFluidVolume(int x, int y, int z, FluidType type) {
@@ -38,12 +43,6 @@ public abstract class CachedFluidRegion implements FluidRegion {
     }
 
     @Override
-    public boolean isSolid(int x, int y, int z) {
-        BlockState localBS = getBlockSection(x >> 4, y >> 4, z >> 4).getBlockState(x & 15, y & 15, z & 15);
-        return (!localBS.isAir() && localBS.getFluidState().isEmpty());
-    }
-
-    @Override
     public void setVolume(int x, int y, int z, MultiFluidValue value) {
         getFluidSection(x >> 4, y >> 4, z >> 4).setVolume(x & 15, y & 15, z & 15, value);
         cachedX = x;
@@ -67,6 +66,11 @@ public abstract class CachedFluidRegion implements FluidRegion {
                 toBeTicked(xD, yD, zD);
             }
         }
+    }
+
+    @Override
+    public BlockState getBlockState(int x, int y, int z) {
+        return getBlockSection(x >> 4, y >> 4, z >> 4).getBlockState(x & 15, y & 15, z & 15);
     }
 
     protected abstract void toBeTicked(int x, int y, int z);

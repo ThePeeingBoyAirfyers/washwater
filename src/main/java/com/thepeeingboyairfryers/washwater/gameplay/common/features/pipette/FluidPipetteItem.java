@@ -22,7 +22,7 @@ public class FluidPipetteItem extends Item {
     }
 
     public static boolean creativePipettePlace(Level level, BlockPos pos, ItemStack itemStack, Player player) {
-        if (!level.isClientSide && pos.getY() != WaterInfo.MIN_Y) {
+        if (!level.isClientSide && pos.getY() != level.getMinBuildHeight()) {
             BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.NONE);
             BlockPos blockPos = blockHitResult.getBlockPos();
             Direction direction = blockHitResult.getDirection();

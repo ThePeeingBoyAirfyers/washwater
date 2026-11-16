@@ -8,6 +8,7 @@
     "accessors.PointedDripstoneBlockAccessor",
     "accessors.EntityAccessor",
     "accessors.StateHolderAccessor",
+<<<<<<< HEAD
     "common.MixinBucketItem",
     "common.MixinEntity",
     "common.MixinLevel",
@@ -21,13 +22,27 @@
     "common.fake_blockstates.MixinIdMapper",
     "common.fake_blockstates.MixinMappedRegistry",
     "common.fake_blockstates.MixinServerCommonPacketListenerImpl"
+=======
+    "base.common.MixinBlockItem",
+    "content.common.MixinBucketItem",
+    "base.common.MixinLevelChunkSection",
+    "base.common.MixinNeighborUpdater",
+    "content.common.MixinPistonBaseBlock",
+    "base.common.MixinProtoChunk",
+    "base.common.MixinServerLevel",
+    "base.common.fake_blockstates.MixinCrudeIncrementalIntIdentityHashBiMap",
+    "base.common.fake_blockstates.MixinFluidState",
+    "base.common.fake_blockstates.MixinIdMapper",
+    "base.common.fake_blockstates.MixinMappedRegistry",
+    "base.common.fake_blockstates.MixinServerCommonPacketListenerImpl"
+>>>>>>> 1.21.1
   ],
   "client": [
     "accessors.ChunkBuilderAccessor",
     "accessors.SodiumWorldRendererAccessor",
-    "client.MixinChunkBuilderMeshingTask",
-    "client.MixinFluidRendererFactory",
-    "client.MixinLevelSlice"
+    "base.client.MixinChunkBuilderMeshingTask",
+    "base.client.MixinFluidRendererFactory",
+    "base.client.MixinLevelSlice"
   ],
   "injectors": {
     "defaultRequire": 1
