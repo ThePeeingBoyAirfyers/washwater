@@ -25,16 +25,13 @@ public class MixinLevel {
             cancellable = true
     )
     private void doDisplacementCheck(BlockPos pos, BlockState newState, int flags, CallbackInfoReturnable<Boolean> cir) {
-        if (FluidUtil.hasFluid((Level) (Object) this, pos)) {
-            if (WaterDisplacement.checkIfCanDisplaceFluids((Level) (Object) this, pos)) {
-                if (!this.isClientSide) {
-                    WaterDisplacement.displaceFluids((Level) (Object) this, pos);
-                }
-            } else {
-                cir.setReturnValue(false);
+        if (!FluidUtil.hasFluid((Level) (Object) this, pos)) return;
+        if (WaterDisplacement.checkIfCanDisplaceFluids((Level) (Object) this, pos)) {
+            if (!this.isClientSide) {
+                WaterDisplacement.displaceFluids((Level) (Object) this, pos);
             }
+        } else {
+            cir.setReturnValue(false);
         }
-
     }
-
 }

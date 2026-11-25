@@ -15,9 +15,6 @@ public class PseudoRandom {
                 x++;
             }
         }
-    }
-
-    static {
         for (int i = 0; i < 6; i++) {
             int x = i;
             for (Direction dir : Direction.values()) {
@@ -26,6 +23,7 @@ public class PseudoRandom {
             }
         }
     }
+
 
     private PseudoRandom() {
         throw new IllegalStateException("Utility class");
