@@ -14,11 +14,12 @@ import java.util.List;
 
 public class WaterDisplacement {
 
-    public static final Direction[] directions = Direction.values();
+    private static final Direction[] DIRECTIONS = Direction.values();
 
     public static final int maxDisplacementRange = 8;
 
-    public static boolean displaceFluids(Level level, BlockPos pos) {
+    public static DisplacementPlan planFluidDisplacements(Level level, BlockPos pos) {
+        List<DisplacementEntry> entries = new ArrayList<>();
         FluidType type = null;
         MultiFluidValue.Entry fluid = null;
         for (MultiFluidValue.Entry fluidEntry : FluidUtil.getFluids(level, pos)) {
@@ -43,95 +44,67 @@ public class WaterDisplacement {
             }
             Iterator<Direction> dirIterator = viableDirections.iterator();
             int theoreticalCut = remainder / viableDirections.size();
-            int theoreticalCutUp = theoreticalCut + initialVolume % viableDirections.size();
+            int theoreticalCutBias = theoreticalCut + (initialVolume % viableDirections.size());
             while (dirIterator.hasNext()) {
                 Direction dir = dirIterator.next();
-                int cut = theoreticalCut;
-                //BIAS LOGIC
-                if (dir == biasDir) {
-                    cut = theoreticalCutUp;
-                    biasDir = null;
-                }
+                int cut = dir == biasDir ? theoreticalCutBias : theoreticalCut;
+                int cutRemainder = displaceInDirection(level, pos, entries, type, dir, cut);
 
-                int cutRemainder = cut;
-                for (int i = 1; i <= maxDisplacementRange && cutRemainder > 0; i++) {
-                    if (FluidUtil.isSolid(level, pos.relative(dir, i))) {
-                        break;
-                    }
-                    cutRemainder = (cutRemainder - FluidUtil.addVolume(level, pos.relative(dir, i).mutable(), type, cutRemainder));
-                }
                 if (cutRemainder > 0) {
                     dirIterator.remove();
                 }
-                int cutTransaction = cut - cutRemainder;
-                remainder -= cutTransaction;
+                
+                remainder -= cut - cutRemainder;
             }
         }
-        return remainder == 0;
+        return new DisplacementPlan(remainder, type, entries);
     }
 
-    public static boolean checkIfCanDisplaceFluids(Level level, BlockPos pos) {
-        FluidType type = null;
-        MultiFluidValue.Entry fluid = null;
-        for (MultiFluidValue.Entry fluidEntry : FluidUtil.getFluids(level, pos)) {
-            if (type != null) throw new IllegalStateException();
-            type = fluidEntry.fluidType();
-            fluid = fluidEntry;
+    public static void applyDisplacements(Level level, DisplacementPlan plan) {
+        for (DisplacementEntry entry : plan.entries) {
+            int applied = FluidUtil.addVolume(level, new BlockPos(entry.x, entry.y, entry.z), plan.type, entry.displacement);
+            if (applied < entry.displacement)
+                throw new IllegalStateException("Displacement failed");
+
         }
-        int initialVolume = fluid.volume();
-        List<Direction> viableDirections = createAndFillViableDirectionList(level, pos);
-        Direction biasDir = null;
-
-        int remainder = initialVolume;
-
-        while (remainder > 0 && !viableDirections.isEmpty()) {
-            Direction[] array =  PseudoRandom.getRandom3DDirectionArray();
-            for (int i = 0; i < 6; i++) {
-                Direction dire = array[i];
-                if (viableDirections.contains(dire)) {
-                    biasDir = dire;
-                    break;
-                }
-            }
-
-
-            Iterator<Direction> dirIterator = viableDirections.iterator();
-            int theoreticalCut = remainder / viableDirections.size();
-            while (dirIterator.hasNext()) {
-                Direction dir = dirIterator.next();
-                int cut = theoreticalCut;
-                //BIAS LOGIC
-                if (dir == biasDir) {
-                    cut += initialVolume % viableDirections.size();
-                    biasDir = null;
-                }
-                int cutRemainder = cut;
-                for (int i = 1; i <= maxDisplacementRange && cutRemainder > 0; i++) {
-                    if (FluidUtil.isSolid(level, pos.relative(dir, i))) {
-                        break;
-                    }
-                    cutRemainder = (cutRemainder - FluidUtil.canAddVolume(level, pos.relative(dir, i).mutable(), type, cutRemainder));
-                }
-                if (cutRemainder > 0) {
-                    dirIterator.remove();
-                }
-                int cutTransaction = cut - cutRemainder;
-                remainder -= cutTransaction;
-            }
-        }
-        return remainder == 0;
     }
+    
 
-
-    public static List<Direction> createAndFillViableDirectionList(Level level, BlockPos pos) {
+    private static List<Direction> createAndFillViableDirectionList(Level level, BlockPos pos) {
         List<Direction> viableDirections = new ArrayList<>(0);
 
-        for (Direction dir : directions) {
+        for (Direction dir : DIRECTIONS) {
             if (!FluidUtil.isSolid(level, pos.relative(dir))) {
                 viableDirections.add(dir);
             }
         }
         return viableDirections;
     }
+    
+    private static int displaceInDirection(Level level, BlockPos pos, List<DisplacementEntry> entries, FluidType type, Direction dir, int cut) {
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+        int cutRemainder = cut;
+        for (int i = 1; i <= maxDisplacementRange && cutRemainder > 0; i++) {
+            mutablePos.set(pos).move(dir, i);
+            if (FluidUtil.isSolid(level, mutablePos)) break;
+            int used = FluidUtil.canAddVolume(level, mutablePos, type, cutRemainder);
+            
+            if (used > 0) {
+                entries.add(new DisplacementEntry(mutablePos.getX(), mutablePos.getY(), mutablePos.getZ(), used));
+                cutRemainder -= used;
+            }
+        }
+        
+        return cutRemainder;
+    }
+    
+    public record DisplacementEntry(
+            int x,
+            int y,
+            int z,
+            int displacement
+    ) {}
+
+    public record DisplacementPlan(int remainder, FluidType type, List<DisplacementEntry> entries) {}
 
 }

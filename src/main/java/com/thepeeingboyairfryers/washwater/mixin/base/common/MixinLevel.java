@@ -26,9 +26,10 @@ public class MixinLevel {
     )
     private void doDisplacementCheck(BlockPos pos, BlockState newState, int flags, CallbackInfoReturnable<Boolean> cir) {
         if (!FluidUtil.hasFluid((Level) (Object) this, pos)) return;
-        if (WaterDisplacement.checkIfCanDisplaceFluids((Level) (Object) this, pos)) {
+        WaterDisplacement.DisplacementPlan plan = WaterDisplacement.planFluidDisplacements((Level) (Object) this, pos);
+        if (plan.remainder() == 0) {
             if (!this.isClientSide) {
-                WaterDisplacement.displaceFluids((Level) (Object) this, pos);
+                WaterDisplacement.applyDisplacements((Level) (Object) this, plan);
             }
         } else {
             cir.setReturnValue(false);
