@@ -22,6 +22,7 @@ public class WaterDisplacement {
         List<DisplacementEntry> entries = new ArrayList<>();
         FluidType type = null;
         MultiFluidValue.Entry fluid = null;
+
         for (MultiFluidValue.Entry fluidEntry : FluidUtil.getFluids(level, pos)) {
             if (type != null) throw new IllegalStateException();
             type = fluidEntry.fluidType();
@@ -29,22 +30,14 @@ public class WaterDisplacement {
         }
         int initialVolume = fluid.volume();
         List<Direction> viableDirections = createAndFillViableDirectionList(level, pos);
-        Direction biasDir = null;
-
         int remainder = initialVolume;
 
         while (remainder > 0 && !viableDirections.isEmpty()) {
-            Direction[] array =  PseudoRandom.getRandom3DDirectionArray();
-            for (int i = 0; i < 6; i++) {
-                Direction dire = array[i];
-                if (viableDirections.contains(dire)) {
-                    biasDir = dire;
-                    break;
-                }
-            }
+            Direction biasDir = PseudoRandom.getRandomElementFromList(viableDirections);
             Iterator<Direction> dirIterator = viableDirections.iterator();
             int theoreticalCut = remainder / viableDirections.size();
             int theoreticalCutBias = theoreticalCut + (initialVolume % viableDirections.size());
+            
             while (dirIterator.hasNext()) {
                 Direction dir = dirIterator.next();
                 int cut = dir == biasDir ? theoreticalCutBias : theoreticalCut;
