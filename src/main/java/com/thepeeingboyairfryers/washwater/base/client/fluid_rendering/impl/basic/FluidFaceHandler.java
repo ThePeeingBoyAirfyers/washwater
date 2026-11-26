@@ -103,10 +103,19 @@ public class FluidFaceHandler {
         MultiFluidValue fluid = fluids.ww€getFluidFor(state.getX(), state.getY(), state.getZ());
         selfHeight = fluid.getTotalVolume() / (float) WaterInfo.VOLUME_PER_BLOCK;
 
-        this.northWestHeight = calculateCornerHeight(fluids, Direction.NORTH, Direction.WEST);
-        this.northEastHeight = calculateCornerHeight(fluids, Direction.NORTH, Direction.EAST);
-        this.southWestHeight = calculateCornerHeight(fluids, Direction.SOUTH, Direction.WEST);
-        this.southEastHeight = calculateCornerHeight(fluids, Direction.SOUTH, Direction.EAST);
+        setCornerHeights(
+                calculateCornerHeight(fluids, Direction.NORTH, Direction.WEST),
+                calculateCornerHeight(fluids, Direction.NORTH, Direction.EAST),
+                calculateCornerHeight(fluids, Direction.SOUTH, Direction.WEST),
+                calculateCornerHeight(fluids, Direction.SOUTH, Direction.EAST)
+        );
+    }
+
+    public void setCornerHeights(float iNorthWestHeight, float iNorthEastHeight, float iSouthWestHeight, float iSouthEastHeight) {
+        this.northWestHeight = iNorthWestHeight;
+        this.northEastHeight = iNorthEastHeight;
+        this.southWestHeight = iSouthWestHeight;
+        this.southEastHeight = iSouthEastHeight;
     }
 
     private void setVertex(ModelQuad quad, int i, float x, float y, float z, float u, float v) {

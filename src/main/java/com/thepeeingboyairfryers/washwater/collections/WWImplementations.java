@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.thepeeingboyairfryers.washwater.WashWater;
 import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.WWFluidRendererFactory;
 import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.impl.basic.BasicFluidRendererFactory;
+import com.thepeeingboyairfryers.washwater.base.client.fluid_rendering.impl.basic.FullFluidRendererFactory;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickForeman;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.FixedWorkForeman;
@@ -37,8 +38,10 @@ public class WWImplementations {
         register(FluidSectionUpgradeStrategy.REGISTRY, DefaultFluidSectionUpgradeStrategy.class, "default", DefaultFluidSectionUpgradeStrategy.INSTANCE.codec(), DefaultFluidSectionUpgradeStrategy.INSTANCE.command());
         register(FluidSectionUpgradeStrategy.REGISTRY, DumbFluidSectionUpgradeStrategy.class, "dumb", DumbFluidSectionUpgradeStrategy.INSTANCE.codec(), DumbFluidSectionUpgradeStrategy.INSTANCE.command());
 
-        if (isClient)
-            register(WWFluidRendererFactory.REGISTRY, BasicFluidRendererFactory.class, "basid", BasicFluidRendererFactory.CODEC, BasicFluidRendererFactory.COMMAND);
+        if (isClient) {
+            register(WWFluidRendererFactory.REGISTRY, BasicFluidRendererFactory.class, "basic", BasicFluidRendererFactory.CODEC, BasicFluidRendererFactory.COMMAND);
+            register(WWFluidRendererFactory.REGISTRY, FullFluidRendererFactory.class, "full", FullFluidRendererFactory.CODEC, FullFluidRendererFactory.COMMAND);
+        }
 
         bus.addListener((RegisterEvent e) ->
                 entries.forEach((r, l) ->
