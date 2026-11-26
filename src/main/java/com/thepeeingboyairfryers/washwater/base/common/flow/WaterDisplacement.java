@@ -33,11 +33,11 @@ public class WaterDisplacement {
         int remainder = initialVolume;
 
         while (remainder > 0 && !viableDirections.isEmpty()) {
-            Direction biasDir = PseudoRandom.getRandomElementFromList(viableDirections);
+            Direction biasDir = PseudoRandom.getRandomElement(viableDirections);
             Iterator<Direction> dirIterator = viableDirections.iterator();
             int theoreticalCut = remainder / viableDirections.size();
             int theoreticalCutBias = theoreticalCut + (initialVolume % viableDirections.size());
-            
+
             while (dirIterator.hasNext()) {
                 Direction dir = dirIterator.next();
                 int cut = dir == biasDir ? theoreticalCutBias : theoreticalCut;

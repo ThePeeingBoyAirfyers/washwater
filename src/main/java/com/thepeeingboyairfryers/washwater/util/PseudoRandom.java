@@ -26,7 +26,7 @@ public class PseudoRandom {
         return RANDOMISED_DIRECTION_ARRAY_ARRAY[(FluidTicker.getCurrentTick() % 4)];
     }
 
-    public static <T> T getRandomElementFromList(List<T> list) {
+    public static <T> T getRandomElement(List<T> list) {
         return list.get(FluidTicker.getCurrentTick() % list.size());
     }
 }
