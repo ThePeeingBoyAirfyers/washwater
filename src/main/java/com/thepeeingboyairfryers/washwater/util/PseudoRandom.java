@@ -3,6 +3,8 @@ package com.thepeeingboyairfryers.washwater.util;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTicker;
 import net.minecraft.core.Direction;
 
+import java.util.List;
+
 public class PseudoRandom {
     private static final Direction[][] RANDOMISED_DIRECTION_ARRAY_ARRAY = new Direction[4][4];
 
@@ -22,5 +24,9 @@ public class PseudoRandom {
 
     public static Direction[] getRandomDirectionArray() {
         return RANDOMISED_DIRECTION_ARRAY_ARRAY[(FluidTicker.getCurrentTick() % 4)];
+    }
+
+    public static <T> T getRandomElement(List<T> list) {
+        return list.get(FluidTicker.getCurrentTick() % list.size());
     }
 }
