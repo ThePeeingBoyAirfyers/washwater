@@ -63,4 +63,10 @@ public interface FluidRegion extends BlockGetter {
     BlockState getBlockState(int x, int y, int z);
 
     void setState(int x, int y, int z, BlockState state);
+
+    /**
+     * @return true if the given block is being ticked or has been ticked
+     *  within the scope of the given fluidtick as a whole
+     */
+    boolean hasBeenTicked(int x, int y, int z);
 }

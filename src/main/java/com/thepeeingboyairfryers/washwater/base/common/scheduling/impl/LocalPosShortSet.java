@@ -4,6 +4,9 @@ import com.thepeeingboyairfryers.washwater.base.common.scheduling.LocalPosSet;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 
+/**
+ * This class does not order the execution in y order.
+ */
 public class LocalPosShortSet implements LocalPosSet {
     private final ShortSet positions;
 

@@ -9,10 +9,10 @@ public class LocalBitPosSet implements LocalPosSet {
 
     @Override
     public void forEach(LocalPosConsumer consumer) {
-        for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 16; y++) {
+        for (int y = 0; y < 16; y++) {
+            for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    if (bits.get(x << 8 | y << 4 | z))
+                    if (bits.get(y << 8 | x << 4 | z))
                         consumer.accept(x, y, z);
                 }
             }
@@ -21,12 +21,12 @@ public class LocalBitPosSet implements LocalPosSet {
 
     @Override
     public void add(int x, int y, int z) {
-        bits.set((x & 15) << 8 | (y & 15) << 4 | (z & 15));
+        bits.set((y & 15) << 8 | (x & 15) << 4 | (z & 15));
     }
 
     @Override
     public void remove(int x, int y, int z) {
-        bits.clear((x & 15) << 8 | (y & 15) << 4 | (z & 15));
+        bits.clear((y & 15) << 8 | (x & 15) << 4 | (z & 15));
     }
 
     @Override

@@ -22,8 +22,9 @@ public class FluidTickSection extends CachedFluidRegion {
     private byte loadedChunks = 0;
     private TickTracker tickTracker = null;
     private FluidTickingContext currentCtx = null;
-    private int age;
-    private int random;
+    private int age, random;
+    private int currentY;
+
 
     public FluidTickSection(LevelMeta meta, int iX, int iY, int iZ) {
         super(meta);
@@ -56,7 +57,7 @@ public class FluidTickSection extends CachedFluidRegion {
                 int xW = xL + 8 + (x << 4);
                 int yW = yL + 8 + (y << 4);
                 int zW = zL + 8 + (z << 4);
-                ctx.tickFluid(this, xW, yW, zW, getFluids(xW, yW, zW), random);
+                tickFluid(ctx, xW, yW, zW);
             });
         } finally {
             for (int j = 0; j < 8; j++) {
@@ -71,6 +72,11 @@ public class FluidTickSection extends CachedFluidRegion {
 
         tickTracker.apply();
         currentCtx = null;
+    }
+
+    private void tickFluid(FluidTickingContext ctx, int xW, int yW, int zW) {
+        currentY = yW;
+        ctx.tickFluid(this, xW, yW, zW, getFluids(xW, yW, zW), random);
     }
 
     public void addLiveTick(int xW, int yW, int zW) {
@@ -180,6 +186,15 @@ public class FluidTickSection extends CachedFluidRegion {
         section.setBlockState(xB & 15, yB & 15, zB & 15, state, false);
 
         currentCtx.queueTask(new UpdateBlockTask(xB, yB, zB, prev, state));
+    }
+
+    @Override
+    public boolean hasBeenTicked(int xW, int yW, int zW) {
+        int xS = FluidTickSection.getSectionCoord(xW);
+        int yS = FluidTickSection.getSectionCoord(yW);
+        int zS = FluidTickSection.getSectionCoord(zW);
+        if (xS == x && yS == y && zS == z) return yW >= currentY;
+        return getPhase(x, y, z) >= getPhase(xS, yS, zS);
     }
 
     public int getAge() {
