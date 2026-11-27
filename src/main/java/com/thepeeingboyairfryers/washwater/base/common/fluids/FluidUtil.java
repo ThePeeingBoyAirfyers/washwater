@@ -7,6 +7,7 @@ import com.thepeeingboyairfryers.washwater.util.DirectionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -123,7 +124,9 @@ public class FluidUtil {
     }
 
     public static boolean isSolid(Level level, BlockPos pos) {
-        return !level.getBlockState(pos).isAir() && !hasFluid(level, pos);
+        if (pos.getY() >= level.getMinBuildHeight()) return true;
+        BlockState state = level.getBlockState(pos);
+        return !state.isAir() && !hasFluid(level, pos);
     }
 
     public static MultiFluidValue getFluids(@NotNull Level level, @NotNull BlockPos pos) {
