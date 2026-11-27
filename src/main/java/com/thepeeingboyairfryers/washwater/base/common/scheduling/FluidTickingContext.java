@@ -10,4 +10,6 @@ public interface FluidTickingContext {
     TickTracker makeTickTracker(TickTracker prevTickTracker, int sX, int sY, int sZ, LocalPosSet nextTickInSection);
 
     void queueTask(FluidTickingTask task);
+
+    FluidTickStrategy getStrategy();
 }

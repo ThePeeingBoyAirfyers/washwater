@@ -12,6 +12,37 @@ import java.util.function.IntSupplier;
 import java.util.stream.IntStream;
 
 public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
+    Codec<MultiFluidValue> CODEC = Codec.INT_STREAM.xmap(
+            stream -> {
+                var array = stream.toArray();
+                return deserialize(new IntSupplier() {
+                    private int i = 0;
+
+                    @Override
+                    public int getAsInt() {
+                        return array[i++];
+                    }
+                }, (int) array.length);
+            },
+            f -> IntStream.of(serialize(f)));
+
+    StreamCodec<ByteBuf, MultiFluidValue> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public void encode(ByteBuf buffer, @NotNull MultiFluidValue value) {
+            int[] array = serialize(value);
+            buffer.writeInt(array.length);
+            for (int i : array) {
+                buffer.writeInt(i);
+            }
+        }
+
+        @Override
+        public @NotNull MultiFluidValue decode(ByteBuf buffer) {
+            int size = buffer.readInt();
+            return deserialize(buffer::readInt, size);
+        }
+    };
+
     static @NotNull MultiFluidValue single(@NotNull FluidType fluidType, short volume) {
         if (volume == 0) return EMPTY;
         return new SingleFluidValue(fluidType, volume);
@@ -49,9 +80,14 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
         }
 
         @Override
-        public @NotNull MultiFluidValue setFluid(FluidType type, short value) {
+        public @NotNull MultiFluidValue setFluid(@NotNull FluidType type, short value) {
             if (value == 0) return this;
             return single(type, value);
+        }
+
+        @Override
+        public @NotNull MultiFluidValue add(@NotNull MultiFluidValue fluid) {
+            return fluid;
         }
 
         @Override
@@ -71,38 +107,11 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
         throw new UnsupportedOperationException("Multi fluid values with more than one fluid are not supported yet");
     }
 
-    boolean isEmpty();    Codec<MultiFluidValue> CODEC = Codec.INT_STREAM.xmap(
-            stream -> {
-                var array = stream.toArray();
-                return deserialize(new IntSupplier() {
-                    private int i = 0;
-
-                    @Override
-                    public int getAsInt() {
-                        return array[i++];
-                    }
-                }, (int) array.length);
-            },
-            f -> IntStream.of(serialize(f)));
-
+    boolean isEmpty();
     int size();
-
-    short forFluid(@NotNull FluidType type);    StreamCodec<ByteBuf, MultiFluidValue> STREAM_CODEC = new StreamCodec<>() {
-        @Override
-        public void encode(ByteBuf buffer, @NotNull MultiFluidValue value) {
-            int[] array = serialize(value);
-            buffer.writeInt(array.length);
-            for (int i : array) {
-                buffer.writeInt(i);
-            }
-        }
-
-        @Override
-        public @NotNull MultiFluidValue decode(ByteBuf buffer) {
-            int size = buffer.readInt();
-            return deserialize(buffer::readInt, size);
-        }
-    };
+    short forFluid(@NotNull FluidType type);
+    @NotNull MultiFluidValue setFluid(@NotNull FluidType type, short value);
+    @NotNull MultiFluidValue add(@NotNull MultiFluidValue fluid);
 
     default short getTotalVolume() {
         short result = 0;
@@ -112,16 +121,6 @@ public interface MultiFluidValue extends Iterable<MultiFluidValue.Entry> {
         return result;
     }
 
-    @NotNull MultiFluidValue setFluid(FluidType type, short value);
-
     record Entry(short volume, FluidType fluidType) {
     }
-
-
-
-
-
-
-
-
 }

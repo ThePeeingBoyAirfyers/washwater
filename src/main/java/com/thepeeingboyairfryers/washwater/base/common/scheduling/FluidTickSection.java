@@ -3,7 +3,9 @@ package com.thepeeingboyairfryers.washwater.base.common.scheduling;
 import com.thepeeingboyairfryers.washwater.base.common.LevelMeta;
 import com.thepeeingboyairfryers.washwater.base.common.flow.CachedFluidRegion;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.LocalBitPosSet;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.TickSectionStrategy;
 import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.UpdateBlockTask;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.impl.WaterfallFix;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSection;
 import com.thepeeingboyairfryers.washwater.base.common.storage.FluidSectionManager;
 import com.thepeeingboyairfryers.washwater.util.SwapPair;
@@ -22,6 +24,7 @@ public class FluidTickSection extends CachedFluidRegion {
     private byte loadedChunks = 0;
     private TickTracker tickTracker = null;
     private FluidTickingContext currentCtx = null;
+    private WaterfallFix waterfallFix = null;
     private int age, random;
     private int currentY;
 
@@ -57,7 +60,7 @@ public class FluidTickSection extends CachedFluidRegion {
                 int xW = xL + 8 + (x << 4);
                 int yW = yL + 8 + (y << 4);
                 int zW = zL + 8 + (z << 4);
-                tickFluid(ctx, xW, yW, zW);
+                tickFluid(xW, yW, zW);
             });
         } finally {
             for (int j = 0; j < 8; j++) {
@@ -70,13 +73,27 @@ public class FluidTickSection extends CachedFluidRegion {
         liveTicks.swap();
         liveTicks.getOther().clear();
 
+        if (waterfallFix != null) {
+            waterfallFix.apply();
+            waterfallFix = null;
+        }
+
         tickTracker.apply();
         currentCtx = null;
     }
 
-    private void tickFluid(FluidTickingContext ctx, int xW, int yW, int zW) {
+    private void tickFluid(int xW, int yW, int zW) {
         currentY = yW;
-        ctx.tickFluid(this, xW, yW, zW, getFluids(xW, yW, zW), random);
+        currentCtx.tickFluid(this, xW, yW, zW, getFluids(xW, yW, zW), random);
+    }
+
+    public WaterfallFix getWaterfallFix() {
+        FluidTickSection below = ((TickSectionStrategy) currentCtx.getStrategy()).getTickSection(x, y - 1, z);
+
+        if (below.waterfallFix == null)
+            below.waterfallFix = new WaterfallFix(below);
+
+        return below.waterfallFix;
     }
 
     public void addLiveTick(int xW, int yW, int zW) {
@@ -150,12 +167,12 @@ public class FluidTickSection extends CachedFluidRegion {
     }
 
     @Override
-    protected void toBeTicked(int xW, int yW, int zW) {
+    public void toBeTicked(int xW, int yW, int zW) {
         tickTracker.toBeTicked(xW, yW, zW);
     }
 
     @Override
-    protected void toBeUnticked(int xW, int yW, int zW) {
+    public void toBeUnticked(int xW, int yW, int zW) {
         tickTracker.toBeUnticked(xW, yW, zW);
     }
 
@@ -193,7 +210,7 @@ public class FluidTickSection extends CachedFluidRegion {
         int xS = FluidTickSection.getSectionCoord(xW);
         int yS = FluidTickSection.getSectionCoord(yW);
         int zS = FluidTickSection.getSectionCoord(zW);
-        if (xS == x && yS == y && zS == z) return yW >= currentY;
+        if (xS == x && yS == y && zS == z) return yW <= currentY;
         return getPhase(x, y, z) >= getPhase(xS, yS, zS);
     }
 

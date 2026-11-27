@@ -46,16 +46,28 @@ public class SingleFluidValue implements MultiFluidValue {
     }
 
     @Override
-    public @NotNull MultiFluidValue setFluid(FluidType type, short value) {
+    public @NotNull MultiFluidValue setFluid(@NotNull FluidType type, short value) {
         if (entry.fluidType().equals(type)) {
             return new SingleFluidValue(type, value);
         }
 
-        return this; //TODO multifluids
+        //TODO multifluids
+        throw new UnsupportedOperationException();
     }
 
     public short getVolume() {
         return entry.volume();
+    }
+
+    @Override
+    public @NotNull MultiFluidValue add(@NotNull MultiFluidValue fluid) {
+        if (fluid instanceof SingleFluidValue s) {
+            if (s.getFluidType().equals(getFluidType()))
+                return new SingleFluidValue(getFluidType(), (short) (s.getVolume() + getVolume()));
+        }
+
+        //TODO multifluids
+        throw new UnsupportedOperationException();
     }
 
     @Override

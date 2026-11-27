@@ -2,6 +2,7 @@ package com.thepeeingboyairfryers.washwater.base.common.flow;
 
 import com.thepeeingboyairfryers.washwater.base.common.WaterInfo;
 import com.thepeeingboyairfryers.washwater.base.common.fluids.MultiFluidValue;
+import com.thepeeingboyairfryers.washwater.base.common.scheduling.FluidTickSection;
 import com.thepeeingboyairfryers.washwater.util.PseudoRandom;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,10 +45,18 @@ public class FluidFlow {
             if (handleOtherFluid(selfPos.getX(), underY, selfPos.getZ()))
                 return;
 
+            equalizeWater(volume, true);
+
             //Flow down
             var transaction = Math.min(volume, WaterInfo.VOLUME_PER_BLOCK - underVolume);
             region.setVolume(selfPos, fluid(volume - transaction));
-            region.setVolume(selfPos.getX(), underY, selfPos.getZ(), fluid(underVolume + transaction));
+
+            if (!region.hasBeenTicked(selfPos.getX(), underY, selfPos.getZ())) {
+                ((FluidTickSection) region).getWaterfallFix().addLate(region, selfPos.getX(), underY, selfPos.getZ(), fluid(transaction));
+            } else {
+                region.setVolume(selfPos.getX(), underY, selfPos.getZ(), fluid(underVolume + transaction));
+            }
+
             volume -= transaction;
             //if (volume > 0) {
             //Flow downwards sideways
@@ -55,11 +64,11 @@ public class FluidFlow {
             //}
         } else {
             //Flow sideways
-            equalizeWater(volume);
+            equalizeWater(volume, false);
         }
     }
 
-    public void equalizeWater(int volume) {
+    private void equalizeWater(int volume, boolean inwardOnly) {
         if (volume < WaterInfo.SURFACE_TENSION_LIMIT) return;
         int newVolume = volume;
 
@@ -73,7 +82,7 @@ public class FluidFlow {
             if (handleOtherFluid(x, y, z)) continue;
 
             int transfer = (newVolume - otherVolume) / WaterInfo.FLOW_DIVIDER;
-            if (transfer > 2 || transfer < -2) {
+            if ((transfer > 2 && !inwardOnly) || transfer < -2) {
                 newVolume -= transfer;
                 region.setVolume(x, y, z, fluid(otherVolume + transfer));
             }
